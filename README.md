@@ -1,4 +1,4 @@
-# AstroMatch Pro (v2.1.0)
+# AstroMatch Pro (v2.2.0)
 
 Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
 
@@ -7,6 +7,19 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 ---
 
 ## Key Features
+
+- **Multi-Language Architecture (Hebrew & English)**:
+  - Built-in bilingual support with instant language switching (`🌐 עברית / English`).
+  - Automatic RTL (Right-to-Left) and LTR layout adaptation.
+  - Centralized dictionary in `static/translations.js` exporting `TRANSLATIONS` for both ES modules and browser scripts.
+  - Complete coverage: UI forms, badges, modals, tooltips, astrological terms, and compatibility verdicts.
+  - User preference persisted across visits in `localStorage`.
+
+- **Version Tracking & Metadata Display**:
+  - Global `APP_VERSION = "2.2.0"` in `app.py`.
+  - All saved analyses in `saved_analyses.json` are stamped with the version number used (`"version": "2.2.0"`).
+  - Saved analysis cards display a version badge (e.g. `v2.2.0`).
+  - Persistent application footer displayed below the program on all screens.
 
 - **Curated World Cities & Verification**:
   - Pre-verified catalog of 120+ global cities across all continents with exact latitudes, longitudes, and default UTC offsets.
@@ -93,12 +106,14 @@ astroDating/
 │   ├── launch.json                    # Flask debug launch config
 │   ├── settings.json                  # Python interpreter binding
 │   └── tasks.json                     # Task runner configuration
+├── static/
+│   └── translations.js                # Bilingual translation engine (HE/EN) & RTL controller
 ├── templates/
 │   ├── index.html                     # Celestial form, city search & saved analyses manager
 │   └── result.html                    # SVG Astrological Map & aspect matrix
 ├── .gitignore                         # Git ignore configuration
-├── app.py                             # Core Flask backend & celestial math engine
-├── CHANGELOG.md                       # Semantic version history (v2.1.0)
+├── app.py                             # Core Flask backend & celestial math engine (v2.2.0)
+├── CHANGELOG.md                       # Semantic version history (v2.2.0)
 ├── cities.json                        # Curated database of world cities & coordinates
 ├── de421.bsp                          # NASA JPL planetary ephemeris (~16 MB)
 ├── environment.yml                    # Conda environment specification

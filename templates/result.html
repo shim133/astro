@@ -226,27 +226,66 @@
             border-color: var(--gold);
             color: #fff;
         }
+
+        /* RTL Directional Styles */
+        [dir="rtl"] {
+            text-align: right;
+        }
+        [dir="rtl"] .cinzel {
+            letter-spacing: 0;
+        }
+        [dir="rtl"] .aspect-item-card {
+            border-left: none !important;
+            border-right: 4px solid #64748b !important;
+        }
+        [dir="rtl"] .aspect-item-card.Conjunction { border-right-color: var(--gold) !important; }
+        [dir="rtl"] .aspect-item-card.Trine { border-right-color: var(--emerald) !important; }
+        [dir="rtl"] .aspect-item-card.Sextile { border-right-color: var(--cyan) !important; }
+        [dir="rtl"] .aspect-item-card.Square { border-right-color: var(--crimson) !important; }
+        [dir="rtl"] .aspect-item-card.Opposition { border-right-color: #f43f5e !important; }
     </style>
+
+    <!-- Multi-Language Translation System -->
+    <script type="module">
+        import { TRANSLATIONS, applyLanguage, toggleLanguage, getCurrentLang, t, tPlanet, tZodiac, tElement, tAspect, tAspectMeaning, tVerdict } from '/static/translations.js';
+        window.TRANSLATIONS = TRANSLATIONS;
+        window.applyLanguage = applyLanguage;
+        window.toggleLanguage = toggleLanguage;
+        window.getCurrentLang = getCurrentLang;
+        window.t = t;
+        window.tPlanet = tPlanet;
+        window.tZodiac = tZodiac;
+        window.tElement = tElement;
+        window.tAspect = tAspect;
+        window.tAspectMeaning = tAspectMeaning;
+        window.tVerdict = tVerdict;
+        window.APP_VERSION = "{{ app_version }}";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(getCurrentLang());
+        });
+    </script>
 </head>
 <body class="py-4">
     <div class="container-fluid px-lg-5">
         
         <!-- Header & Nav -->
-        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 flex-wrap gap-2">
             <div>
-                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill mb-1">← New Calculation</a>
+                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill mb-1" data-i18n="newCalc">← New Calculation</a>
                 <h1 class="cinzel h3 text-white mb-0">
                     <span style="color: var(--p1-color)">{{ p1.name }}</span> 
                     <span class="text-secondary">&amp;</span> 
                     <span style="color: var(--p2-color)">{{ p2.name }}</span>
                 </h1>
-                <small class="text-muted">High-Precision Geocentric Synastry Analysis</small>
+                <small class="text-muted" data-i18n="reportSubtitle">High-Precision Geocentric Synastry Analysis</small>
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-export" id="btnSaveAnalysis" onclick="saveCurrentAnalysis()">💾 Save to My Analyses</button>
-                <button type="button" class="btn btn-export" onclick="exportSvg()">⬇️ Export SVG Map</button>
-                <button type="button" class="btn btn-export" onclick="exportPng()">🖼️ Export PNG Map</button>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" id="langToggleBtn" class="btn btn-export" onclick="toggleLanguage()">🌐 עברית (HE)</button>
+                <button type="button" class="btn btn-export" id="btnSaveAnalysis" onclick="saveCurrentAnalysis()" data-i18n="saveToMyAnalyses">💾 Save to My Analyses</button>
+                <button type="button" class="btn btn-export" onclick="exportSvg()" data-i18n="exportSvg">⬇️ Export SVG Map</button>
+                <button type="button" class="btn btn-export" onclick="exportPng()" data-i18n="exportPng">🖼️ Export PNG Map</button>
             </div>
         </div>
 
@@ -258,8 +297,8 @@
                 <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="cinzel text-uppercase tracking-wider text-warning" style="font-size: 0.85rem;">Synastry Index</span>
-                            <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1" style="font-size: 0.78rem;">{{ synastry.aspects|length }} Aspects</span>
+                            <span class="cinzel text-uppercase tracking-wider text-warning" style="font-size: 0.85rem;" data-i18n="synastryIndex">Synastry Index</span>
+                            <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1" style="font-size: 0.78rem;">{{ synastry.aspects|length }} <span data-i18n="aspectsCount">Aspects</span></span>
                         </div>
 
                         <div class="d-flex align-items-center gap-4 mb-4">
@@ -270,20 +309,20 @@
                                 </div>
                             </div>
                             <div>
-                                <h4 class="h5 mb-1 text-white">Compatibility Rating</h4>
+                                <h4 class="h5 mb-1 text-white" data-i18n="compatRating">Compatibility Rating</h4>
                                 <div class="text-secondary" style="font-size: 0.85rem;">
                                     {% if synastry.overall_score >= 80 %}
-                                        ✨ Soulmate Potential
+                                        <span data-i18n="soulmatePotential">✨ Soulmate Potential</span>
                                     {% elif synastry.overall_score >= 65 %}
-                                        💫 Harmonious Resonance
+                                        <span data-i18n="harmoniousResonance">💫 Harmonious Resonance</span>
                                     {% else %}
-                                        ⚡ Dynamic Growth Catalyst
+                                        <span data-i18n="dynamicGrowth">⚡ Dynamic Growth Catalyst</span>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
 
-                        <p class="text-secondary mb-3" style="font-size: 0.88rem; line-height: 1.55;">
+                        <p id="synastryVerdictText" class="text-secondary mb-3" data-verdict-key="{{ synastry.verdict_key }}" data-default-verdict="{{ synastry.verdict }}" style="font-size: 0.88rem; line-height: 1.55;">
                             {{ synastry.verdict }}
                         </p>
                     </div>
@@ -292,7 +331,7 @@
                     <div class="pt-2 border-top border-secondary border-opacity-25">
                         <div class="mb-2">
                             <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
-                                <span>🔥 Romantic Chemistry</span>
+                                <span data-i18n="romanticChemistry">🔥 Romantic Chemistry</span>
                                 <span class="text-white">{{ synastry.chemistry_score }}%</span>
                             </div>
                             <div class="metric-bar-wrap">
@@ -302,7 +341,7 @@
 
                         <div class="mb-2">
                             <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
-                                <span>🌊 Emotional Safety</span>
+                                <span data-i18n="emotionalSafety">🌊 Emotional Safety</span>
                                 <span class="text-white">{{ synastry.emotional_score }}%</span>
                             </div>
                             <div class="metric-bar-wrap">
@@ -312,7 +351,7 @@
 
                         <div class="mb-2">
                             <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
-                                <span>⚡ Mental Rapport</span>
+                                <span data-i18n="mentalRapport">⚡ Mental Rapport</span>
                                 <span class="text-white">{{ synastry.intellectual_score }}%</span>
                             </div>
                             <div class="metric-bar-wrap">
@@ -322,7 +361,7 @@
 
                         <div>
                             <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
-                                <span>🏛️ Long-Term Stability</span>
+                                <span data-i18n="stabilityScore">🏛️ Long-Term Stability</span>
                                 <span class="text-white">{{ synastry.stability_score }}%</span>
                             </div>
                             <div class="metric-bar-wrap">
@@ -344,40 +383,40 @@
                                     <h3 class="h5 cinzel mb-0" style="color: var(--p1-color);">{{ p1.name }}</h3>
                                     <small class="text-muted">{{ p1.city }} ({{ p1.date }})</small>
                                 </div>
-                                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--p1-color); border: 1px solid rgba(56, 189, 248, 0.3);">Inner Wheel</span>
+                                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--p1-color); border: 1px solid rgba(56, 189, 248, 0.3);" data-i18n="innerWheel">Inner Wheel</span>
                             </div>
 
                             <div class="d-flex flex-column gap-2 mt-3">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong class="text-warning">☉ Sun:</strong></span>
-                                    <span class="fw-semibold">{{ p1.planets_dict['Sun'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Sun'].sign }}" data-symbol="{{ p1.planets_dict['Sun'].symbol }}" data-deg="{{ p1.planets_dict['Sun'].sign_deg }}" data-min="{{ p1.planets_dict['Sun'].sign_min }}" data-formatted="{{ p1.planets_dict['Sun'].formatted }}">{{ p1.planets_dict['Sun'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #cbd5e1;">☽ Moon:</strong></span>
-                                    <span class="fw-semibold">{{ p1.planets_dict['Moon'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Moon'].sign }}" data-symbol="{{ p1.planets_dict['Moon'].symbol }}" data-deg="{{ p1.planets_dict['Moon'].sign_deg }}" data-min="{{ p1.planets_dict['Moon'].sign_min }}" data-formatted="{{ p1.planets_dict['Moon'].formatted }}">{{ p1.planets_dict['Moon'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #ec4899;">ASC Rising:</strong></span>
-                                    <span class="fw-semibold">{{ p1.asc_point.formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.asc_point.sign }}" data-symbol="{{ p1.asc_point.symbol }}" data-deg="{{ p1.asc_point.sign_deg }}" data-min="{{ p1.asc_point.sign_min }}" data-formatted="{{ p1.asc_point.formatted }}">{{ p1.asc_point.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #f472b6;">♀ Venus:</strong></span>
-                                    <span class="fw-semibold">{{ p1.planets_dict['Venus'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Venus'].sign }}" data-symbol="{{ p1.planets_dict['Venus'].symbol }}" data-deg="{{ p1.planets_dict['Venus'].sign_deg }}" data-min="{{ p1.planets_dict['Venus'].sign_min }}" data-formatted="{{ p1.planets_dict['Venus'].formatted }}">{{ p1.planets_dict['Venus'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #ef4444;">♂ Mars:</strong></span>
-                                    <span class="fw-semibold">{{ p1.planets_dict['Mars'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ef4444;">♂ <span data-i18n="planetMars">Mars</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Mars'].sign }}" data-symbol="{{ p1.planets_dict['Mars'].symbol }}" data-deg="{{ p1.planets_dict['Mars'].sign_deg }}" data-min="{{ p1.planets_dict['Mars'].sign_min }}" data-formatted="{{ p1.planets_dict['Mars'].formatted }}">{{ p1.planets_dict['Mars'].formatted }}</span>
                                 </div>
                             </div>
 
                             <!-- Location Resolution Details -->
                             <div class="mt-3 pt-2 border-top border-secondary border-opacity-25" style="font-size: 0.76rem;">
                                 <div class="text-truncate text-light text-opacity-75 mb-1" title="{{ p1.location_address }}">
-                                    📍 <strong>Resolved:</strong> {{ p1.location_address }}
+                                    📍 <strong data-i18n="resolvedLabel">Resolved:</strong> {{ p1.location_address }}
                                 </div>
                                 <div class="text-secondary d-flex justify-content-between">
-                                    <span>Coord: {{ p1.lat }}°, {{ p1.lon }}°</span>
-                                    <span class="badge bg-secondary bg-opacity-25 text-info">{{ p1.location_source }}</span>
+                                    <span><span data-i18n="coordLabel">Coord</span>: {{ p1.lat }}°, {{ p1.lon }}°</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-info location-source-badge" data-source="{{ p1.location_source }}">{{ p1.location_source }}</span>
                                 </div>
                             </div>
                         </div>
@@ -391,40 +430,40 @@
                                     <h3 class="h5 cinzel mb-0" style="color: var(--p2-color);">{{ p2.name }}</h3>
                                     <small class="text-muted">{{ p2.city }} ({{ p2.date }})</small>
                                 </div>
-                                <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);">Outer Wheel</span>
+                                <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);" data-i18n="outerWheel">Outer Wheel</span>
                             </div>
 
                             <div class="d-flex flex-column gap-2 mt-3">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong class="text-warning">☉ Sun:</strong></span>
-                                    <span class="fw-semibold">{{ p2.planets_dict['Sun'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Sun'].sign }}" data-symbol="{{ p2.planets_dict['Sun'].symbol }}" data-deg="{{ p2.planets_dict['Sun'].sign_deg }}" data-min="{{ p2.planets_dict['Sun'].sign_min }}" data-formatted="{{ p2.planets_dict['Sun'].formatted }}">{{ p2.planets_dict['Sun'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #cbd5e1;">☽ Moon:</strong></span>
-                                    <span class="fw-semibold">{{ p2.planets_dict['Moon'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Moon'].sign }}" data-symbol="{{ p2.planets_dict['Moon'].symbol }}" data-deg="{{ p2.planets_dict['Moon'].sign_deg }}" data-min="{{ p2.planets_dict['Moon'].sign_min }}" data-formatted="{{ p2.planets_dict['Moon'].formatted }}">{{ p2.planets_dict['Moon'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #ec4899;">ASC Rising:</strong></span>
-                                    <span class="fw-semibold">{{ p2.asc_point.formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.asc_point.sign }}" data-symbol="{{ p2.asc_point.symbol }}" data-deg="{{ p2.asc_point.sign_deg }}" data-min="{{ p2.asc_point.sign_min }}" data-formatted="{{ p2.asc_point.formatted }}">{{ p2.asc_point.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #f472b6;">♀ Venus:</strong></span>
-                                    <span class="fw-semibold">{{ p2.planets_dict['Venus'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Venus'].sign }}" data-symbol="{{ p2.planets_dict['Venus'].symbol }}" data-deg="{{ p2.planets_dict['Venus'].sign_deg }}" data-min="{{ p2.planets_dict['Venus'].sign_min }}" data-formatted="{{ p2.planets_dict['Venus'].formatted }}">{{ p2.planets_dict['Venus'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary"><strong style="color: #ef4444;">♂ Mars:</strong></span>
-                                    <span class="fw-semibold">{{ p2.planets_dict['Mars'].formatted }}</span>
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ef4444;">♂ <span data-i18n="planetMars">Mars</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Mars'].sign }}" data-symbol="{{ p2.planets_dict['Mars'].symbol }}" data-deg="{{ p2.planets_dict['Mars'].sign_deg }}" data-min="{{ p2.planets_dict['Mars'].sign_min }}" data-formatted="{{ p2.planets_dict['Mars'].formatted }}">{{ p2.planets_dict['Mars'].formatted }}</span>
                                 </div>
                             </div>
 
                             <!-- Location Resolution Details -->
                             <div class="mt-3 pt-2 border-top border-secondary border-opacity-25" style="font-size: 0.76rem;">
                                 <div class="text-truncate text-light text-opacity-75 mb-1" title="{{ p2.location_address }}">
-                                    📍 <strong>Resolved:</strong> {{ p2.location_address }}
+                                    📍 <strong data-i18n="resolvedLabel">Resolved:</strong> {{ p2.location_address }}
                                 </div>
                                 <div class="text-secondary d-flex justify-content-between">
-                                    <span>Coord: {{ p2.lat }}°, {{ p2.lon }}°</span>
-                                    <span class="badge bg-secondary bg-opacity-25 text-info">{{ p2.location_source }}</span>
+                                    <span><span data-i18n="coordLabel">Coord</span>: {{ p2.lat }}°, {{ p2.lon }}°</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-info location-source-badge" data-source="{{ p2.location_source }}">{{ p2.location_source }}</span>
                                 </div>
                             </div>
                         </div>
@@ -439,23 +478,23 @@
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs mb-4 justify-content-center" id="mapTabs">
                 <li class="nav-item">
-                    <button class="nav-link active" onclick="switchMapMode('synastry')">
+                    <button class="nav-link active" onclick="switchMapMode('synastry')" data-i18n="tabBiWheel">
                         🔮 Synastry Bi-Wheel
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="switchMapMode('natal1')">
+                    <button class="nav-link tab-natal-btn" data-partner="p1" data-name="{{ p1.name }}" onclick="switchMapMode('natal1')">
                         🪐 {{ p1.name }}'s Natal Map
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="switchMapMode('natal2')">
+                    <button class="nav-link tab-natal-btn" data-partner="p2" data-name="{{ p2.name }}" onclick="switchMapMode('natal2')">
                         🌙 {{ p2.name }}'s Natal Map
                     </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" onclick="scrollToAspects()">
-                        📜 Aspect Catalog ({{ synastry.aspects|length }})
+                        📜 <span data-i18n="tabAspects">Aspect Catalog</span> ({{ synastry.aspects|length }})
                     </button>
                 </li>
             </ul>
@@ -463,18 +502,18 @@
             <!-- Map Controls & Filter Legend -->
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 px-3">
                 <div class="d-flex align-items-center gap-3">
-                    <span class="text-secondary small">Wheel Mode:</span>
+                    <span class="text-secondary small" data-i18n="wheelControls">Wheel Mode:</span>
                     <span id="currentModeLabel" class="badge bg-secondary bg-opacity-25 text-warning font-monospace">Synastry Bi-Wheel</span>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <span class="text-secondary small me-1">Aspect Filters:</span>
-                    <button class="filter-btn active" id="btn-all" onclick="filterAspects('all')">All</button>
-                    <button class="filter-btn" id="btn-trine" onclick="filterAspects('Trine')">🟢 Trines (120°)</button>
-                    <button class="filter-btn" id="btn-sextile" onclick="filterAspects('Sextile')">🔵 Sextiles (60°)</button>
-                    <button class="filter-btn" id="btn-conjunction" onclick="filterAspects('Conjunction')">🟡 Conjunctions (0°)</button>
-                    <button class="filter-btn" id="btn-square" onclick="filterAspects('Square')">🔴 Squares (90°)</button>
-                    <button class="filter-btn" id="btn-opposition" onclick="filterAspects('Opposition')">🟣 Oppositions (180°)</button>
+                    <span class="text-secondary small me-1" data-i18n="aspectFilters">Aspect Filters:</span>
+                    <button class="filter-btn active" id="btn-all" onclick="filterAspects('all')" data-i18n="filterAll">All</button>
+                    <button class="filter-btn" id="btn-trine" onclick="filterAspects('Trine')" data-i18n="filterTrine">🟢 Trines (120°)</button>
+                    <button class="filter-btn" id="btn-sextile" onclick="filterAspects('Sextile')" data-i18n="filterSextile">🔵 Sextiles (60°)</button>
+                    <button class="filter-btn" id="btn-conjunction" onclick="filterAspects('Conjunction')" data-i18n="filterConjunction">🟡 Conjunctions (0°)</button>
+                    <button class="filter-btn" id="btn-square" onclick="filterAspects('Square')" data-i18n="filterSquare">🔴 Squares (90°)</button>
+                    <button class="filter-btn" id="btn-opposition" onclick="filterAspects('Opposition')" data-i18n="filterOpposition">🟣 Oppositions (180°)</button>
                 </div>
             </div>
 
@@ -505,7 +544,7 @@
                 </svg>
             </div>
             
-            <div class="text-center mt-3 text-secondary" style="font-size: 0.8rem;">
+            <div class="text-center mt-3 text-secondary" style="font-size: 0.8rem;" data-i18n="chartHint">
                 💡 <em>Hover over any planet glyph or aspect line to view exact degrees, house placements, and astrological interpretations.</em>
             </div>
         </div>
@@ -514,14 +553,14 @@
         <div class="glass-card p-4" id="aspectsCatalogSection">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
                 <div>
-                    <h3 class="cinzel h4 text-white mb-1">Synastry Aspect Matrix &amp; Interpretations</h3>
-                    <p class="text-secondary small mb-0">Detailed geometric angular relationships between {{ p1.name }} and {{ p2.name }}'s charts</p>
+                    <h3 class="cinzel h4 text-white mb-1" data-i18n="tabAspects">Synastry Aspect Matrix &amp; Interpretations</h3>
+                    <p class="text-secondary small mb-0" data-i18n="aspectSubtitle">Detailed geometric angular relationships between charts</p>
                 </div>
 
                 <div class="d-flex gap-2 mt-2 mt-md-0">
-                    <button class="filter-btn active" onclick="filterCardList('all')">Show All</button>
-                    <button class="filter-btn" onclick="filterCardList('harmonious')">Harmonious</button>
-                    <button class="filter-btn" onclick="filterCardList('challenging')">Dynamic / Friction</button>
+                    <button class="filter-btn active" onclick="filterCardList('all')" data-i18n="filterAll">Show All</button>
+                    <button class="filter-btn" onclick="filterCardList('harmonious')" data-i18n="filterHarmonious">Harmonious</button>
+                    <button class="filter-btn" onclick="filterCardList('challenging')" data-i18n="filterChallenging">Dynamic / Friction</button>
                 </div>
             </div>
 
@@ -531,24 +570,34 @@
                     <div class="aspect-item-card {{ item.aspect }} h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2 aspect-pair-header" 
+                                     data-p1-name="{{ p1.name }}" data-p1-planet="{{ item.p1_planet }}" data-p1-sym="{{ item.p1_symbol }}"
+                                     data-p2-name="{{ p2.name }}" data-p2-planet="{{ item.p2_planet }}" data-p2-sym="{{ item.p2_symbol }}">
                                     <span class="fw-bold" style="color: var(--p1-color)">{{ p1.name }}'s {{ item.p1_symbol }} {{ item.p1_planet }}</span>
                                     <span class="text-secondary">✕</span>
                                     <span class="fw-bold" style="color: var(--p2-color)">{{ p2.name }}'s {{ item.p2_symbol }} {{ item.p2_planet }}</span>
                                 </div>
-                                <span class="badge" style="background: rgba(255,255,255,0.08); color: {{ item.color }}; border: 1px solid {{ item.color }}66;">
+                                <span class="badge aspect-badge-name" data-aspect="{{ item.aspect }}" data-angle="{{ item.angle }}" style="background: rgba(255,255,255,0.08); color: {{ item.color }}; border: 1px solid {{ item.color }}66;">
                                     {{ item.aspect }} ({{ item.angle }}°)
                                 </span>
                             </div>
 
-                            <p class="text-light text-opacity-90 mb-2" style="font-size: 0.88rem; line-height: 1.5;">
+                            <p class="text-light text-opacity-90 mb-2 aspect-meaning-text" 
+                               data-aspect-key="{{ item.aspect_key }}" 
+                               data-p1-planet="{{ item.p1_planet }}" 
+                               data-p2-planet="{{ item.p2_planet }}" 
+                               data-aspect="{{ item.aspect }}" 
+                               data-default-meaning="{{ item.meaning }}" 
+                               style="font-size: 0.88rem; line-height: 1.5;">
                                 {{ item.meaning }}
                             </p>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-10 text-muted" style="font-size: 0.75rem;">
-                            <span>Orb: <strong class="text-white">{{ item.orb }}°</strong> (Tightness: {{ (item.tightness * 100)|round }}%)</span>
-                            <span>
+                            <span class="aspect-orb-text" data-orb="{{ item.orb }}" data-tightness="{{ (item.tightness * 100)|round }}">
+                                Orb: <strong class="text-white">{{ item.orb }}°</strong> (Tightness: {{ (item.tightness * 100)|round }}%)
+                            </span>
+                            <span class="aspect-nature-tag" data-nature="{{ item.nature }}">
                                 {% if item.nature == 'harmonious' %}
                                     <span class="text-success">● Harmonious Flow</span>
                                 {% else %}
@@ -563,6 +612,21 @@
         </div>
 
     </div>
+
+    <!-- Application Footer Displaying Version -->
+    <footer class="text-center py-4 mt-5 border-top border-secondary border-opacity-25 text-muted small">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <div data-i18n="footerProgram" data-version="{{ app_version }}">
+                    AstroMatch Pro · Version {{ app_version }} · Pure NASA Ephemeris Engine · Built with Skyfield &amp; Python
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-secondary bg-opacity-25 text-warning px-2 py-1 font-monospace">App v{{ app_version }}</span>
+                    <span class="text-secondary" id="footerEphemerisText" data-i18n="ephemerisFooter">Ephemeris: NASA DE421 (J2000)</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!-- Inject Backend Payload for Dynamic SVG -->
     <script id="astroData" type="application/json">
@@ -858,12 +922,22 @@
 
                 // Hover events
                 g.addEventListener('mouseenter', (e) => {
+                    const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                    const pNameTranslated = window.tPlanet ? window.tPlanet(p.name) : p.name;
+                    const signTranslated = window.tZodiac ? window.tZodiac(p.sign) : p.sign;
+                    const elemTranslated = window.tElement ? window.tElement(p.sign_element) : p.sign_element;
+                    const headerHtml = isHe 
+                        ? `${p.symbol} ${pNameTranslated} של ${personName}`
+                        : `${personName}: ${p.symbol} ${pNameTranslated}`;
+                    const houseText = isHe 
+                        ? `בית: <strong>${p.house}</strong> | יסוד: <strong style="color:${p.sign_color}">${elemTranslated}</strong>`
+                        : `House: <strong>${p.house}</strong> | Element: <strong style="color:${p.sign_color}">${p.sign_element}</strong>`;
                     showTooltip(e, `
                         <div class="fw-bold" style="color: ${ringColor}">
-                            ${personName}: ${p.symbol} ${p.name}
+                            ${headerHtml}
                         </div>
-                        <div class="text-warning small mb-1">${p.formatted}</div>
-                        <div class="text-secondary small">House: <strong>${p.house}</strong> | Element: <strong style="color:${p.sign_color}">${p.sign}</strong></div>
+                        <div class="text-warning small mb-1">${p.sign_deg}° ${signTranslated}</div>
+                        <div class="text-secondary small">${houseText}</div>
                     `);
                     highlightPlanetAspects(p.name, groupTag);
                 });
@@ -911,17 +985,25 @@
                     line.setAttribute('data-p2', asp.p2_planet);
 
                     line.addEventListener('mouseenter', (e) => {
+                        const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                        const aspName = window.tAspect ? window.tAspect(asp.aspect) : asp.aspect;
+                        const p1Name = window.tPlanet ? window.tPlanet(asp.p1_planet) : asp.p1_planet;
+                        const p2Name = window.tPlanet ? window.tPlanet(asp.p2_planet) : asp.p2_planet;
+                        const meaningText = window.tAspectMeaning ? window.tAspectMeaning(asp) : asp.meaning;
+                        const pairLabel = isHe
+                            ? `<strong style="color: var(--p1-color)">${p1Name} של ${chart1.name}</strong> ↔ <strong style="color: var(--p2-color)">${p2Name} של ${chart2.name}</strong>`
+                            : `<strong style="color: var(--p1-color)">${chart1.name}'s ${p1Name}</strong> ↔ <strong style="color: var(--p2-color)">${chart2.name}'s ${p2Name}</strong>`;
+                        const orbBadge = isHe ? `סטייה (Orb): ${asp.orb}°` : `Orb ${asp.orb}°`;
+
                         showTooltip(e, `
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold" style="color: ${asp.color}">${asp.aspect} (${asp.angle}°)</span>
-                                <span class="badge bg-dark">Orb ${asp.orb}°</span>
+                                <span class="fw-bold" style="color: ${asp.color}">${aspName} (${asp.angle}°)</span>
+                                <span class="badge bg-dark">${orbBadge}</span>
                             </div>
                             <div class="small mb-1 text-light">
-                                <strong style="color: var(--p1-color)">${chart1.name}'s ${asp.p1_planet}</strong> 
-                                ↔ 
-                                <strong style="color: var(--p2-color)">${chart2.name}'s ${asp.p2_planet}</strong>
+                                ${pairLabel}
                             </div>
-                            <div class="small text-secondary" style="font-size:0.78rem;">${asp.meaning}</div>
+                            <div class="small text-secondary" style="font-size:0.78rem;">${meaningText}</div>
                         `);
                     });
 
@@ -953,9 +1035,15 @@
                     line.setAttribute('class', `aspect-chord aspect-${asp.aspect.toLowerCase()}`);
 
                     line.addEventListener('mouseenter', (e) => {
+                        const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                        const aspName = window.tAspect ? window.tAspect(asp.aspect) : asp.aspect;
+                        const p1Name = window.tPlanet ? window.tPlanet(asp.p1) : asp.p1;
+                        const p2Name = window.tPlanet ? window.tPlanet(asp.p2) : asp.p2;
+                        const titleText = isHe ? `היבט מולדת: ${aspName} (${asp.angle}°)` : `Natal ${asp.aspect} (${asp.angle}°)`;
+                        const orbText = isHe ? `סטייה: ${asp.orb}°` : `Orb: ${asp.orb}°`;
                         showTooltip(e, `
-                            <div class="fw-bold" style="color: ${asp.color}">Natal ${asp.aspect} (${asp.angle}°)</div>
-                            <div class="small text-light">${asp.p1} ↔ ${asp.p2} (Orb: ${asp.orb}°)</div>
+                            <div class="fw-bold" style="color: ${asp.color}">${titleText}</div>
+                            <div class="small text-light">${p1Name} ↔ ${p2Name} (${orbText})</div>
                         `);
                     });
                     line.addEventListener('mouseleave', hideTooltip);
@@ -996,15 +1084,19 @@
             subtitle.setAttribute('font-size', '10');
             subtitle.setAttribute('text-anchor', 'middle');
 
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+
             if (mode === 'synastry') {
-                title.textContent = `${synastry.overall_score}% MATCH`;
-                subtitle.textContent = 'SYNASTRY';
+                title.textContent = isHe ? `${synastry.overall_score}% ${window.t ? window.t('matchLabel') : 'התאמה'}` : `${synastry.overall_score}% MATCH`;
+                subtitle.textContent = isHe ? (window.t ? window.t('synastryLabel') : 'סינסטריה') : 'SYNASTRY';
             } else if (mode === 'natal1') {
                 title.textContent = chart1.name.toUpperCase();
-                subtitle.textContent = `☉ ${chart1.sun_sign}`;
+                const signTranslated = window.tZodiac ? window.tZodiac(chart1.sun_sign) : chart1.sun_sign;
+                subtitle.textContent = `☉ ${signTranslated}`;
             } else {
                 title.textContent = chart2.name.toUpperCase();
-                subtitle.textContent = `☉ ${chart2.sun_sign}`;
+                const signTranslated = window.tZodiac ? window.tZodiac(chart2.sun_sign) : chart2.sun_sign;
+                subtitle.textContent = `☉ ${signTranslated}`;
             }
 
             layer.appendChild(title);
@@ -1028,16 +1120,23 @@
             tabs.forEach(t => t.classList.remove('active'));
 
             const label = document.getElementById('currentModeLabel');
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
 
             if (mode === 'synastry') {
                 tabs[0].classList.add('active');
-                label.textContent = 'Synastry Bi-Wheel (Inner: ' + chart1.name + ' / Outer: ' + chart2.name + ')';
+                label.textContent = isHe
+                    ? `גלגל סינסטריה כפול (פנימי: ${chart1.name} / חיצוני: ${chart2.name})`
+                    : `Synastry Bi-Wheel (Inner: ${chart1.name} / Outer: ${chart2.name})`;
             } else if (mode === 'natal1') {
                 tabs[1].classList.add('active');
-                label.textContent = chart1.name + ' - Natal Chart Map';
+                label.textContent = isHe
+                    ? `מפת לידה: ${chart1.name}`
+                    : `${chart1.name} - Natal Chart Map`;
             } else if (mode === 'natal2') {
                 tabs[2].classList.add('active');
-                label.textContent = chart2.name + ' - Natal Chart Map';
+                label.textContent = isHe
+                    ? `מפת לידה: ${chart2.name}`
+                    : `${chart2.name} - Natal Chart Map`;
             }
 
             redrawWheel();
@@ -1164,11 +1263,13 @@
         async function saveCurrentAnalysis() {
             const btn = document.getElementById('btnSaveAnalysis');
             const defaultTitle = `${chart1.name} & ${chart2.name}`;
-            const title = prompt("Enter a title to save this analysis:", defaultTitle);
+            const promptMsg = window.t ? window.t('promptTitle') : "Enter a title to save this analysis:";
+            const title = prompt(promptMsg, defaultTitle);
             if (title === null) return;
 
             const payload = {
                 title: title.trim() || defaultTitle,
+                version: window.APP_VERSION || "{{ app_version }}",
                 p1: {
                     name: chart1.name,
                     date: chart1.date,
@@ -1193,11 +1294,11 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    btn.innerHTML = '✅ Saved to Analyses!';
+                    btn.innerHTML = window.t ? window.t('saveSuccess') : '✅ Saved to Analyses!';
                     btn.classList.add('text-success');
                     btn.style.borderColor = '#10b981';
                     setTimeout(() => {
-                        btn.innerHTML = '💾 Saved';
+                        btn.innerHTML = window.t ? window.t('saveToMyAnalyses') : '💾 Saved';
                     }, 2500);
                 } else {
                     alert("Could not save analysis.");
@@ -1206,6 +1307,25 @@
                 alert("Error saving analysis: " + err);
             }
         }
+
+        // Redraw wheel and refresh mode label when language toggles
+        window.addEventListener('languageChanged', (e) => {
+            const lang = e.detail && e.detail.lang ? e.detail.lang : (window.getCurrentLang ? window.getCurrentLang() : 'en');
+            const label = document.getElementById('currentModeLabel');
+            if (label) {
+                const isHe = lang === 'he';
+                if (currentMode === 'synastry') {
+                    label.textContent = isHe
+                        ? `גלגל סינסטריה כפול (פנימי: ${chart1.name} / חיצוני: ${chart2.name})`
+                        : `Synastry Bi-Wheel (Inner: ${chart1.name} / Outer: ${chart2.name})`;
+                } else if (currentMode === 'natal1') {
+                    label.textContent = isHe ? `מפת לידה: ${chart1.name}` : `${chart1.name} - Natal Chart Map`;
+                } else if (currentMode === 'natal2') {
+                    label.textContent = isHe ? `מפת לידה: ${chart2.name}` : `${chart2.name} - Natal Chart Map`;
+                }
+            }
+            redrawWheel();
+        });
 
         // Initialize Wheel on Load
         document.addEventListener('DOMContentLoaded', () => {

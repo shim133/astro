@@ -11,6 +11,8 @@ import uuid
 
 app = Flask(__name__)
 
+APP_VERSION = "2.2.0"
+
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CITIES_FILE = os.path.join(BASE_DIR, 'cities.json')
@@ -278,6 +280,8 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
             "sign_symbol": zodiac["symbol"],
             "sign_deg": zodiac["deg"],
             "sign_min": zodiac["min"],
+            "deg": zodiac["deg"],
+            "min": zodiac["min"],
             "sign_color": zodiac["color"],
             "formatted": zodiac["formatted"],
             "house": house_num
@@ -297,6 +301,8 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         "sign_symbol": asc_zodiac["symbol"],
         "sign_deg": asc_zodiac["deg"],
         "sign_min": asc_zodiac["min"],
+        "deg": asc_zodiac["deg"],
+        "min": asc_zodiac["min"],
         "sign_color": asc_zodiac["color"],
         "formatted": asc_zodiac["formatted"],
         "house": 1
@@ -313,6 +319,8 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         "sign_symbol": mc_zodiac["symbol"],
         "sign_deg": mc_zodiac["deg"],
         "sign_min": mc_zodiac["min"],
+        "deg": mc_zodiac["deg"],
+        "min": mc_zodiac["min"],
         "sign_color": mc_zodiac["color"],
         "formatted": mc_zodiac["formatted"],
         "house": get_house_for_lon(angles["mc"], asc_deg)
@@ -399,16 +407,18 @@ def calculate_synastry(c1, c2):
                     # Compute tightness factor (1.0 = exact, 0.0 = at orb boundary)
                     tightness = max(0.0, 1.0 - (orb / asp_cfg["max_orb"]))
                     
-                    # Look up custom interpretation
+                    # Look up custom interpretation and key
                     pair_key1 = f"{p1['name']}-{p2['name']}-{asp_name}"
                     pair_key2 = f"{p2['name']}-{p1['name']}-{asp_name}"
-                    meaning = CUSTOM_INTERPRETATIONS.get(
-                        pair_key1,
-                        CUSTOM_INTERPRETATIONS.get(
-                            pair_key2,
-                            f"Dynamic planetary link: {p1['name']} {asp_name} {p2['name']} creates active energy exchange between {p1['name']}'s drive and {p2['name']}'s essence."
-                        )
-                    )
+                    if pair_key1 in CUSTOM_INTERPRETATIONS:
+                        aspect_key = pair_key1
+                        meaning = CUSTOM_INTERPRETATIONS[pair_key1]
+                    elif pair_key2 in CUSTOM_INTERPRETATIONS:
+                        aspect_key = pair_key2
+                        meaning = CUSTOM_INTERPRETATIONS[pair_key2]
+                    else:
+                        aspect_key = f"generic-{asp_name}"
+                        meaning = f"Dynamic planetary link: {p1['name']} {asp_name} {p2['name']} creates active energy exchange between {p1['name']}'s drive and {p2['name']}'s essence."
                     
                     # Point calculation
                     weight = PLANETS_CONFIG.get(p1['name'], {}).get('weight', 1.0) * \
@@ -443,6 +453,7 @@ def calculate_synastry(c1, c2):
                         "nature": asp_cfg["nature"],
                         "color": asp_cfg["color"],
                         "meaning": meaning,
+                        "aspect_key": aspect_key,
                         "points": round(pt, 1)
                     })
                     break
@@ -462,12 +473,16 @@ def calculate_synastry(c1, c2):
     
     # Overall summary verdict
     if overall_pct >= 85:
+        verdict_key = "verdict_85"
         verdict = "Exceptional Cosmic Affinity: Rare magnetic harmony with deep mutual understanding and lasting soul connection."
     elif overall_pct >= 70:
+        verdict_key = "verdict_70"
         verdict = "High Astrological Resonance: Natural chemistry and supportive aspects outshine minor differences."
     elif overall_pct >= 55:
+        verdict_key = "verdict_55"
         verdict = "Dynamic & Complementary Bond: Meaningful passion paired with growth opportunities that require conscious empathy."
     else:
+        verdict_key = "verdict_0"
         verdict = "Karmic Growth Catalyst: Intense friction and distinct temperaments; great personal transformation if communication is nurtured."
 
     return {
@@ -478,13 +493,14 @@ def calculate_synastry(c1, c2):
         "intellectual_score": intellectual_pct,
         "stability_score": stability_pct,
         "verdict": verdict,
+        "verdict_key": verdict_key,
         "raw_points": round(raw_score, 1)
     }
 
 # --- ROUTES ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('index.html', app_version=APP_VERSION)
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -524,14 +540,16 @@ def analyze():
             p1=chart1,
             p2=chart2,
             synastry=synastry,
-            payload_json=json.dumps(payload)
+            payload_json=json.dumps(payload),
+            app_version=APP_VERSION
         )
         
     except Exception as e:
         import traceback
         return render_template(
             'index.html',
-            error=f"Error calculating charts: {str(e)}"
+            error=f"Error calculating charts: {str(e)}",
+            app_version=APP_VERSION
         )
 
 # --- API ROUTES ---
@@ -631,6 +649,7 @@ def api_save_analysis():
             "id": f"match-{analysis_id}",
             "title": data.get("title") or f"{data.get('p1', {}).get('name', 'Partner A')} & {data.get('p2', {}).get('name', 'Partner B')}",
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "version": data.get("version") or APP_VERSION,
             "p1": data.get("p1", {}),
             "p2": data.get("p2", {}),
             "notes": data.get("notes", "")
@@ -665,6 +684,7 @@ def api_update_analysis(analysis_id):
         if "p1" in data: item["p1"] = data["p1"]
         if "p2" in data: item["p2"] = data["p2"]
         if "notes" in data: item["notes"] = data["notes"]
+        item["version"] = data.get("version") or item.get("version") or APP_VERSION
         item["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         
         saved[idx] = item

@@ -256,30 +256,80 @@
             from { transform: translate(-50%, -50%) rotate(0deg); }
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
+
+        /* RTL Directional Styles */
+        [dir="rtl"] {
+            text-align: right;
+        }
+        [dir="rtl"] .cinzel {
+            letter-spacing: 0;
+        }
+        [dir="rtl"] .form-label.d-flex {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .tz-pills button {
+            margin-right: 0;
+            margin-left: 0.25rem;
+        }
+        [dir="rtl"] .saved-analysis-card .col-6:first-child {
+            border-left: none !important;
+            border-right: 3px solid var(--p1-color) !important;
+        }
+        [dir="rtl"] .saved-analysis-card .col-6:last-child {
+            border-left: none !important;
+            border-right: 3px solid var(--p2-color) !important;
+        }
     </style>
+
+    <!-- Multi-Language Translation System -->
+    <script type="module">
+        import { TRANSLATIONS, applyLanguage, toggleLanguage, getCurrentLang, t, tPlanet, tZodiac, tAspect } from '/static/translations.js';
+        window.TRANSLATIONS = TRANSLATIONS;
+        window.applyLanguage = applyLanguage;
+        window.toggleLanguage = toggleLanguage;
+        window.getCurrentLang = getCurrentLang;
+        window.t = t;
+        window.tPlanet = tPlanet;
+        window.tZodiac = tZodiac;
+        window.tAspect = tAspect;
+        window.APP_VERSION = "{{ app_version }}";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(getCurrentLang());
+        });
+    </script>
 </head>
-<body class="py-5 position-relative">
+<body class="py-4 position-relative">
     <div class="cosmic-rings"></div>
 
-    <div class="container py-3">
+    <div class="container py-2">
+        <!-- Top Language & Version Bar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-inline-flex align-items-center gap-2">
+                <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2" style="font-size: 0.8rem;">
+                    ✨ <span data-i18n="engineBadge">Pure NASA Ephemeris Engine (v{{ app_version }})</span>
+                </span>
+            </div>
+            <div>
+                <button type="button" id="langToggleBtn" class="btn btn-action-pill" onclick="toggleLanguage()">
+                    🌐 עברית (HE)
+                </button>
+            </div>
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-5">
-            <div class="d-inline-flex align-items-center gap-2 mb-2">
-                <span style="font-size: 1.4rem;">✨</span>
-                <span class="text-uppercase tracking-widest" style="font-size: 0.8rem; letter-spacing: 3px; color: var(--gold);">Pure NASA Ephemeris Engine (v2.1.0)</span>
-                <span style="font-size: 1.4rem;">✨</span>
-            </div>
-            <h1 class="header-title cinzel display-4 mb-2">AstroMatch Pro</h1>
-            <p class="lead text-secondary mx-auto" style="max-width: 650px; font-size: 1.05rem;">
-                Professional Astrological Compatibility & Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield & NASA DE421.
+            <h1 class="header-title cinzel display-4 mb-2" data-i18n="appTitle">AstroMatch Pro</h1>
+            <p class="lead text-secondary mx-auto" style="max-width: 650px; font-size: 1.05rem;" data-i18n="heroSubtitle">
+                Professional Astrological Compatibility &amp; Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield &amp; NASA DE421.
             </p>
 
             <div class="d-flex justify-content-center gap-2 mt-3">
-                <button type="button" class="btn btn-action-pill" onclick="loadSampleMatch()">
+                <button type="button" class="btn btn-action-pill" onclick="loadSampleMatch()" data-i18n="quickSample">
                     💫 Quick Sample Match
                 </button>
                 <button type="button" class="btn btn-action-pill" onclick="scrollToSaved()">
-                    📁 View Saved Analyses (<span id="savedCountBadge">0</span>)
+                    <span data-i18n="viewSaved">📁 View Saved Analyses</span> (<span id="savedCountBadge">0</span>)
                 </button>
             </div>
         </div>
@@ -298,22 +348,22 @@
                 <div class="col-lg-5 col-md-6">
                     <div class="glass-card partner-card-1 p-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;">Partner A</h3>
-                            <span class="badge-partner-1">Inner Wheel</span>
+                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;" data-i18n="partnerA">Partner A</h3>
+                            <span class="badge-partner-1" data-i18n="innerWheel">Inner Wheel</span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Full Name or Alias</label>
-                            <input type="text" id="p1_name" name="p1_name" class="form-control" placeholder="e.g. Alex" required>
+                            <label class="form-label" data-i18n="fullName">Full Name or Alias</label>
+                            <input type="text" id="p1_name" name="p1_name" class="form-control" placeholder="e.g. Alex" data-i18n-placeholder="namePlaceholderP1" required>
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-7">
-                                <label class="form-label">Date of Birth</label>
+                                <label class="form-label" data-i18n="dob">Date of Birth</label>
                                 <input type="date" id="p1_date" name="p1_date" class="form-control" required>
                             </div>
                             <div class="col-5">
-                                <label class="form-label">Exact Time</label>
+                                <label class="form-label" data-i18n="exactTime">Exact Time</label>
                                 <input type="time" id="p1_time" name="p1_time" class="form-control" value="12:00" required>
                             </div>
                         </div>
@@ -321,20 +371,20 @@
                         <!-- City Selection with Live Verification -->
                         <div class="mb-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>City / Town of Birth (Worldwide)</span>
-                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p1_city', 'p1_tz', 'p1_city_status')" style="cursor: pointer; text-decoration: underline;">🔍 Check Location</span>
+                                <span data-i18n="cityLabel">City / Town of Birth (Worldwide)</span>
+                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p1_city', 'p1_tz', 'p1_city_status')" style="cursor: pointer; text-decoration: underline;" data-i18n="checkLocation">🔍 Check Location</span>
                             </label>
-                            <input type="text" id="p1_city" name="p1_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, New York, London..." autocomplete="off" required onchange="onCitySelected('p1_city', 'p1_tz', 'p1_city_status')" oninput="onCityInput('p1_city', 'p1_tz', 'p1_city_status')">
+                            <input type="text" id="p1_city" name="p1_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, New York, London..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p1_city', 'p1_tz', 'p1_city_status')" oninput="onCityInput('p1_city', 'p1_tz', 'p1_city_status')">
                             <div id="p1_city_status"></div>
-                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
+                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;" data-i18n="cityHelp">
                                 Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
                             </small>
                         </div>
 
                         <div class="mb-2">
                             <label class="form-label d-flex justify-content-between">
-                                <span>UTC Timezone Offset</span>
-                                <span class="text-muted" style="font-size: 0.75rem;">Auto-set from city</span>
+                                <span data-i18n="tzLabel">UTC Timezone Offset</span>
+                                <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
                             <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required>
                             <div class="tz-pills mt-1">
@@ -352,22 +402,22 @@
                 <div class="col-lg-5 col-md-6">
                     <div class="glass-card partner-card-2 p-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;">Partner B</h3>
-                            <span class="badge-partner-2">Outer Wheel</span>
+                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;" data-i18n="partnerB">Partner B</h3>
+                            <span class="badge-partner-2" data-i18n="outerWheel">Outer Wheel</span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Full Name or Alias</label>
-                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" required>
+                            <label class="form-label" data-i18n="fullName">Full Name or Alias</label>
+                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" data-i18n-placeholder="namePlaceholderP2" required>
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-7">
-                                <label class="form-label">Date of Birth</label>
+                                <label class="form-label" data-i18n="dob">Date of Birth</label>
                                 <input type="date" id="p2_date" name="p2_date" class="form-control" required>
                             </div>
                             <div class="col-5">
-                                <label class="form-label">Exact Time</label>
+                                <label class="form-label" data-i18n="exactTime">Exact Time</label>
                                 <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" required>
                             </div>
                         </div>
@@ -375,20 +425,20 @@
                         <!-- City Selection with Live Verification -->
                         <div class="mb-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>City / Town of Birth (Worldwide)</span>
-                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p2_city', 'p2_tz', 'p2_city_status')" style="cursor: pointer; text-decoration: underline;">🔍 Check Location</span>
+                                <span data-i18n="cityLabel">City / Town of Birth (Worldwide)</span>
+                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p2_city', 'p2_tz', 'p2_city_status')" style="cursor: pointer; text-decoration: underline;" data-i18n="checkLocation">🔍 Check Location</span>
                             </label>
-                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status')" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status')">
+                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status')" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status')">
                             <div id="p2_city_status"></div>
-                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
+                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;" data-i18n="cityHelp">
                                 Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
                             </small>
                         </div>
 
                         <div class="mb-2">
                             <label class="form-label d-flex justify-content-between">
-                                <span>UTC Timezone Offset</span>
-                                <span class="text-muted" style="font-size: 0.75rem;">Auto-set from city</span>
+                                <span data-i18n="tzLabel">UTC Timezone Offset</span>
+                                <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
                             <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required>
                             <div class="tz-pills mt-1">
@@ -407,14 +457,14 @@
             <!-- Action Buttons -->
             <div class="text-center mb-5">
                 <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <button type="submit" class="btn btn-analyze" id="submitBtn">
+                    <button type="submit" class="btn btn-analyze" id="submitBtn" data-i18n="calcBtn">
                         🔮 Calculate Synastry &amp; Draw Astrological Maps
                     </button>
-                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" onclick="saveCurrentFormAsAnalysis()">
+                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" onclick="saveCurrentFormAsAnalysis()" data-i18n="saveBtn">
                         💾 Save to My Analyses
                     </button>
                 </div>
-                <div class="mt-3 text-muted" style="font-size: 0.8rem;">
+                <div class="mt-3 text-muted" style="font-size: 0.8rem;" data-i18n="formHint">
                     Generates interactive Synastry Bi-Wheel, Natal House Maps, and In-Depth Aspect Interpretations
                 </div>
             </div>
@@ -427,13 +477,13 @@
         <div class="glass-card p-4 mt-5" id="savedAnalysesSection">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
                 <div>
-                    <h3 class="cinzel h4 text-white mb-1">📁 Saved Analyses &amp; Couple Profiles</h3>
-                    <p class="text-secondary small mb-0">Select, load, edit, or delete previously saved synastry profiles</p>
+                    <h3 class="cinzel h4 text-white mb-1" data-i18n="savedAnalysesTitle">📁 Saved Analyses &amp; Couple Profiles</h3>
+                    <p class="text-secondary small mb-0" data-i18n="savedAnalysesSub">Select, load, edit, or delete previously saved synastry profiles</p>
                 </div>
 
                 <div class="d-flex gap-2 align-items-center mt-2 mt-md-0">
-                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." style="width: 200px;" oninput="filterSavedList()">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="fetchSavedAnalyses()">🔄 Refresh</button>
+                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." data-i18n-placeholder="searchSavedPlaceholder" style="width: 200px;" oninput="filterSavedList()">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="fetchSavedAnalyses()" data-i18n="refreshBtn">🔄 Refresh</button>
                 </div>
             </div>
 
@@ -447,86 +497,101 @@
 
     </div>
 
+    <!-- Application Footer Displaying Version -->
+    <footer class="text-center py-4 mt-5 border-top border-secondary border-opacity-25 text-muted small">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <div data-i18n="footerProgram" data-version="{{ app_version }}">
+                    AstroMatch Pro · Version {{ app_version }} · Pure NASA Ephemeris Engine · Built with Skyfield &amp; Python
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-secondary bg-opacity-25 text-warning px-2 py-1 font-monospace">App v{{ app_version }}</span>
+                    <span class="text-secondary">Ephemeris: NASA DE421 (J2000)</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <!-- Edit Analysis Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content p-4">
                 <div class="modal-header border-secondary border-opacity-25 pb-3">
-                    <h5 class="modal-title cinzel text-warning">✏️ Edit Saved Analysis</h5>
+                    <h5 class="modal-title cinzel text-warning" data-i18n="editModalTitle">✏️ Edit Saved Analysis</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body py-3">
                     <input type="hidden" id="edit_id">
                     
                     <div class="mb-3">
-                        <label class="form-label">Analysis Title / Label</label>
+                        <label class="form-label" data-i18n="editTitleLabel">Analysis Title / Label</label>
                         <input type="text" id="edit_title" class="form-control">
                     </div>
 
                     <div class="row g-3 mb-3">
                         <!-- Partner A Edit -->
                         <div class="col-md-6 p-3 rounded" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2);">
-                            <h6 class="cinzel text-info mb-2">Partner A</h6>
+                            <h6 class="cinzel text-info mb-2" data-i18n="partnerA">Partner A</h6>
                             <div class="mb-2">
-                                <label class="form-label small">Name</label>
+                                <label class="form-label small" data-i18n="fullName">Name</label>
                                 <input type="text" id="edit_p1_name" class="form-control form-control-sm">
                             </div>
                             <div class="row g-2 mb-2">
                                 <div class="col-7">
-                                    <label class="form-label small">Date</label>
+                                    <label class="form-label small" data-i18n="dob">Date</label>
                                     <input type="date" id="edit_p1_date" class="form-control form-control-sm">
                                 </div>
                                 <div class="col-5">
-                                    <label class="form-label small">Time</label>
+                                    <label class="form-label small" data-i18n="exactTime">Time</label>
                                     <input type="time" id="edit_p1_time" class="form-control form-control-sm">
                                 </div>
                             </div>
                             <div class="mb-2">
-                                <label class="form-label small">City</label>
+                                <label class="form-label small" data-i18n="cityLabel">City</label>
                                 <input type="text" id="edit_p1_city" list="citiesList" class="form-control form-control-sm" onchange="onCitySelected('edit_p1_city', 'edit_p1_tz')">
                             </div>
                             <div>
-                                <label class="form-label small">UTC Offset</label>
+                                <label class="form-label small" data-i18n="tzLabel">UTC Offset</label>
                                 <input type="text" id="edit_p1_tz" class="form-control form-control-sm">
                             </div>
                         </div>
 
                         <!-- Partner B Edit -->
                         <div class="col-md-6 p-3 rounded" style="background: rgba(244, 114, 182, 0.05); border: 1px solid rgba(244, 114, 182, 0.2);">
-                            <h6 class="cinzel text-warning mb-2" style="color: var(--p2-color) !important;">Partner B</h6>
+                            <h6 class="cinzel text-warning mb-2" style="color: var(--p2-color) !important;" data-i18n="partnerB">Partner B</h6>
                             <div class="mb-2">
-                                <label class="form-label small">Name</label>
+                                <label class="form-label small" data-i18n="fullName">Name</label>
                                 <input type="text" id="edit_p2_name" class="form-control form-control-sm">
                             </div>
                             <div class="row g-2 mb-2">
                                 <div class="col-7">
-                                    <label class="form-label small">Date</label>
+                                    <label class="form-label small" data-i18n="dob">Date</label>
                                     <input type="date" id="edit_p2_date" class="form-control form-control-sm">
                                 </div>
                                 <div class="col-5">
-                                    <label class="form-label small">Time</label>
+                                    <label class="form-label small" data-i18n="exactTime">Time</label>
                                     <input type="time" id="edit_p2_time" class="form-control form-control-sm">
                                 </div>
                             </div>
                             <div class="mb-2">
-                                <label class="form-label small">City</label>
+                                <label class="form-label small" data-i18n="cityLabel">City</label>
                                 <input type="text" id="edit_p2_city" list="citiesList" class="form-control form-control-sm" onchange="onCitySelected('edit_p2_city', 'edit_p2_tz')">
                             </div>
                             <div>
-                                <label class="form-label small">UTC Offset</label>
+                                <label class="form-label small" data-i18n="tzLabel">UTC Offset</label>
                                 <input type="text" id="edit_p2_tz" class="form-control form-control-sm">
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label">Notes / Relationship Context</label>
-                        <textarea id="edit_notes" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                        <label class="form-label" data-i18n="notesLabel">Notes / Relationship Context</label>
+                        <textarea id="edit_notes" class="form-control" rows="2" placeholder="Optional notes..." data-i18n-placeholder="notesPlaceholder"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-secondary border-opacity-25 pt-3">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-warning px-4" onclick="saveEditedAnalysis()">Save Changes</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="cancelBtn">Cancel</button>
+                    <button type="button" class="btn btn-warning px-4" onclick="saveEditedAnalysis()" data-i18n="saveChangesBtn">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -593,10 +658,11 @@
             // 2. Debounced live check against OpenStreetMap / Nominatim
             if (cityDebounceTimers[cityInputId]) clearTimeout(cityDebounceTimers[cityInputId]);
 
+            const checkingMsg = window.t ? window.t('checkingLocation') : 'Checking location on OpenStreetMap & local database...';
             document.getElementById(statusId).innerHTML = `
                 <div class="searching-badge">
                     <span class="spinner-border spinner-border-sm" role="status" style="width: 0.8rem; height: 0.8rem;"></span>
-                    <span>Checking location on OpenStreetMap &amp; local database...</span>
+                    <span>${checkingMsg}</span>
                 </div>
             `;
 
@@ -614,7 +680,7 @@
         function triggerCityVerify(cityInputId, tzInputId, statusId) {
             const val = document.getElementById(cityInputId).value.trim();
             if (!val) {
-                alert("Please enter a city name to verify.");
+                alert(window.t ? window.t('enterCityAlert') : "Please enter a city name to verify.");
                 return;
             }
             verifyCityLive(val, statusId, tzInputId);
@@ -634,12 +700,15 @@
                 if (data.found) {
                     renderCitySuccess(data, statusId, tzInputId, data.source);
                 } else {
+                    const notFoundTitle = window.t ? window.t('locationNotFound') : 'Location not found:';
+                    const couldNotResolve = window.t ? window.t('couldNotResolve') : 'Could not resolve';
+                    const checkHint = window.t ? window.t('locationCheckHint') : 'Check spelling or specify country/region (e.g. "Ramat Gan, Israel").';
                     container.innerHTML = `
                         <div class="not-found-badge">
                             <span>⚠️</span>
                             <div>
-                                <strong>Location not found:</strong> Could not resolve "${escapeHtml(query)}" on OpenStreetMap or local list.
-                                <div class="small text-white text-opacity-75">Check spelling or specify country/region (e.g. <em>"${escapeHtml(query)}, Israel"</em>).</div>
+                                <strong>${notFoundTitle}</strong> ${couldNotResolve} "${escapeHtml(query)}"
+                                <div class="small text-white text-opacity-75">${checkHint}</div>
                             </div>
                         </div>
                     `;
@@ -654,11 +723,15 @@
             const latStr = data.lat >= 0 ? `${data.lat.toFixed(2)}° N` : `${Math.abs(data.lat).toFixed(2)}° S`;
             const lonStr = data.lon >= 0 ? `${data.lon.toFixed(2)}° E` : `${Math.abs(data.lon).toFixed(2)}° W`;
             
+            const isCurated = sourceName === "Curated Database";
+            const sourceBadge = isCurated ? (window.t ? window.t('foundViaCurated') : `✓ Found via Curated Database`) : (window.t ? window.t('foundViaOsm') : `✓ Found via OpenStreetMap`);
+            const tzLabel = window.t ? window.t('suggestedTZ') : 'Suggested TZ:';
+
             container.innerHTML = `
                 <div class="verified-badge">
-                    <span class="badge bg-success bg-opacity-25 text-success">✓ Found via ${escapeHtml(sourceName)}</span>
+                    <span class="badge bg-success bg-opacity-25 text-success">${escapeHtml(sourceBadge)}</span>
                     <span><strong>${escapeHtml(data.display || data.name)}</strong> (${latStr}, ${lonStr})</span>
-                    <span class="text-warning small ms-1">· Suggested TZ: ${data.tz}</span>
+                    <span class="text-warning small ms-1">· ${tzLabel} ${data.tz}</span>
                 </div>
             `;
 
@@ -702,11 +775,13 @@
         function renderSavedAnalyses(list) {
             const container = document.getElementById('savedAnalysesContainer');
             if (!list || list.length === 0) {
+                const noSavedText = window.t ? window.t('noSavedYet') : 'No saved analyses yet.';
+                const noSavedSubText = window.t ? window.t('noSavedSub') : 'Fill in the form above and click "Save to My Analyses" to store couple profiles.';
                 container.innerHTML = `
                     <div class="col-12 text-center py-5 text-secondary">
                         <div style="font-size: 2rem;">📭</div>
-                        <p class="mb-2">No saved analyses yet.</p>
-                        <small>Fill in the form above and click "Save to My Analyses" to store couple profiles.</small>
+                        <p class="mb-2">${noSavedText}</p>
+                        <small>${noSavedSubText}</small>
                     </div>
                 `;
                 return;
@@ -719,23 +794,32 @@
 
                 const p1 = item.p1 || {};
                 const p2 = item.p2 || {};
+                const versionNum = item.version || window.APP_VERSION || '2.2.0';
+                const loadBtnText = window.t ? window.t('loadIntoForm') : '📥 Load into Form';
+                const editBtnText = window.t ? window.t('editBtn') : '✏️ Edit';
+                const deleteBtnText = window.t ? window.t('deleteBtn') : '🗑️ Delete';
+                const p1Label = p1.name || (window.t ? window.t('partnerA') : 'Partner A');
+                const p2Label = p2.name || (window.t ? window.t('partnerB') : 'Partner B');
 
                 col.innerHTML = `
                     <div class="saved-analysis-card h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="cinzel text-warning mb-0" style="font-size: 1.15rem;">${escapeHtml(item.title)}</h5>
-                                <span class="badge bg-secondary bg-opacity-25 text-muted small">${item.created_at || ''}</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="badge bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25 font-monospace small" title="Program Version Used">v${versionNum}</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-muted small">${item.created_at || ''}</span>
+                                </div>
                             </div>
 
                             <div class="row g-2 mb-3 mt-1" style="font-size: 0.85rem;">
                                 <div class="col-6 p-2 rounded" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--p1-color);">
-                                    <strong style="color: var(--p1-color)">${escapeHtml(p1.name || 'Partner A')}</strong>
+                                    <strong style="color: var(--p1-color)">${escapeHtml(p1Label)}</strong>
                                     <div class="text-secondary small">📅 ${p1.date || 'N/A'} ${p1.time || ''}</div>
                                     <div class="text-secondary small text-truncate">📍 ${escapeHtml(p1.city || 'N/A')}</div>
                                 </div>
                                 <div class="col-6 p-2 rounded" style="background: rgba(244, 114, 182, 0.08); border-left: 3px solid var(--p2-color);">
-                                    <strong style="color: var(--p2-color)">${escapeHtml(p2.name || 'Partner B')}</strong>
+                                    <strong style="color: var(--p2-color)">${escapeHtml(p2Label)}</strong>
                                     <div class="text-secondary small">📅 ${p2.date || 'N/A'} ${p2.time || ''}</div>
                                     <div class="text-secondary small text-truncate">📍 ${escapeHtml(p2.city || 'N/A')}</div>
                                 </div>
@@ -746,14 +830,14 @@
 
                         <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-15">
                             <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="loadAnalysisIntoForm('${item.id}')">
-                                📥 Load into Form
+                                ${loadBtnText}
                             </button>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="openEditModal('${item.id}')" title="Edit Profile">
-                                    ✏️ Edit
+                                    ${editBtnText}
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteAnalysis('${item.id}')" title="Delete Profile">
-                                    🗑️ Delete
+                                    ${deleteBtnText}
                                 </button>
                             </div>
                         </div>
@@ -775,7 +859,8 @@
                 const p2Name = ((item.p2 && item.p2.name) || '').toLowerCase();
                 const p1City = ((item.p1 && item.p1.city) || '').toLowerCase();
                 const p2City = ((item.p2 && item.p2.city) || '').toLowerCase();
-                return title.includes(q) || p1Name.includes(q) || p2Name.includes(q) || p1City.includes(q) || p2City.includes(q);
+                const version = (item.version || '').toLowerCase();
+                return title.includes(q) || p1Name.includes(q) || p2Name.includes(q) || p1City.includes(q) || p2City.includes(q) || version.includes(q);
             });
             renderSavedAnalyses(filtered);
         }
@@ -817,16 +902,18 @@
             const p2_name = document.getElementById('p2_name').value.trim();
 
             if (!p1_name || !p2_name) {
-                alert("Please fill in at least Partner A and Partner B names before saving.");
+                alert(window.t ? window.t('fillNamesAlert') : "Please fill in at least Partner A and Partner B names before saving.");
                 return;
             }
 
             const defaultTitle = `${p1_name} & ${p2_name}`;
-            const title = prompt("Enter a title for this saved analysis:", defaultTitle);
+            const promptMsg = window.t ? window.t('promptTitle') : "Enter a title for this saved analysis:";
+            const title = prompt(promptMsg, defaultTitle);
             if (title === null) return; // user cancelled
 
             const payload = {
                 title: title.trim() || defaultTitle,
+                version: window.APP_VERSION || "{{ app_version }}",
                 p1: {
                     name: p1_name,
                     date: document.getElementById('p1_date').value,
@@ -895,6 +982,7 @@
             const id = document.getElementById('edit_id').value;
             const payload = {
                 title: document.getElementById('edit_title').value.trim(),
+                version: window.APP_VERSION || "{{ app_version }}",
                 p1: {
                     name: document.getElementById('edit_p1_name').value.trim(),
                     date: document.getElementById('edit_p1_date').value,
@@ -932,7 +1020,8 @@
         async function deleteAnalysis(id) {
             const item = savedAnalyses.find(x => x.id === id);
             const title = item ? item.title : 'this analysis';
-            if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+            const confirmMsg = `${window.t ? window.t('deleteConfirm') : 'Are you sure you want to delete'} "${title}"?`;
+            if (!confirm(confirmMsg)) return;
 
             try {
                 const res = await fetch(`/api/analyses/${id}`, { method: 'DELETE' });
@@ -960,6 +1049,11 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // Language change event listener to update dynamic sections
+        window.addEventListener('languageChanged', () => {
+            renderSavedAnalyses(savedAnalyses);
+        });
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadCities();
@@ -972,7 +1066,7 @@
 
         document.getElementById('astroForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '✨ Computing Celestial Positions...';
+            btn.innerHTML = window.t ? window.t('calcBtnLoading') : '✨ Computing Celestial Positions...';
             btn.style.opacity = '0.85';
             btn.style.pointerEvents = 'none';
         });

@@ -5,6 +5,49 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-09-06
+
+### Added
+- **Application Version Tracking System**:
+  - Global `APP_VERSION = "2.2.0"` defined in `app.py` and provided to all frontend contexts.
+  - **Saved Analyses Version Stamp**: Saving or updating couple profiles now stamps each profile record with the version number used (`"version": "2.2.0"`).
+  - **Version Badge Display**: Saved analysis cards now prominently display their creation/update version badge (e.g., `v2.2.0`).
+  - **Persistent Program Footers**: Clean, professional footer added to both the main calculation page and the synastry results page, displaying `AstroMatch Pro v2.2.0 · Pure NASA Ephemeris Engine · Built with Skyfield & Python`.
+
+- **Multi-Language Engine (`static/translations.js`)**:
+  - Full bilingual support starting with **Hebrew (`he`, RTL)** and **English (`en`, LTR)**.
+  - Strict compliance with requested format:
+    ```javascript
+    export const TRANSLATIONS = {
+      he: { dir: 'rtl', langName: 'עברית', appTitle: 'אסטרו-מאץ׳ פרו', ... },
+      en: { dir: 'ltr', langName: 'English', appTitle: 'AstroMatch Pro', ... }
+    };
+    ```
+  - Compatible with modern ES modules and direct browser scripts via global `window` exposure.
+  - Dynamic page layout direction flipping (`document.documentElement.dir = 'rtl'` / `'ltr'`) and RTL-specific CSS enhancements.
+  - Interactive language switcher toggle button (`🌐 עברית (HE) / 🌐 English (EN)`) in the top navigation bar of both pages.
+  - Comprehensive localization across all layers:
+    - Headers, subtitles, buttons, form inputs, placeholders, and tooltips.
+    - Live geocoding status badges, confirmations, and alerts.
+    - Astrological vocabulary: 12 Zodiac signs (טלה through דגים), 10 planets + ASC / MC, 5 major aspects (צמידות, טריין, סקסטיל, סקוויר, אופוזיציה), and the 4 elements.
+    - Synastry category bars and compatibility rating verdicts.
+    - Interactive SVG chart tooltips and chord hover descriptions.
+  - Persistent user language preference saved in `localStorage` (`astromatch_lang`).
+
+- **Expanded Israeli Cities & Regional Catalog**:
+  - Added over 40 Israeli cities (including Ramat Gan, Kiryat Gat, Herzliya, Kfar Saba, Petah Tikva, Rishon LeZion, Ashdod, Netanya, Holon, Bnei Brak, Rehovot, Bat Yam, Givatayim, Hod HaSharon, Ramat HaSharon, Modi'in, Lod, Ramla, Ashkelon, Beit Shemesh, Nazareth, Tiberias, Nahariya, Acre, Afula, Hadera, Karmiel, Yavne, Kiryat Ono, Kiryat Motzkin, Kiryat Bialik, Kiryat Yam, Kiryat Ata, Dimona, Arad, Kiryat Shmona, Zikhron Ya'akov, Sderot, Netivot) with pre-verified coordinates and default offsets.
+
+- **Transparent Live Geocoding Fallback & Source Reporting**:
+  - Seamless fallback to live OpenStreetMap (Nominatim) lookup whenever a city is not in the curated database.
+  - Explicit real-time UI status reporting indicating where the location is being queried from and whether it succeeded or needs a spelling check (`Searching OpenStreetMap...`, `Found via OpenStreetMap: Lat, Lon`, or `Not found - please check spelling`).
+    - Fully bilingual status feedback integrated into the translation engine (Hebrew & English).
+
+### Fixed
+- **Partner Profile Card Degree & Position Rendering**:
+  - Corrected degree and minute mapping (`sign_deg` and `sign_min` keys alongside `deg`/`min` in `compute_chart`) so planet position rows display exact coordinates (e.g., `1° 45' ☉ Pisces`) rather than missing degrees (`° 00'`).
+  - Added robust fallback to pre-formatted coordinate strings when switching languages.
+  - Streamlined Ascendant row labels (`ASC Rising` / `אופק (ASC)`) and applied `text-nowrap` to prevent awkward line breaks on high-density cards.
+
 ## [2.1.0] - 2026-09-06
 
 ### Added
