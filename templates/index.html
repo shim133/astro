@@ -11,7 +11,7 @@
     <style>
         :root {
             --bg-deep: #070913;
-            --bg-card: rgba(17, 24, 43, 0.75);
+            --bg-card: rgba(17, 24, 43, 0.85);
             --border-glow: rgba(255, 215, 0, 0.2);
             --gold: #fbbf24;
             --gold-glow: rgba(251, 191, 36, 0.35);
@@ -82,7 +82,7 @@
             margin-bottom: 0.35rem;
         }
 
-        .form-control {
+        .form-control, .form-select {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.12);
             color: #f8fafc;
@@ -92,7 +92,7 @@
             transition: all 0.25s ease;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             background: rgba(15, 23, 42, 0.95);
             color: #fff;
             border-color: var(--gold);
@@ -123,7 +123,7 @@
             color: #000;
         }
 
-        .btn-demo {
+        .btn-action-pill {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #cbd5e1;
@@ -133,7 +133,7 @@
             transition: all 0.2s ease;
         }
 
-        .btn-demo:hover {
+        .btn-action-pill:hover {
             background: rgba(255, 255, 255, 0.12);
             color: #fff;
             border-color: var(--gold);
@@ -174,6 +174,70 @@
             border-color: var(--gold);
         }
 
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.76rem;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 4px 10px;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .searching-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.76rem;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 8px;
+            padding: 4px 10px;
+            margin-top: 6px;
+        }
+
+        .not-found-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.76rem;
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 8px;
+            padding: 4px 10px;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        /* Saved Analyses Cards */
+        .saved-analysis-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.1rem;
+            transition: all 0.25s ease;
+        }
+
+        .saved-analysis-card:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(251, 191, 36, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        .modal-content {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc;
+            border-radius: 20px;
+        }
+
         .cosmic-rings {
             position: absolute;
             top: 50%;
@@ -202,7 +266,7 @@
         <div class="text-center mb-5">
             <div class="d-inline-flex align-items-center gap-2 mb-2">
                 <span style="font-size: 1.4rem;">✨</span>
-                <span class="text-uppercase tracking-widest" style="font-size: 0.8rem; letter-spacing: 3px; color: var(--gold);">Pure NASA Ephemeris Engine</span>
+                <span class="text-uppercase tracking-widest" style="font-size: 0.8rem; letter-spacing: 3px; color: var(--gold);">Pure NASA Ephemeris Engine (v2.1.0)</span>
                 <span style="font-size: 1.4rem;">✨</span>
             </div>
             <h1 class="header-title cinzel display-4 mb-2">AstroMatch Pro</h1>
@@ -210,9 +274,12 @@
                 Professional Astrological Compatibility & Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield & NASA DE421.
             </p>
 
-            <div class="mt-3">
-                <button type="button" class="btn btn-demo" onclick="loadSampleMatch()">
-                    💫 Load Sample Couple: Alex & Jordan
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <button type="button" class="btn btn-action-pill" onclick="loadSampleMatch()">
+                    💫 Quick Sample Match
+                </button>
+                <button type="button" class="btn btn-action-pill" onclick="scrollToSaved()">
+                    📁 View Saved Analyses (<span id="savedCountBadge">0</span>)
                 </button>
             </div>
         </div>
@@ -223,9 +290,9 @@
         </div>
         {% endif %}
 
-        <!-- Form -->
+        <!-- Main Form -->
         <form action="/analyze" method="POST" id="astroForm">
-            <div class="row g-4 justify-content-center mb-5">
+            <div class="row g-4 justify-content-center mb-4">
                 
                 <!-- Partner A -->
                 <div class="col-lg-5 col-md-6">
@@ -251,10 +318,23 @@
                             </div>
                         </div>
 
+                        <!-- City Selection with Live Verification -->
                         <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>City / Town of Birth (Worldwide)</span>
+                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p1_city', 'p1_tz', 'p1_city_status')" style="cursor: pointer; text-decoration: underline;">🔍 Check Location</span>
+                            </label>
+                            <input type="text" id="p1_city" name="p1_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, New York, London..." autocomplete="off" required onchange="onCitySelected('p1_city', 'p1_tz', 'p1_city_status')" oninput="onCityInput('p1_city', 'p1_tz', 'p1_city_status')">
+                            <div id="p1_city_status"></div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
+                                Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
+                            </small>
+                        </div>
+
+                        <div class="mb-2">
                             <label class="form-label d-flex justify-content-between">
                                 <span>UTC Timezone Offset</span>
-                                <span class="text-muted" style="font-size: 0.75rem;">e.g. +03:00, -05:00</span>
+                                <span class="text-muted" style="font-size: 0.75rem;">Auto-set from city</span>
                             </label>
                             <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required>
                             <div class="tz-pills mt-1">
@@ -264,12 +344,6 @@
                                 <button type="button" onclick="setTZ('p1_tz', '+01:00')">PAR (+1)</button>
                                 <button type="button" onclick="setTZ('p1_tz', '-08:00')">LAX (-8)</button>
                             </div>
-                        </div>
-
-                        <div class="mb-2">
-                            <label class="form-label">City of Birth</label>
-                            <input type="text" id="p1_city" name="p1_city" class="form-control" placeholder="e.g. Tel Aviv, Israel" required>
-                            <small class="text-muted" style="font-size: 0.75rem;">Used for precise latitude, longitude & Ascendant calculation</small>
                         </div>
                     </div>
                 </div>
@@ -298,10 +372,23 @@
                             </div>
                         </div>
 
+                        <!-- City Selection with Live Verification -->
                         <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>City / Town of Birth (Worldwide)</span>
+                                <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p2_city', 'p2_tz', 'p2_city_status')" style="cursor: pointer; text-decoration: underline;">🔍 Check Location</span>
+                            </label>
+                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status')" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status')">
+                            <div id="p2_city_status"></div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
+                                Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
+                            </small>
+                        </div>
+
+                        <div class="mb-2">
                             <label class="form-label d-flex justify-content-between">
                                 <span>UTC Timezone Offset</span>
-                                <span class="text-muted" style="font-size: 0.75rem;">e.g. -05:00, +02:00</span>
+                                <span class="text-muted" style="font-size: 0.75rem;">Auto-set from city</span>
                             </label>
                             <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required>
                             <div class="tz-pills mt-1">
@@ -312,30 +399,276 @@
                                 <button type="button" onclick="setTZ('p2_tz', '-08:00')">LAX (-8)</button>
                             </div>
                         </div>
-
-                        <div class="mb-2">
-                            <label class="form-label">City of Birth</label>
-                            <input type="text" id="p2_city" name="p2_city" class="form-control" placeholder="e.g. New York, USA" required>
-                            <small class="text-muted" style="font-size: 0.75rem;">Used for precise latitude, longitude & Ascendant calculation</small>
-                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" class="btn btn-analyze" id="submitBtn">
-                    🔮 Calculate Synastry & Draw Astrological Maps
-                </button>
+            <!-- Action Buttons -->
+            <div class="text-center mb-5">
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <button type="submit" class="btn btn-analyze" id="submitBtn">
+                        🔮 Calculate Synastry &amp; Draw Astrological Maps
+                    </button>
+                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" onclick="saveCurrentFormAsAnalysis()">
+                        💾 Save to My Analyses
+                    </button>
+                </div>
                 <div class="mt-3 text-muted" style="font-size: 0.8rem;">
                     Generates interactive Synastry Bi-Wheel, Natal House Maps, and In-Depth Aspect Interpretations
                 </div>
             </div>
         </form>
+
+        <!-- Curated Cities Datalist -->
+        <datalist id="citiesList"></datalist>
+
+        <!-- Saved Analyses Manager Section -->
+        <div class="glass-card p-4 mt-5" id="savedAnalysesSection">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <h3 class="cinzel h4 text-white mb-1">📁 Saved Analyses &amp; Couple Profiles</h3>
+                    <p class="text-secondary small mb-0">Select, load, edit, or delete previously saved synastry profiles</p>
+                </div>
+
+                <div class="d-flex gap-2 align-items-center mt-2 mt-md-0">
+                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." style="width: 200px;" oninput="filterSavedList()">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="fetchSavedAnalyses()">🔄 Refresh</button>
+                </div>
+            </div>
+
+            <!-- List Container -->
+            <div id="savedAnalysesContainer" class="row g-3">
+                <div class="text-center py-4 text-secondary">
+                    <div class="spinner-border spinner-border-sm text-warning" role="status"></div> Loading saved profiles...
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Edit Analysis Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content p-4">
+                <div class="modal-header border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title cinzel text-warning">✏️ Edit Saved Analysis</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <input type="hidden" id="edit_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Analysis Title / Label</label>
+                        <input type="text" id="edit_title" class="form-control">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Partner A Edit -->
+                        <div class="col-md-6 p-3 rounded" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2);">
+                            <h6 class="cinzel text-info mb-2">Partner A</h6>
+                            <div class="mb-2">
+                                <label class="form-label small">Name</label>
+                                <input type="text" id="edit_p1_name" class="form-control form-control-sm">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-7">
+                                    <label class="form-label small">Date</label>
+                                    <input type="date" id="edit_p1_date" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label small">Time</label>
+                                    <input type="time" id="edit_p1_time" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">City</label>
+                                <input type="text" id="edit_p1_city" list="citiesList" class="form-control form-control-sm" onchange="onCitySelected('edit_p1_city', 'edit_p1_tz')">
+                            </div>
+                            <div>
+                                <label class="form-label small">UTC Offset</label>
+                                <input type="text" id="edit_p1_tz" class="form-control form-control-sm">
+                            </div>
+                        </div>
+
+                        <!-- Partner B Edit -->
+                        <div class="col-md-6 p-3 rounded" style="background: rgba(244, 114, 182, 0.05); border: 1px solid rgba(244, 114, 182, 0.2);">
+                            <h6 class="cinzel text-warning mb-2" style="color: var(--p2-color) !important;">Partner B</h6>
+                            <div class="mb-2">
+                                <label class="form-label small">Name</label>
+                                <input type="text" id="edit_p2_name" class="form-control form-control-sm">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-7">
+                                    <label class="form-label small">Date</label>
+                                    <input type="date" id="edit_p2_date" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label small">Time</label>
+                                    <input type="time" id="edit_p2_time" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">City</label>
+                                <input type="text" id="edit_p2_city" list="citiesList" class="form-control form-control-sm" onchange="onCitySelected('edit_p2_city', 'edit_p2_tz')">
+                            </div>
+                            <div>
+                                <label class="form-label small">UTC Offset</label>
+                                <input type="text" id="edit_p2_tz" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label">Notes / Relationship Context</label>
+                        <textarea id="edit_notes" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25 pt-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning px-4" onclick="saveEditedAnalysis()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS for modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+        let worldCities = [];
+        let savedAnalyses = [];
+        let editModalInstance = null;
+
+        // Fetch Curated Cities Database
+        async function loadCities() {
+            try {
+                const res = await fetch('/api/cities');
+                worldCities = await res.json();
+                populateCitiesDatalist(worldCities);
+            } catch (err) {
+                console.error("Could not load cities:", err);
+            }
+        }
+
+        function populateCitiesDatalist(cities) {
+            const datalist = document.getElementById('citiesList');
+            datalist.innerHTML = '';
+            cities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.display;
+                opt.label = `${c.name} (${c.country}) - TZ: ${c.tz}`;
+                datalist.appendChild(opt);
+            });
+        }
+
+        function findCity(val) {
+            if (!val) return null;
+            const clean = val.trim().toLowerCase();
+            return worldCities.find(c => 
+                c.display.toLowerCase() === clean || 
+                c.name.toLowerCase() === clean
+            ) || worldCities.find(c =>
+                c.display.toLowerCase().includes(clean) ||
+                clean.includes(c.name.toLowerCase())
+            );
+        }
+
+        const cityDebounceTimers = {};
+
+        function onCityInput(cityInputId, tzInputId, statusId) {
+            const val = document.getElementById(cityInputId).value.trim();
+            if (!val) {
+                document.getElementById(statusId).innerHTML = '';
+                return;
+            }
+
+            // 1. Instant check in local curated database
+            const localMatch = findCity(val);
+            if (localMatch && (localMatch.name.toLowerCase() === val.toLowerCase() || localMatch.display.toLowerCase() === val.toLowerCase())) {
+                renderCitySuccess(localMatch, statusId, tzInputId, "Curated Database");
+                return;
+            }
+
+            // 2. Debounced live check against OpenStreetMap / Nominatim
+            if (cityDebounceTimers[cityInputId]) clearTimeout(cityDebounceTimers[cityInputId]);
+
+            document.getElementById(statusId).innerHTML = `
+                <div class="searching-badge">
+                    <span class="spinner-border spinner-border-sm" role="status" style="width: 0.8rem; height: 0.8rem;"></span>
+                    <span>Checking location on OpenStreetMap &amp; local database...</span>
+                </div>
+            `;
+
+            cityDebounceTimers[cityInputId] = setTimeout(() => {
+                verifyCityLive(val, statusId, tzInputId);
+            }, 450);
+        }
+
+        function onCitySelected(cityInputId, tzInputId, statusId) {
+            const val = document.getElementById(cityInputId).value.trim();
+            if (cityDebounceTimers[cityInputId]) clearTimeout(cityDebounceTimers[cityInputId]);
+            verifyCityLive(val, statusId, tzInputId);
+        }
+
+        function triggerCityVerify(cityInputId, tzInputId, statusId) {
+            const val = document.getElementById(cityInputId).value.trim();
+            if (!val) {
+                alert("Please enter a city name to verify.");
+                return;
+            }
+            verifyCityLive(val, statusId, tzInputId);
+        }
+
+        async function verifyCityLive(query, statusId, tzInputId) {
+            if (!query || query.length < 2) {
+                document.getElementById(statusId).innerHTML = '';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                const container = document.getElementById(statusId);
+
+                if (data.found) {
+                    renderCitySuccess(data, statusId, tzInputId, data.source);
+                } else {
+                    container.innerHTML = `
+                        <div class="not-found-badge">
+                            <span>⚠️</span>
+                            <div>
+                                <strong>Location not found:</strong> Could not resolve "${escapeHtml(query)}" on OpenStreetMap or local list.
+                                <div class="small text-white text-opacity-75">Check spelling or specify country/region (e.g. <em>"${escapeHtml(query)}, Israel"</em>).</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Live geocoding error:", err);
+            }
+        }
+
+        function renderCitySuccess(data, statusId, tzInputId, sourceName) {
+            const container = document.getElementById(statusId);
+            const latStr = data.lat >= 0 ? `${data.lat.toFixed(2)}° N` : `${Math.abs(data.lat).toFixed(2)}° S`;
+            const lonStr = data.lon >= 0 ? `${data.lon.toFixed(2)}° E` : `${Math.abs(data.lon).toFixed(2)}° W`;
+            
+            container.innerHTML = `
+                <div class="verified-badge">
+                    <span class="badge bg-success bg-opacity-25 text-success">✓ Found via ${escapeHtml(sourceName)}</span>
+                    <span><strong>${escapeHtml(data.display || data.name)}</strong> (${latStr}, ${lonStr})</span>
+                    <span class="text-warning small ms-1">· Suggested TZ: ${data.tz}</span>
+                </div>
+            `;
+
+            // Auto-fill or update timezone if available
+            if (tzInputId && data.tz) {
+                const tzEl = document.getElementById(tzInputId);
+                if (tzEl) tzEl.value = data.tz;
+            }
+        }
+
         function setTZ(elementId, val) {
             document.getElementById(elementId).value = val;
         }
@@ -344,15 +677,298 @@
             document.getElementById('p1_name').value = 'Alex';
             document.getElementById('p1_date').value = '1992-04-15';
             document.getElementById('p1_time').value = '14:30';
-            document.getElementById('p1_tz').value = '+03:00';
             document.getElementById('p1_city').value = 'Tel Aviv, Israel';
+            onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
 
             document.getElementById('p2_name').value = 'Jordan';
             document.getElementById('p2_date').value = '1994-11-20';
             document.getElementById('p2_time').value = '08:15';
-            document.getElementById('p2_tz').value = '-05:00';
             document.getElementById('p2_city').value = 'New York, USA';
+            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
         }
+
+        // --- SAVED ANALYSES MANAGEMENT ---
+        async function fetchSavedAnalyses() {
+            try {
+                const res = await fetch('/api/analyses');
+                savedAnalyses = await res.json();
+                renderSavedAnalyses(savedAnalyses);
+                document.getElementById('savedCountBadge').textContent = savedAnalyses.length;
+            } catch (err) {
+                console.error("Could not fetch saved analyses:", err);
+            }
+        }
+
+        function renderSavedAnalyses(list) {
+            const container = document.getElementById('savedAnalysesContainer');
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5 text-secondary">
+                        <div style="font-size: 2rem;">📭</div>
+                        <p class="mb-2">No saved analyses yet.</p>
+                        <small>Fill in the form above and click "Save to My Analyses" to store couple profiles.</small>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            list.forEach(item => {
+                const col = document.createElement('div');
+                col.className = 'col-lg-6';
+
+                const p1 = item.p1 || {};
+                const p2 = item.p2 || {};
+
+                col.innerHTML = `
+                    <div class="saved-analysis-card h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="cinzel text-warning mb-0" style="font-size: 1.15rem;">${escapeHtml(item.title)}</h5>
+                                <span class="badge bg-secondary bg-opacity-25 text-muted small">${item.created_at || ''}</span>
+                            </div>
+
+                            <div class="row g-2 mb-3 mt-1" style="font-size: 0.85rem;">
+                                <div class="col-6 p-2 rounded" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--p1-color);">
+                                    <strong style="color: var(--p1-color)">${escapeHtml(p1.name || 'Partner A')}</strong>
+                                    <div class="text-secondary small">📅 ${p1.date || 'N/A'} ${p1.time || ''}</div>
+                                    <div class="text-secondary small text-truncate">📍 ${escapeHtml(p1.city || 'N/A')}</div>
+                                </div>
+                                <div class="col-6 p-2 rounded" style="background: rgba(244, 114, 182, 0.08); border-left: 3px solid var(--p2-color);">
+                                    <strong style="color: var(--p2-color)">${escapeHtml(p2.name || 'Partner B')}</strong>
+                                    <div class="text-secondary small">📅 ${p2.date || 'N/A'} ${p2.time || ''}</div>
+                                    <div class="text-secondary small text-truncate">📍 ${escapeHtml(p2.city || 'N/A')}</div>
+                                </div>
+                            </div>
+
+                            ${item.notes ? `<p class="text-secondary small mb-3 italic"><em>"${escapeHtml(item.notes)}"</em></p>` : ''}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-15">
+                            <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="loadAnalysisIntoForm('${item.id}')">
+                                📥 Load into Form
+                            </button>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="openEditModal('${item.id}')" title="Edit Profile">
+                                    ✏️ Edit
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteAnalysis('${item.id}')" title="Delete Profile">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        function filterSavedList() {
+            const q = document.getElementById('savedSearchInput').value.trim().toLowerCase();
+            if (!q) {
+                renderSavedAnalyses(savedAnalyses);
+                return;
+            }
+            const filtered = savedAnalyses.filter(item => {
+                const title = (item.title || '').toLowerCase();
+                const p1Name = ((item.p1 && item.p1.name) || '').toLowerCase();
+                const p2Name = ((item.p2 && item.p2.name) || '').toLowerCase();
+                const p1City = ((item.p1 && item.p1.city) || '').toLowerCase();
+                const p2City = ((item.p2 && item.p2.city) || '').toLowerCase();
+                return title.includes(q) || p1Name.includes(q) || p2Name.includes(q) || p1City.includes(q) || p2City.includes(q);
+            });
+            renderSavedAnalyses(filtered);
+        }
+
+        function loadAnalysisIntoForm(id) {
+            const item = savedAnalyses.find(x => x.id === id);
+            if (!item) return;
+
+            const p1 = item.p1 || {};
+            const p2 = item.p2 || {};
+
+            document.getElementById('p1_name').value = p1.name || '';
+            document.getElementById('p1_date').value = p1.date || '';
+            document.getElementById('p1_time').value = p1.time || '12:00';
+            document.getElementById('p1_city').value = p1.city || '';
+            document.getElementById('p1_tz').value = p1.tz || '+03:00';
+            onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
+
+            document.getElementById('p2_name').value = p2.name || '';
+            document.getElementById('p2_date').value = p2.date || '';
+            document.getElementById('p2_time').value = p2.time || '12:00';
+            document.getElementById('p2_city').value = p2.city || '';
+            document.getElementById('p2_tz').value = p2.tz || '-05:00';
+            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+
+            // Smooth scroll up to form
+            document.getElementById('astroForm').scrollIntoView({ behavior: 'smooth' });
+
+            // Visual feedback highlight
+            const cards = document.querySelectorAll('.partner-card-1, .partner-card-2');
+            cards.forEach(c => {
+                c.style.transform = 'scale(1.02)';
+                setTimeout(() => c.style.transform = '', 300);
+            });
+        }
+
+        async function saveCurrentFormAsAnalysis() {
+            const p1_name = document.getElementById('p1_name').value.trim();
+            const p2_name = document.getElementById('p2_name').value.trim();
+
+            if (!p1_name || !p2_name) {
+                alert("Please fill in at least Partner A and Partner B names before saving.");
+                return;
+            }
+
+            const defaultTitle = `${p1_name} & ${p2_name}`;
+            const title = prompt("Enter a title for this saved analysis:", defaultTitle);
+            if (title === null) return; // user cancelled
+
+            const payload = {
+                title: title.trim() || defaultTitle,
+                p1: {
+                    name: p1_name,
+                    date: document.getElementById('p1_date').value,
+                    time: document.getElementById('p1_time').value,
+                    city: document.getElementById('p1_city').value,
+                    tz: document.getElementById('p1_tz').value
+                },
+                p2: {
+                    name: p2_name,
+                    date: document.getElementById('p2_date').value,
+                    time: document.getElementById('p2_time').value,
+                    city: document.getElementById('p2_city').value,
+                    tz: document.getElementById('p2_tz').value
+                },
+                notes: ""
+            };
+
+            try {
+                const res = await fetch('/api/analyses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    await fetchSavedAnalyses();
+                    scrollToSaved();
+                } else {
+                    alert("Failed to save analysis.");
+                }
+            } catch (err) {
+                alert("Error saving analysis: " + err);
+            }
+        }
+
+        function openEditModal(id) {
+            const item = savedAnalyses.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('edit_id').value = item.id;
+            document.getElementById('edit_title').value = item.title || '';
+
+            const p1 = item.p1 || {};
+            const p2 = item.p2 || {};
+
+            document.getElementById('edit_p1_name').value = p1.name || '';
+            document.getElementById('edit_p1_date').value = p1.date || '';
+            document.getElementById('edit_p1_time').value = p1.time || '';
+            document.getElementById('edit_p1_city').value = p1.city || '';
+            document.getElementById('edit_p1_tz').value = p1.tz || '';
+
+            document.getElementById('edit_p2_name').value = p2.name || '';
+            document.getElementById('edit_p2_date').value = p2.date || '';
+            document.getElementById('edit_p2_time').value = p2.time || '';
+            document.getElementById('edit_p2_city').value = p2.city || '';
+            document.getElementById('edit_p2_tz').value = p2.tz || '';
+
+            document.getElementById('edit_notes').value = item.notes || '';
+
+            if (!editModalInstance) {
+                editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
+            }
+            editModalInstance.show();
+        }
+
+        async function saveEditedAnalysis() {
+            const id = document.getElementById('edit_id').value;
+            const payload = {
+                title: document.getElementById('edit_title').value.trim(),
+                p1: {
+                    name: document.getElementById('edit_p1_name').value.trim(),
+                    date: document.getElementById('edit_p1_date').value,
+                    time: document.getElementById('edit_p1_time').value,
+                    city: document.getElementById('edit_p1_city').value,
+                    tz: document.getElementById('edit_p1_tz').value
+                },
+                p2: {
+                    name: document.getElementById('edit_p2_name').value.trim(),
+                    date: document.getElementById('edit_p2_date').value,
+                    time: document.getElementById('edit_p2_time').value,
+                    city: document.getElementById('edit_p2_city').value,
+                    tz: document.getElementById('edit_p2_tz').value
+                },
+                notes: document.getElementById('edit_notes').value.trim()
+            };
+
+            try {
+                const res = await fetch(`/api/analyses/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    editModalInstance.hide();
+                    await fetchSavedAnalyses();
+                } else {
+                    alert("Failed to update analysis.");
+                }
+            } catch (err) {
+                alert("Error updating analysis: " + err);
+            }
+        }
+
+        async function deleteAnalysis(id) {
+            const item = savedAnalyses.find(x => x.id === id);
+            const title = item ? item.title : 'this analysis';
+            if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/analyses/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await fetchSavedAnalyses();
+                } else {
+                    alert("Failed to delete analysis.");
+                }
+            } catch (err) {
+                alert("Error deleting analysis: " + err);
+            }
+        }
+
+        function scrollToSaved() {
+            document.getElementById('savedAnalysesSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCities();
+            fetchSavedAnalyses();
+
+            // Default check for initial values
+            onCityInput('p1_city', 'p1_tz', 'p1_city_status');
+            onCityInput('p2_city', 'p2_tz', 'p2_city_status');
+        });
 
         document.getElementById('astroForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');

@@ -6,7 +6,50 @@ from geopy.geocoders import Nominatim
 import ssl
 import json
 
+import os
+import uuid
+
 app = Flask(__name__)
+
+# --- FILE PATHS & DATA LOADING ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CITIES_FILE = os.path.join(BASE_DIR, 'cities.json')
+SAVED_ANALYSES_FILE = os.path.join(BASE_DIR, 'saved_analyses.json')
+
+# Load Curated World Cities
+CITIES_DATA = []
+if os.path.exists(CITIES_FILE):
+    try:
+        with open(CITIES_FILE, 'r', encoding='utf-8') as f:
+            CITIES_DATA = json.load(f)
+        print(f"Loaded {len(CITIES_DATA)} curated world cities.")
+    except Exception as err:
+        print(f"Error loading cities.json: {err}")
+
+def find_city_in_db(city_str):
+    """Find pre-verified city by exact or substring match."""
+    clean = city_str.strip().lower()
+    for c in CITIES_DATA:
+        if c['display'].lower() == clean or c['name'].lower() == clean:
+            return c
+    for c in CITIES_DATA:
+        if clean in c['display'].lower() or c['name'].lower() in clean:
+            return c
+    return None
+
+def load_saved_analyses():
+    if not os.path.exists(SAVED_ANALYSES_FILE):
+        return []
+    try:
+        with open(SAVED_ANALYSES_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as err:
+        print(f"Error reading {SAVED_ANALYSES_FILE}: {err}")
+        return []
+
+def save_analyses_to_file(data):
+    with open(SAVED_ANALYSES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 # --- CONFIG & EPHEMERIS LOADING ---
 # Fix SSL for geopy
@@ -172,12 +215,19 @@ def get_house_for_lon(lon_deg, asc_deg):
 
 def compute_chart(name, date_str, time_str, tz_str, city_str):
     """Calculates all planetary coordinates, angles, houses, and natal aspects."""
-    # Geocode
-    location = geolocator.geocode(city_str)
-    if not location:
-        raise ValueError(f"Could not locate city: '{city_str}'. Please check spelling or add country name.")
-        
-    lat, lon = location.latitude, location.longitude
+    # Resolve City Coordinates (Curated DB first, then live OpenStreetMap/Nominatim fallback)
+    matched_city = find_city_in_db(city_str)
+    if matched_city:
+        lat, lon = matched_city['lat'], matched_city['lon']
+        address = matched_city['display']
+        source = "Curated Database"
+    else:
+        location = geolocator.geocode(city_str)
+        if not location:
+            raise ValueError(f"Could not locate '{city_str}' on OpenStreetMap or local database. Please check spelling or specify country (e.g., 'Kiryat Gat, Israel').")
+        lat, lon = location.latitude, location.longitude
+        address = location.address
+        source = "OpenStreetMap"
     
     # Parse date and time
     dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
@@ -302,7 +352,8 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         "time": time_str,
         "tz": tz_str,
         "city": city_str,
-        "location_address": location.address,
+        "location_address": address,
+        "location_source": source,
         "lat": round(lat, 4),
         "lon": round(lon, 4),
         "asc": round(asc_deg, 2),
@@ -482,6 +533,159 @@ def analyze():
             'index.html',
             error=f"Error calculating charts: {str(e)}"
         )
+
+# --- API ROUTES ---
+@app.route('/api/geocode', methods=['GET'])
+def api_geocode():
+    """
+    Verify city live across curated DB and OpenStreetMap (Nominatim).
+    Tells the client exactly where it looked, if it found it, coordinates, and timezone.
+    """
+    q = request.args.get('q', '').strip()
+    if not q or len(q) < 2:
+        return jsonify({"found": False, "message": "City query is empty or too short."})
+    
+    # 1. Curated database check (Fastest, pre-verified)
+    matched = find_city_in_db(q)
+    if matched:
+        return jsonify({
+            "found": True,
+            "source": "Curated Database",
+            "name": matched["name"],
+            "display": matched["display"],
+            "lat": matched["lat"],
+            "lon": matched["lon"],
+            "tz": matched["tz"],
+            "message": f"Verified in local database: {matched['display']}"
+        })
+        
+    # 2. OpenStreetMap / Nominatim check (Worldwide coverage: towns, suburbs, villages)
+    try:
+        loc = geolocator.geocode(q)
+        if loc:
+            addr = loc.address
+            lat = round(loc.latitude, 4)
+            lon = round(loc.longitude, 4)
+            
+            # Smart timezone estimation
+            if "ישראל" in addr or "Israel" in addr or (29.5 <= lat <= 33.5 and 34.0 <= lon <= 36.0):
+                tz_est = "+03:00"
+            else:
+                raw_offset = round(lon / 15.0)
+                sign = "+" if raw_offset >= 0 else "-"
+                tz_est = f"{sign}{abs(int(raw_offset)):02d}:00"
+                
+            return jsonify({
+                "found": True,
+                "source": "OpenStreetMap",
+                "name": q,
+                "display": loc.address,
+                "lat": lat,
+                "lon": lon,
+                "tz": tz_est,
+                "message": f"Found on OpenStreetMap: {loc.address}"
+            })
+        else:
+            return jsonify({
+                "found": False,
+                "source": "OpenStreetMap & Local Database",
+                "query": q,
+                "message": f"Could not find '{q}' on OpenStreetMap or local list. Please check spelling or specify country (e.g. '{q}, Israel')."
+            })
+    except Exception as e:
+        return jsonify({
+            "found": False,
+            "source": "OpenStreetMap Lookup",
+            "query": q,
+            "message": f"Geocoding service error: {str(e)}"
+        })
+
+@app.route('/api/cities', methods=['GET'])
+def api_cities():
+    """Return filtered cities from curated database."""
+    q = request.args.get('q', '').strip().lower()
+    if not q:
+        return jsonify(CITIES_DATA[:80])
+    matches = [
+        c for c in CITIES_DATA
+        if q in c['display'].lower() or q in c['name'].lower() or q in c['country'].lower()
+    ]
+    return jsonify(matches[:40])
+
+@app.route('/api/analyses', methods=['GET'])
+def api_get_analyses():
+    """List all saved analyses."""
+    return jsonify(load_saved_analyses())
+
+@app.route('/api/analyses', methods=['POST'])
+def api_save_analysis():
+    """Save a new couple analysis profile."""
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "No JSON payload provided"}), 400
+        
+        saved = load_saved_analyses()
+        analysis_id = str(uuid.uuid4())[:8]
+        new_item = {
+            "id": f"match-{analysis_id}",
+            "title": data.get("title") or f"{data.get('p1', {}).get('name', 'Partner A')} & {data.get('p2', {}).get('name', 'Partner B')}",
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "p1": data.get("p1", {}),
+            "p2": data.get("p2", {}),
+            "notes": data.get("notes", "")
+        }
+        saved.insert(0, new_item)
+        save_analyses_to_file(saved)
+        return jsonify({"success": True, "analysis": new_item}), 201
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+@app.route('/api/analyses/<analysis_id>', methods=['GET'])
+def api_get_single_analysis(analysis_id):
+    """Retrieve a single saved analysis."""
+    saved = load_saved_analyses()
+    item = next((x for x in saved if x["id"] == analysis_id), None)
+    if not item:
+        return jsonify({"error": "Analysis not found"}), 404
+    return jsonify(item)
+
+@app.route('/api/analyses/<analysis_id>', methods=['PUT'])
+def api_update_analysis(analysis_id):
+    """Update an existing analysis profile."""
+    try:
+        data = request.get_json(force=True)
+        saved = load_saved_analyses()
+        idx = next((i for i, x in enumerate(saved) if x["id"] == analysis_id), None)
+        if idx is None:
+            return jsonify({"error": "Analysis not found"}), 404
+            
+        item = saved[idx]
+        if "title" in data: item["title"] = data["title"]
+        if "p1" in data: item["p1"] = data["p1"]
+        if "p2" in data: item["p2"] = data["p2"]
+        if "notes" in data: item["notes"] = data["notes"]
+        item["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        saved[idx] = item
+        save_analyses_to_file(saved)
+        return jsonify({"success": True, "analysis": item})
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+@app.route('/api/analyses/<analysis_id>', methods=['DELETE'])
+def api_delete_analysis(analysis_id):
+    """Delete a saved analysis profile."""
+    try:
+        saved = load_saved_analyses()
+        initial_len = len(saved)
+        saved = [x for x in saved if x["id"] != analysis_id]
+        if len(saved) == initial_len:
+            return jsonify({"error": "Analysis not found"}), 404
+        save_analyses_to_file(saved)
+        return jsonify({"success": True, "deleted_id": analysis_id})
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5050)

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "match-demo-001",
+    "title": "Alex & Jordan (Sample)",
+    "created_at": "2026-09-06 06:00",
+    "p1": {
+      "name": "Alex",
+      "date": "1992-04-15",
+      "time": "14:30",
+      "tz": "+03:00",
+      "city": "Tel Aviv, Israel"
+    },
+    "p2": {
+      "name": "Jordan",
+      "date": "1994-11-20",
+      "time": "08:15",
+      "tz": "-05:00",
+      "city": "New York, USA"
+    },
+    "notes": "Classic Aries Sun & Scorpio Sun demonstration"
+  }
+]

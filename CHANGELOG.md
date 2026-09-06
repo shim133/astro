@@ -5,6 +5,32 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-09-06
+
+### Added
+- **Curated World Cities Catalog (`cities.json`)**:
+  - Offline-capable database of over 120 major world cities and metropolitan regions across all continents.
+  - Includes exact pre-verified latitudes, longitudes, canonical display names, and default UTC timezone offsets.
+  - Searchable autocomplete dropdown (`<datalist>`) in city inputs with instant filtering.
+  - Instant selection automatically locks in coordinates, auto-fills default UTC offset, and displays an interactive verification badge (`📍 Verified: Lat, Lon · Country`).
+  - Fallback to live Nominatim geocoding for unlisted custom locations.
+- **Saved Analyses Management System (Full CRUD)**:
+  - Persistent JSON database storage (`saved_analyses.json`) preserving couple calculation profiles across restarts.
+  - Complete REST API:
+    - `GET /api/analyses`: list all saved profiles.
+    - `POST /api/analyses`: save a new couple profile.
+    - `GET /api/analyses/<id>`: retrieve individual profile.
+    - `PUT /api/analyses/<id>`: update/edit saved couple data.
+    - `DELETE /api/analyses/<id>`: remove profile from storage.
+  - Interactive UI Management Panel on homepage:
+    - Searchable list of saved couple profiles.
+    - **Load into Form**: Populates form inputs with a single click.
+    - **Inline Edit Modal**: Allows editing names, dates, times, cities, timezones, and notes.
+    - **Delete**: Instant removal with confirmation dialog.
+  - **Quick Save Actions**:
+    - "💾 Save to My Analyses" button directly on the homepage input form.
+    - "💾 Save to My Analyses" button in the result report action bar.
+
 ## [2.0.0] - 2026-09-06
 
 ### Added

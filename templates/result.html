@@ -244,6 +244,7 @@
             </div>
 
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-export" id="btnSaveAnalysis" onclick="saveCurrentAnalysis()">💾 Save to My Analyses</button>
                 <button type="button" class="btn btn-export" onclick="exportSvg()">⬇️ Export SVG Map</button>
                 <button type="button" class="btn btn-export" onclick="exportPng()">🖼️ Export PNG Map</button>
             </div>
@@ -368,6 +369,17 @@
                                     <span class="fw-semibold">{{ p1.planets_dict['Mars'].formatted }}</span>
                                 </div>
                             </div>
+
+                            <!-- Location Resolution Details -->
+                            <div class="mt-3 pt-2 border-top border-secondary border-opacity-25" style="font-size: 0.76rem;">
+                                <div class="text-truncate text-light text-opacity-75 mb-1" title="{{ p1.location_address }}">
+                                    📍 <strong>Resolved:</strong> {{ p1.location_address }}
+                                </div>
+                                <div class="text-secondary d-flex justify-content-between">
+                                    <span>Coord: {{ p1.lat }}°, {{ p1.lon }}°</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-info">{{ p1.location_source }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -402,6 +414,17 @@
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary"><strong style="color: #ef4444;">♂ Mars:</strong></span>
                                     <span class="fw-semibold">{{ p2.planets_dict['Mars'].formatted }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Location Resolution Details -->
+                            <div class="mt-3 pt-2 border-top border-secondary border-opacity-25" style="font-size: 0.76rem;">
+                                <div class="text-truncate text-light text-opacity-75 mb-1" title="{{ p2.location_address }}">
+                                    📍 <strong>Resolved:</strong> {{ p2.location_address }}
+                                </div>
+                                <div class="text-secondary d-flex justify-content-between">
+                                    <span>Coord: {{ p2.lat }}°, {{ p2.lon }}°</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-info">{{ p2.location_source }}</span>
                                 </div>
                             </div>
                         </div>
@@ -1135,6 +1158,53 @@
                 document.body.removeChild(downloadLink);
             };
             img.src = url;
+        }
+
+        // Save Current Analysis
+        async function saveCurrentAnalysis() {
+            const btn = document.getElementById('btnSaveAnalysis');
+            const defaultTitle = `${chart1.name} & ${chart2.name}`;
+            const title = prompt("Enter a title to save this analysis:", defaultTitle);
+            if (title === null) return;
+
+            const payload = {
+                title: title.trim() || defaultTitle,
+                p1: {
+                    name: chart1.name,
+                    date: chart1.date,
+                    time: chart1.time,
+                    city: chart1.city,
+                    tz: chart1.tz
+                },
+                p2: {
+                    name: chart2.name,
+                    date: chart2.date,
+                    time: chart2.time,
+                    city: chart2.city,
+                    tz: chart2.tz
+                },
+                notes: `Compatibility Score: ${synastry.overall_score}% (${synastry.aspects.length} aspects)`
+            };
+
+            try {
+                const res = await fetch('/api/analyses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    btn.innerHTML = '✅ Saved to Analyses!';
+                    btn.classList.add('text-success');
+                    btn.style.borderColor = '#10b981';
+                    setTimeout(() => {
+                        btn.innerHTML = '💾 Saved';
+                    }, 2500);
+                } else {
+                    alert("Could not save analysis.");
+                }
+            } catch (err) {
+                alert("Error saving analysis: " + err);
+            }
         }
 
         // Initialize Wheel on Load

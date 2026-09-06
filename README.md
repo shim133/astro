@@ -1,4 +1,4 @@
-# AstroMatch Pro (v2.0.0)
+# AstroMatch Pro (v2.1.0)
 
 Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
 
@@ -7,6 +7,21 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 ---
 
 ## Key Features
+
+- **Curated World Cities & Verification**:
+  - Pre-verified catalog of 120+ global cities across all continents with exact latitudes, longitudes, and default UTC offsets.
+  - Searchable autocomplete dropdown (`<datalist>`) for selecting birth cities.
+  - Selecting a city locks in verified coordinates, auto-fills the timezone offset, and displays an instant verification badge (`📍 Verified: Lat, Lon · Country`).
+  - Fallback to live geocoding for unlisted custom locations.
+
+- **Saved Analyses Management (Full CRUD)**:
+  - Persistent JSON database storage (`saved_analyses.json`) so your couple profiles are saved across sessions.
+  - Dedicated manager on the homepage:
+    - **List & Search**: Browse all saved couples with metadata and birth details.
+    - **Load into Form**: Populate both partners' details with one click.
+    - **Inline Edit**: Edit names, birth dates, times, cities, or notes in a clean modal dialog.
+    - **Delete**: Remove profiles with instant UI update.
+  - Quick-save buttons on both the homepage form and the result report header.
 
 - **Interactive Astrological Maps (Pure SVG Engine)**:
   - **Synastry Bi-Wheel**: Partner A on the inner track, Partner B on the outer track, with color-coded inter-chart aspect chords in the center.
@@ -79,12 +94,14 @@ astroDating/
 │   ├── settings.json                  # Python interpreter binding
 │   └── tasks.json                     # Task runner configuration
 ├── templates/
-│   ├── index.html                     # Celestial input form & sample loader
+│   ├── index.html                     # Celestial form, city search & saved analyses manager
 │   └── result.html                    # SVG Astrological Map & aspect matrix
 ├── .gitignore                         # Git ignore configuration
 ├── app.py                             # Core Flask backend & celestial math engine
-├── CHANGELOG.md                       # Semantic version history (v2.0.0)
+├── CHANGELOG.md                       # Semantic version history (v2.1.0)
+├── cities.json                        # Curated database of world cities & coordinates
 ├── de421.bsp                          # NASA JPL planetary ephemeris (~16 MB)
 ├── environment.yml                    # Conda environment specification
-└── README.md                          # Project documentation
+├── README.md                          # Project documentation
+└── saved_analyses.json                # Persistent JSON database for couple profiles
 ```
