@@ -1,4 +1,4 @@
-# AstroMatch Pro (v2.2.0)
+# AstroMatch Pro (v2.3.0)
 
 Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
 
@@ -8,6 +8,14 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 
 ## Key Features
 
+- **Individual Person Profiles & Partner Comparison System (New in v2.3.0)**:
+  - **Saved People Directory (`saved_people.json`)**: Save individual birth profiles (birth date, exact hour of birth, city, timezone) for rapid pairing.
+  - **Independent Partner Selectors**: Select any saved individual for Partner A and Partner B independently to quickly compare against multiple partners.
+  - **Live Save Status Indicators**: Real-time comparison between entered details and saved records (`✓ Saved`, `Modified 💾 Update`, or `Not saved 💾 Save`).
+  - **Interactive Results Page Comparison Modal**: Easily adjust the hour of birth or switch partners directly from the results view and recalculate instantaneously.
+  - **1-Click Partner Swap**: Instantly flip Partner A and Partner B with coordinates and parameters preserved.
+  - **Dual-Tab Directory**: Tabbed manager on the main page for both Saved Couple Analyses and Individual People Profiles.
+
 - **Multi-Language Architecture (Hebrew & English)**:
   - Built-in bilingual support with instant language switching (`🌐 עברית / English`).
   - Automatic RTL (Right-to-Left) and LTR layout adaptation.
@@ -16,9 +24,9 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
   - User preference persisted across visits in `localStorage`.
 
 - **Version Tracking & Metadata Display**:
-  - Global `APP_VERSION = "2.2.0"` in `app.py`.
-  - All saved analyses in `saved_analyses.json` are stamped with the version number used (`"version": "2.2.0"`).
-  - Saved analysis cards display a version badge (e.g. `v2.2.0`).
+  - Global `APP_VERSION = "2.3.0"` in `app.py`.
+  - All saved analyses and people profiles are stamped with the version number used (`"version": "2.3.0"`).
+  - Saved cards display a version badge (e.g. `v2.3.0`).
   - Persistent application footer displayed below the program on all screens.
 
 - **Curated World Cities & Verification**:

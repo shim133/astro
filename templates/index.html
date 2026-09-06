@@ -347,24 +347,34 @@
                 <!-- Partner A -->
                 <div class="col-lg-5 col-md-6">
                     <div class="glass-card partner-card-1 p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;" data-i18n="partnerA">Partner A</h3>
                             <span class="badge-partner-1" data-i18n="innerWheel">Inner Wheel</span>
                         </div>
 
+                        <!-- Saved Person Quick Select -->
                         <div class="mb-3">
-                            <label class="form-label" data-i18n="fullName">Full Name or Alias</label>
-                            <input type="text" id="p1_name" name="p1_name" class="form-control" placeholder="e.g. Alex" data-i18n-placeholder="namePlaceholderP1" required>
+                            <select id="p1_person_select" class="form-select form-select-sm" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); color: #f8fafc;" onchange="onSelectSavedPerson('p1', this.value)">
+                                <option value="" data-i18n="chooseSavedPerson">👤 Choose saved person...</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" data-i18n="fullName">Full Name or Alias</label>
+                                <div id="p1_saved_indicator" class="d-flex align-items-center gap-1"></div>
+                            </div>
+                            <input type="text" id="p1_name" name="p1_name" class="form-control" placeholder="e.g. Alex" data-i18n-placeholder="namePlaceholderP1" required oninput="checkPersonSavedState('p1')">
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-7">
                                 <label class="form-label" data-i18n="dob">Date of Birth</label>
-                                <input type="date" id="p1_date" name="p1_date" class="form-control" required>
+                                <input type="date" id="p1_date" name="p1_date" class="form-control" required onchange="checkPersonSavedState('p1')">
                             </div>
                             <div class="col-5">
                                 <label class="form-label" data-i18n="exactTime">Exact Time</label>
-                                <input type="time" id="p1_time" name="p1_time" class="form-control" value="12:00" required>
+                                <input type="time" id="p1_time" name="p1_time" class="form-control" value="12:00" required oninput="checkPersonSavedState('p1')" onchange="checkPersonSavedState('p1')">
                             </div>
                         </div>
 
@@ -374,7 +384,7 @@
                                 <span data-i18n="cityLabel">City / Town of Birth (Worldwide)</span>
                                 <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p1_city', 'p1_tz', 'p1_city_status')" style="cursor: pointer; text-decoration: underline;" data-i18n="checkLocation">🔍 Check Location</span>
                             </label>
-                            <input type="text" id="p1_city" name="p1_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, New York, London..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p1_city', 'p1_tz', 'p1_city_status')" oninput="onCityInput('p1_city', 'p1_tz', 'p1_city_status')">
+                            <input type="text" id="p1_city" name="p1_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, New York, London..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p1_city', 'p1_tz', 'p1_city_status'); checkPersonSavedState('p1');" oninput="onCityInput('p1_city', 'p1_tz', 'p1_city_status'); checkPersonSavedState('p1');">
                             <div id="p1_city_status"></div>
                             <small class="text-muted d-block mt-1" style="font-size: 0.74rem;" data-i18n="cityHelp">
                                 Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
@@ -386,39 +396,56 @@
                                 <span data-i18n="tzLabel">UTC Timezone Offset</span>
                                 <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
-                            <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required>
+                            <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required oninput="checkPersonSavedState('p1')">
                             <div class="tz-pills mt-1">
-                                <button type="button" onclick="setTZ('p1_tz', '+03:00')">TLV (+3)</button>
-                                <button type="button" onclick="setTZ('p1_tz', '-05:00')">NYC (-5)</button>
-                                <button type="button" onclick="setTZ('p1_tz', '+00:00')">LON (+0)</button>
-                                <button type="button" onclick="setTZ('p1_tz', '+01:00')">PAR (+1)</button>
-                                <button type="button" onclick="setTZ('p1_tz', '-08:00')">LAX (-8)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+03:00'); checkPersonSavedState('p1');">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '-05:00'); checkPersonSavedState('p1');">NYC (-5)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+00:00'); checkPersonSavedState('p1');">LON (+0)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+01:00'); checkPersonSavedState('p1');">PAR (+1)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '-08:00'); checkPersonSavedState('p1');">LAX (-8)</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Swap Button -->
+                <div class="col-12 text-center my-0">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" onclick="swapPartners()" data-i18n="swapPartnersBtn" title="Swap Partner A and Partner B">
+                        🔄 Swap Partners (A ⇄ B)
+                    </button>
+                </div>
+
                 <!-- Partner B -->
                 <div class="col-lg-5 col-md-6">
                     <div class="glass-card partner-card-2 p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;" data-i18n="partnerB">Partner B</h3>
                             <span class="badge-partner-2" data-i18n="outerWheel">Outer Wheel</span>
                         </div>
 
+                        <!-- Saved Person Quick Select -->
                         <div class="mb-3">
-                            <label class="form-label" data-i18n="fullName">Full Name or Alias</label>
-                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" data-i18n-placeholder="namePlaceholderP2" required>
+                            <select id="p2_person_select" class="form-select form-select-sm" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(244, 114, 182, 0.4); color: #f8fafc;" onchange="onSelectSavedPerson('p2', this.value)">
+                                <option value="" data-i18n="chooseSavedPerson">👤 Choose saved person...</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" data-i18n="fullName">Full Name or Alias</label>
+                                <div id="p2_saved_indicator" class="d-flex align-items-center gap-1"></div>
+                            </div>
+                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" data-i18n-placeholder="namePlaceholderP2" required oninput="checkPersonSavedState('p2')">
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-7">
                                 <label class="form-label" data-i18n="dob">Date of Birth</label>
-                                <input type="date" id="p2_date" name="p2_date" class="form-control" required>
+                                <input type="date" id="p2_date" name="p2_date" class="form-control" required onchange="checkPersonSavedState('p2')">
                             </div>
                             <div class="col-5">
                                 <label class="form-label" data-i18n="exactTime">Exact Time</label>
-                                <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" required>
+                                <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" required oninput="checkPersonSavedState('p2')" onchange="checkPersonSavedState('p2')">
                             </div>
                         </div>
 
@@ -428,7 +455,7 @@
                                 <span data-i18n="cityLabel">City / Town of Birth (Worldwide)</span>
                                 <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p2_city', 'p2_tz', 'p2_city_status')" style="cursor: pointer; text-decoration: underline;" data-i18n="checkLocation">🔍 Check Location</span>
                             </label>
-                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status')" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status')">
+                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');">
                             <div id="p2_city_status"></div>
                             <small class="text-muted d-block mt-1" style="font-size: 0.74rem;" data-i18n="cityHelp">
                                 Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
@@ -440,13 +467,13 @@
                                 <span data-i18n="tzLabel">UTC Timezone Offset</span>
                                 <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
-                            <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required>
+                            <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required oninput="checkPersonSavedState('p2')">
                             <div class="tz-pills mt-1">
-                                <button type="button" onclick="setTZ('p2_tz', '+03:00')">TLV (+3)</button>
-                                <button type="button" onclick="setTZ('p2_tz', '-05:00')">NYC (-5)</button>
-                                <button type="button" onclick="setTZ('p2_tz', '+00:00')">LON (+0)</button>
-                                <button type="button" onclick="setTZ('p2_tz', '+01:00')">PAR (+1)</button>
-                                <button type="button" onclick="setTZ('p2_tz', '-08:00')">LAX (-8)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+03:00'); checkPersonSavedState('p2');">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '-05:00'); checkPersonSavedState('p2');">NYC (-5)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+00:00'); checkPersonSavedState('p2');">LON (+0)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+01:00'); checkPersonSavedState('p2');">PAR (+1)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '-08:00'); checkPersonSavedState('p2');">LAX (-8)</button>
                             </div>
                         </div>
                     </div>
@@ -473,24 +500,35 @@
         <!-- Curated Cities Datalist -->
         <datalist id="citiesList"></datalist>
 
-        <!-- Saved Analyses Manager Section -->
+        <!-- Saved Analyses & Profiles Manager Section -->
         <div class="glass-card p-4 mt-5" id="savedAnalysesSection">
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
-                <div>
-                    <h3 class="cinzel h4 text-white mb-1" data-i18n="savedAnalysesTitle">📁 Saved Analyses &amp; Couple Profiles</h3>
-                    <p class="text-secondary small mb-0" data-i18n="savedAnalysesSub">Select, load, edit, or delete previously saved synastry profiles</p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25 gap-3">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 active" id="btnTabAnalyses" onclick="switchSavedTab('analyses')">
+                        <span data-i18n="savedAnalysesTitle">📁 Saved Couple Analyses</span> (<span id="savedCountBadge">0</span>)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" id="btnTabPeople" onclick="switchSavedTab('people')">
+                        <span data-i18n="savedPeopleTitle">👥 Saved People Profiles</span> (<span id="savedPeopleCountBadge">0</span>)
+                    </button>
                 </div>
 
-                <div class="d-flex gap-2 align-items-center mt-2 mt-md-0">
-                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." data-i18n-placeholder="searchSavedPlaceholder" style="width: 200px;" oninput="filterSavedList()">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="fetchSavedAnalyses()" data-i18n="refreshBtn">🔄 Refresh</button>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." data-i18n-placeholder="searchSavedPlaceholder" style="width: 200px;" oninput="filterActiveSavedList()">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="refreshAllSaved()" data-i18n="refreshBtn">🔄 Refresh</button>
                 </div>
             </div>
 
-            <!-- List Container -->
+            <!-- Couple Analyses Container -->
             <div id="savedAnalysesContainer" class="row g-3">
                 <div class="text-center py-4 text-secondary">
                     <div class="spinner-border spinner-border-sm text-warning" role="status"></div> Loading saved profiles...
+                </div>
+            </div>
+
+            <!-- Individual People Profiles Container -->
+            <div id="savedPeopleContainer" class="row g-3" style="display: none;">
+                <div class="text-center py-4 text-secondary">
+                    <div class="spinner-border spinner-border-sm text-info" role="status"></div> Loading saved people...
                 </div>
             </div>
         </div>
@@ -597,13 +635,57 @@
         </div>
     </div>
 
+    <!-- Edit Person Profile Modal -->
+    <div class="modal fade" id="editPersonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <div class="modal-header border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title cinzel text-info" data-i18n="editPersonTitle">✏️ Edit Person Profile</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <input type="hidden" id="edit_person_id">
+                    <div class="mb-3">
+                        <label class="form-label small" data-i18n="fullName">Full Name or Alias</label>
+                        <input type="text" id="edit_person_name" class="form-control" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7">
+                            <label class="form-label small" data-i18n="dob">Date of Birth</label>
+                            <input type="date" id="edit_person_date" class="form-control" required>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small" data-i18n="exactTime">Exact Time</label>
+                            <input type="time" id="edit_person_time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small" data-i18n="cityLabel">City of Birth</label>
+                        <input type="text" id="edit_person_city" list="citiesList" class="form-control" required onchange="onCitySelected('edit_person_city', 'edit_person_tz')">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small" data-i18n="tzLabel">UTC Offset</label>
+                        <input type="text" id="edit_person_tz" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25 pt-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="cancelBtn">Cancel</button>
+                    <button type="button" class="btn btn-info px-4" onclick="saveEditedPerson()" data-i18n="saveChangesBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS for modal -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         let worldCities = [];
         let savedAnalyses = [];
+        let savedPeople = [];
+        let currentSavedTab = 'analyses';
         let editModalInstance = null;
+        let editPersonModalInstance = null;
 
         // Fetch Curated Cities Database
         async function loadCities() {
@@ -1049,15 +1131,374 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // --- SAVED PEOPLE PROFILES LOGIC ---
+        async function fetchSavedPeople() {
+            try {
+                const res = await fetch('/api/people');
+                savedPeople = await res.json();
+                
+                const badge = document.getElementById('savedPeopleCountBadge');
+                if (badge) badge.textContent = savedPeople.length;
+                
+                renderPeopleDropdowns();
+                renderSavedPeople(savedPeople);
+                checkPersonSavedState('p1');
+                checkPersonSavedState('p2');
+            } catch (err) {
+                console.error("Could not fetch saved people:", err);
+            }
+        }
+
+        function renderPeopleDropdowns() {
+            ['p1', 'p2'].forEach(partner => {
+                const select = document.getElementById(`${partner}_person_select`);
+                if (!select) return;
+                const currentVal = select.value;
+                const chooseText = window.t ? window.t('chooseSavedPerson') : '👤 Choose saved person...';
+                
+                let opts = `<option value="">${chooseText}</option>`;
+                savedPeople.forEach(p => {
+                    const sel = (p.id === currentVal) ? 'selected' : '';
+                    opts += `<option value="${p.id}" ${sel}>${escapeHtml(p.name)} (${p.date || 'N/A'}, ${escapeHtml(p.city || '')})</option>`;
+                });
+                select.innerHTML = opts;
+            });
+        }
+
+        function onSelectSavedPerson(partner, personId) {
+            if (!personId) return;
+            const person = savedPeople.find(x => x.id === personId);
+            if (!person) return;
+
+            document.getElementById(`${partner}_name`).value = person.name || '';
+            document.getElementById(`${partner}_date`).value = person.date || '';
+            document.getElementById(`${partner}_time`).value = person.time || '12:00';
+            document.getElementById(`${partner}_city`).value = person.city || '';
+            document.getElementById(`${partner}_tz`).value = person.tz || '+03:00';
+
+            onCitySelected(`${partner}_city`, `${partner}_tz`, `${partner}_city_status`);
+            checkPersonSavedState(partner);
+        }
+
+        function checkPersonSavedState(partner) {
+            const name = (document.getElementById(`${partner}_name`).value || '').trim();
+            const date = (document.getElementById(`${partner}_date`).value || '').trim();
+            const time = (document.getElementById(`${partner}_time`).value || '').trim();
+            const city = (document.getElementById(`${partner}_city`).value || '').trim();
+            const tz = (document.getElementById(`${partner}_tz`).value || '').trim();
+            const indicator = document.getElementById(`${partner}_saved_indicator`);
+            if (!indicator) return;
+
+            if (!name) {
+                indicator.innerHTML = '';
+                return;
+            }
+
+            const match = savedPeople.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+            if (match) {
+                const isExact = (match.date === date && match.time === time && match.city.toLowerCase() === city.toLowerCase());
+                if (isExact) {
+                    const badgeText = window.t ? window.t('personSavedBadge') : '✓ Saved';
+                    indicator.innerHTML = `
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-2 py-1" style="font-size: 0.76rem;">
+                            <span>${badgeText}</span>
+                        </span>
+                    `;
+                    const select = document.getElementById(`${partner}_person_select`);
+                    if (select && select.value !== match.id) select.value = match.id;
+                } else {
+                    const modText = window.t ? window.t('personModifiedBadge') : 'Modified';
+                    const updateText = window.t ? window.t('updatePersonBtn') : '💾 Update';
+                    indicator.innerHTML = `
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-40 px-2 py-1 me-1" style="font-size: 0.74rem;">
+                            <span>${modText}</span>
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-warning py-0 px-2 rounded-pill" style="font-size: 0.74rem;" onclick="savePersonDirect('${partner}')" title="Update saved profile details">
+                            ${updateText}
+                        </button>
+                    `;
+                }
+            } else {
+                const notSavedText = window.t ? window.t('personNotSavedBadge') : 'Not saved';
+                const saveText = window.t ? window.t('savePersonBtn') : '💾 Save';
+                indicator.innerHTML = `
+                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-40 px-2 py-1 me-1" style="font-size: 0.74rem;">
+                        <span>${notSavedText}</span>
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-info py-0 px-2 rounded-pill" style="font-size: 0.74rem;" onclick="savePersonDirect('${partner}')" title="Save profile for reuse and comparison">
+                        ${saveText}
+                    </button>
+                `;
+            }
+        }
+
+        async function savePersonDirect(partner) {
+            const name = (document.getElementById(`${partner}_name`).value || '').trim();
+            const date = (document.getElementById(`${partner}_date`).value || '').trim();
+            const time = (document.getElementById(`${partner}_time`).value || '').trim() || '12:00';
+            const city = (document.getElementById(`${partner}_city`).value || '').trim();
+            const tz = (document.getElementById(`${partner}_tz`).value || '').trim() || '+03:00';
+
+            if (!name) {
+                alert("Please enter a name first.");
+                return;
+            }
+
+            const payload = {
+                name, date, time, city, tz,
+                version: window.APP_VERSION || "{{ app_version }}"
+            };
+
+            try {
+                const res = await fetch('/api/people', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    await fetchSavedPeople();
+                    checkPersonSavedState(partner);
+                } else {
+                    alert("Failed to save person profile.");
+                }
+            } catch (err) {
+                alert("Error saving person: " + err);
+            }
+        }
+
+        function swapPartners() {
+            const fields = ['name', 'date', 'time', 'city', 'tz'];
+            const vals1 = {};
+            const vals2 = {};
+
+            fields.forEach(f => {
+                vals1[f] = document.getElementById(`p1_${f}`).value;
+                vals2[f] = document.getElementById(`p2_${f}`).value;
+            });
+
+            fields.forEach(f => {
+                document.getElementById(`p1_${f}`).value = vals2[f];
+                document.getElementById(`p2_${f}`).value = vals1[f];
+            });
+
+            onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
+            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
+        }
+
+        function switchSavedTab(tab) {
+            currentSavedTab = tab;
+            const btnAnalyses = document.getElementById('btnTabAnalyses');
+            const btnPeople = document.getElementById('btnTabPeople');
+            const containerAnalyses = document.getElementById('savedAnalysesContainer');
+            const containerPeople = document.getElementById('savedPeopleContainer');
+
+            if (tab === 'analyses') {
+                btnAnalyses.classList.add('active');
+                btnPeople.classList.remove('active');
+                containerAnalyses.style.display = '';
+                containerPeople.style.display = 'none';
+            } else {
+                btnPeople.classList.add('active');
+                btnAnalyses.classList.remove('active');
+                containerAnalyses.style.display = 'none';
+                containerPeople.style.display = '';
+            }
+            filterActiveSavedList();
+        }
+
+        function filterActiveSavedList() {
+            const q = (document.getElementById('savedSearchInput').value || '').trim().toLowerCase();
+            if (currentSavedTab === 'analyses') {
+                if (!q) {
+                    renderSavedAnalyses(savedAnalyses);
+                } else {
+                    const filtered = savedAnalyses.filter(item => {
+                        const title = (item.title || '').toLowerCase();
+                        const p1Name = ((item.p1 && item.p1.name) || '').toLowerCase();
+                        const p2Name = ((item.p2 && item.p2.name) || '').toLowerCase();
+                        const p1City = ((item.p1 && item.p1.city) || '').toLowerCase();
+                        const p2City = ((item.p2 && item.p2.city) || '').toLowerCase();
+                        return title.includes(q) || p1Name.includes(q) || p2Name.includes(q) || p1City.includes(q) || p2City.includes(q);
+                    });
+                    renderSavedAnalyses(filtered);
+                }
+            } else {
+                if (!q) {
+                    renderSavedPeople(savedPeople);
+                } else {
+                    const filtered = savedPeople.filter(p => {
+                        const name = (p.name || '').toLowerCase();
+                        const city = (p.city || '').toLowerCase();
+                        const date = (p.date || '').toLowerCase();
+                        return name.includes(q) || city.includes(q) || date.includes(q);
+                    });
+                    renderSavedPeople(filtered);
+                }
+            }
+        }
+
+        function refreshAllSaved() {
+            fetchSavedAnalyses();
+            fetchSavedPeople();
+        }
+
+        function renderSavedPeople(list) {
+            const container = document.getElementById('savedPeopleContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-4 text-secondary">
+                        <p class="mb-1">${window.t ? window.t('noSavedPeopleYet') : 'No saved people profiles yet.'}</p>
+                        <small class="text-muted">${window.t ? window.t('noSavedPeopleSub') : 'Enter details in the form above and click "Save" to store individual profiles.'}</small>
+                    </div>
+                `;
+                return;
+            }
+
+            const p1BtnText = window.t ? window.t('setAsPartnerA') : '👤 Set as Partner A';
+            const p2BtnText = window.t ? window.t('setAsPartnerB') : '👤 Set as Partner B';
+            const editBtnText = window.t ? window.t('editBtn') : '✏️ Edit';
+            const deleteBtnText = window.t ? window.t('deleteBtn') : '🗑️ Delete';
+
+            list.forEach(person => {
+                const col = document.createElement('div');
+                col.className = 'col-lg-4 col-md-6';
+                col.innerHTML = `
+                    <div class="saved-analysis-card h-100 d-flex flex-column justify-content-between" style="border-left: 4px solid var(--p1-color);">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="cinzel text-white mb-0" style="font-size: 1.2rem;">
+                                    👤 ${escapeHtml(person.name)}
+                                </h5>
+                                <span class="badge bg-secondary bg-opacity-25 text-info font-monospace small">v${person.version || '2.3.0'}</span>
+                            </div>
+
+                            <div class="p-2 rounded mb-3" style="background: rgba(255, 255, 255, 0.03); font-size: 0.85rem;">
+                                <div class="text-light mb-1">📅 <strong>${person.date || 'N/A'}</strong> at <strong>${person.time || '12:00'}</strong></div>
+                                <div class="text-secondary text-truncate">📍 ${escapeHtml(person.city || 'N/A')} <span class="text-muted">(${person.tz || '+03:00'})</span></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex gap-2 mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-info rounded-pill flex-grow-1" onclick="loadPersonIntoPartner('${person.id}', 'p1')">
+                                    ${p1BtnText}
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill flex-grow-1" style="color: var(--p2-color); border-color: var(--p2-color);" onclick="loadPersonIntoPartner('${person.id}', 'p2')">
+                                    ${p2BtnText}
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 pt-2 border-top border-secondary border-opacity-15">
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="openEditPersonModal('${person.id}')" title="Edit Person Profile">
+                                    ${editBtnText}
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="deletePerson('${person.id}')" title="Delete Person Profile">
+                                    ${deleteBtnText}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        function loadPersonIntoPartner(personId, partner) {
+            onSelectSavedPerson(partner, personId);
+            document.getElementById('astroForm').scrollIntoView({ behavior: 'smooth' });
+            const card = document.querySelector(partner === 'p1' ? '.partner-card-1' : '.partner-card-2');
+            if (card) {
+                card.style.transform = 'scale(1.02)';
+                setTimeout(() => card.style.transform = '', 300);
+            }
+        }
+
+        function openEditPersonModal(id) {
+            const p = savedPeople.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('edit_person_id').value = p.id;
+            document.getElementById('edit_person_name').value = p.name || '';
+            document.getElementById('edit_person_date').value = p.date || '';
+            document.getElementById('edit_person_time').value = p.time || '12:00';
+            document.getElementById('edit_person_city').value = p.city || '';
+            document.getElementById('edit_person_tz').value = p.tz || '+03:00';
+
+            if (!editPersonModalInstance) {
+                editPersonModalInstance = new bootstrap.Modal(document.getElementById('editPersonModal'));
+            }
+            editPersonModalInstance.show();
+        }
+
+        async function saveEditedPerson() {
+            const id = document.getElementById('edit_person_id').value;
+            const payload = {
+                name: (document.getElementById('edit_person_name').value || '').trim(),
+                date: document.getElementById('edit_person_date').value,
+                time: document.getElementById('edit_person_time').value,
+                city: document.getElementById('edit_person_city').value,
+                tz: document.getElementById('edit_person_tz').value,
+                version: window.APP_VERSION || "{{ app_version }}"
+            };
+
+            if (!payload.name) {
+                alert("Name is required.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/people/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    editPersonModalInstance.hide();
+                    await fetchSavedPeople();
+                } else {
+                    alert("Failed to update person profile.");
+                }
+            } catch (err) {
+                alert("Error updating person: " + err);
+            }
+        }
+
+        async function deletePerson(id) {
+            const p = savedPeople.find(x => x.id === id);
+            const name = p ? p.name : 'this person';
+            const confirmMsg = `${window.t ? window.t('deletePersonConfirm') : 'Are you sure you want to delete profile for'} "${name}"?`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch(`/api/people/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await fetchSavedPeople();
+                } else {
+                    alert("Failed to delete person profile.");
+                }
+            } catch (err) {
+                alert("Error deleting person: " + err);
+            }
+        }
+
         // Language change event listener to update dynamic sections
         window.addEventListener('languageChanged', () => {
             renderSavedAnalyses(savedAnalyses);
+            renderSavedPeople(savedPeople);
+            renderPeopleDropdowns();
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
         });
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadCities();
             fetchSavedAnalyses();
+            fetchSavedPeople();
 
             // Default check for initial values
             onCityInput('p1_city', 'p1_tz', 'p1_city_status');

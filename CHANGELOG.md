@@ -5,6 +5,37 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-09-06
+
+### Added
+- **Individual Person Profiles Repository (`saved_people.json`)**:
+  - Independent persistent storage for individual astrological profiles (name, birth date, exact time/hour, city, and UTC timezone offset).
+  - Seeded with initial profiles from existing records (`SA`, `YS`, `AM`, `Alex`, `Jordan`).
+  - Full RESTful API in `app.py`: `GET /api/people`, `POST /api/people`, `PUT /api/people/<id>`, and `DELETE /api/people/<id>`.
+  - Auto-sync integration: Saving a couple analysis now automatically registers and updates both partners in the person profile repository.
+
+- **Independent Saved Person Selectors & Quick Swapping**:
+  - Dedicated dropdown selector for Partner A and Partner B independently, enabling instant pairing of any saved person against any other partner.
+  - Centered `🔄 Swap Partners (A ⇄ B)` 1-click button to flip Partner A and Partner B with all coordinates and timezone data preserved.
+
+- **Live Saved Status Indicators & 1-Click Action Buttons**:
+  - Real-time comparison between active form inputs and the person database.
+  - Displays `✓ Saved` when details match.
+  - Displays `Modified` and an immediate `💾 Update` button when details (e.g. birth hour) are edited.
+  - Displays `Not saved` and a 1-click `💾 Save` button when entering a new person.
+
+- **Interactive Results Page "Edit Details & Compare Partner" System**:
+  - Top navigation and Partner Card `✏️ Edit Details / Compare Partner` button on `result.html`.
+  - Opens a dedicated modal allowing instant adjustments to the hour of birth, switching Partner B to a different saved person, and recalculating via `⚡ Recalculate & Compare`.
+  - Direct individual `💾 Save` / `✓ Saved` badges on the partner summary cards on the results page.
+
+- **Dual-Tab Directory (Analyses & People Profiles)**:
+  - Tabbed interface allowing users to manage both Couple Analyses and Individual People Profiles.
+  - Person cards feature `👤 Set as Partner A`, `👤 Set as Partner B`, inline profile editing modal, and deletion.
+
+- **Bilingual Localization Expansion**:
+  - Full Hebrew and English translations for all new person selectors, status badges, modals, and comparison controls.
+
 ## [2.2.0] - 2026-09-06
 
 ### Added

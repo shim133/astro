@@ -62,6 +62,31 @@ export const TRANSLATIONS = {
     cancelBtn: 'ביטול',
     saveChangesBtn: 'שמור שינויים',
 
+    // Person Profile Management
+    chooseSavedPerson: '👤 בחר/י פרופיל שמור...',
+    personSavedBadge: '✓ שמור',
+    personNotSavedBadge: 'לא שמור',
+    personModifiedBadge: 'שונה',
+    savePersonBtn: '💾 שמור',
+    updatePersonBtn: '💾 עדכן',
+    savePersonTooltip: 'שמור פרופיל אישי זה לשימוש חוזר מהיר והשוואות עתידיות',
+    savedPeopleTitle: '👥 מאגר פרופילים אישיים',
+    savedPeopleSub: 'פרופילי לידה אישיים המוכנים להשוואה מול כל בן/בת זוג',
+    searchPeoplePlaceholder: '🔍 חפש פרופיל...',
+    noSavedPeopleYet: 'אין עדיין פרופילים אישיים שמורים.',
+    noSavedPeopleSub: 'הזינו פרטים בטופס ולחצו "שמור" ליד שם האדם כדי לשמור פרופיל לשימוש חוזר.',
+    setAsPartnerA: '👤 הגדר כבן/בת זוג א׳',
+    setAsPartnerB: '👤 הגדר כבן/בת זוג ב׳',
+    editPersonTitle: '✏️ עריכת פרופיל אישי',
+    deletePersonConfirm: 'האם את/ה בטוח/ה שברצונך למחוק את הפרופיל של',
+    personSaveSuccess: '✅ הפרופיל האישי נשמר בהצלחה!',
+
+    // Compare & Modify Modal
+    editDetailsCompareBtn: '✏️ ערוך פרטים / השווה לבן/בת זוג',
+    editCompareModalTitle: '🔮 עריכת פרטי לידה והשוואת בן/בת זוג',
+    recalcCompareBtn: '⚡ חשב מחדש והשווה',
+    swapPartnersBtn: '🔄 החלף צדדים (א׳ ⇄ ב׳)',
+
     // Geocoding Badges & Resolution
     checkingLocation: 'בודק מיקום ב-OpenStreetMap ובמאגר...',
     locationNotFound: 'המיקום לא נמצא:',
@@ -305,6 +330,31 @@ export const TRANSLATIONS = {
     notesPlaceholder: 'Optional notes...',
     cancelBtn: 'Cancel',
     saveChangesBtn: 'Save Changes',
+
+    // Person Profile Management
+    chooseSavedPerson: '👤 Choose saved person...',
+    personSavedBadge: '✓ Saved',
+    personNotSavedBadge: 'Not saved',
+    personModifiedBadge: 'Modified',
+    savePersonBtn: '💾 Save',
+    updatePersonBtn: '💾 Update',
+    savePersonTooltip: 'Save this person profile for quick reuse and partner comparisons',
+    savedPeopleTitle: '👥 Saved People Profiles',
+    savedPeopleSub: 'Individual birth profiles ready to pair and compare against any partner',
+    searchPeoplePlaceholder: '🔍 Search people...',
+    noSavedPeopleYet: 'No saved people profiles yet.',
+    noSavedPeopleSub: 'Enter details in the form above and click "Save" near their name to save for quick reuse.',
+    setAsPartnerA: '👤 Set as Partner A',
+    setAsPartnerB: '👤 Set as Partner B',
+    editPersonTitle: '✏️ Edit Person Profile',
+    deletePersonConfirm: 'Are you sure you want to delete profile for',
+    personSaveSuccess: '✅ Person profile saved successfully!',
+
+    // Compare & Modify Modal
+    editDetailsCompareBtn: '✏️ Edit Details / Compare Partner',
+    editCompareModalTitle: '🔮 Modify Birth Details & Compare Partner',
+    recalcCompareBtn: '⚡ Recalculate & Compare',
+    swapPartnersBtn: '🔄 Swap Partners (A ⇄ B)',
 
     // Geocoding Badges & Resolution
     checkingLocation: 'Checking location on OpenStreetMap & local database...',

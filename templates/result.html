@@ -282,6 +282,7 @@
             </div>
 
             <div class="d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" class="btn btn-export" onclick="openEditCompareModal()" data-i18n="editDetailsCompareBtn">✏️ Edit Details / Compare Partner</button>
                 <button type="button" id="langToggleBtn" class="btn btn-export" onclick="toggleLanguage()">🌐 עברית (HE)</button>
                 <button type="button" class="btn btn-export" id="btnSaveAnalysis" onclick="saveCurrentAnalysis()" data-i18n="saveToMyAnalyses">💾 Save to My Analyses</button>
                 <button type="button" class="btn btn-export" onclick="exportSvg()" data-i18n="exportSvg">⬇️ Export SVG Map</button>
@@ -380,8 +381,11 @@
                         <div class="glass-card p-4 h-100" style="border-top: 3px solid var(--p1-color);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h3 class="h5 cinzel mb-0" style="color: var(--p1-color);">{{ p1.name }}</h3>
-                                    <small class="text-muted">{{ p1.city }} ({{ p1.date }})</small>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h3 class="h5 cinzel mb-0" style="color: var(--p1-color);">{{ p1.name }}</h3>
+                                        <span id="p1_result_saved_badge"></span>
+                                    </div>
+                                    <small class="text-muted">{{ p1.city }} ({{ p1.date }} {{ p1.time }})</small>
                                 </div>
                                 <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--p1-color); border: 1px solid rgba(56, 189, 248, 0.3);" data-i18n="innerWheel">Inner Wheel</span>
                             </div>
@@ -427,10 +431,18 @@
                         <div class="glass-card p-4 h-100" style="border-top: 3px solid var(--p2-color);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h3 class="h5 cinzel mb-0" style="color: var(--p2-color);">{{ p2.name }}</h3>
-                                    <small class="text-muted">{{ p2.city }} ({{ p2.date }})</small>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h3 class="h5 cinzel mb-0" style="color: var(--p2-color);">{{ p2.name }}</h3>
+                                        <span id="p2_result_saved_badge"></span>
+                                    </div>
+                                    <small class="text-muted">{{ p2.city }} ({{ p2.date }} {{ p2.time }})</small>
                                 </div>
-                                <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);" data-i18n="outerWheel">Outer Wheel</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-xs btn-outline-warning py-0 px-2 rounded-pill" onclick="openEditCompareModal('p2')" style="font-size: 0.72rem; color: var(--p2-color); border-color: var(--p2-color);" title="Compare with a different partner">
+                                        🔄 Compare
+                                    </button>
+                                    <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);" data-i18n="outerWheel">Outer Wheel</span>
+                                </div>
                             </div>
 
                             <div class="d-flex flex-column gap-2 mt-3">
@@ -1326,10 +1338,251 @@
             }
             redrawWheel();
         });
+    </script>
 
-        // Initialize Wheel on Load
+    <!-- Modify Birth Details & Partner Comparison Modal -->
+    <div class="modal fade" id="editCompareModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content p-4" style="background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; color: #f8fafc;">
+                <div class="modal-header border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title cinzel text-warning" data-i18n="editCompareModalTitle">🔮 Modify Birth Details &amp; Compare Partner</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/analyze" method="POST" id="editCompareForm">
+                    <div class="modal-body py-3">
+                        <div class="row g-3 mb-3">
+                            <!-- Partner A -->
+                            <div class="col-md-6 p-3 rounded" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2);">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="cinzel text-info mb-0" data-i18n="partnerA">Partner A</h6>
+                                    <span class="badge bg-info bg-opacity-10 text-info small" data-i18n="innerWheel">Inner Wheel</span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="chooseSavedPerson">Choose Saved Person</label>
+                                    <select id="modal_p1_person_select" class="form-select form-select-sm bg-dark text-light border-secondary" onchange="onModalSelectPerson('p1', this.value)">
+                                        <option value="">👤 Choose saved person...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="fullName">Full Name</label>
+                                    <input type="text" id="modal_p1_name" name="p1_name" class="form-control form-control-sm" value="{{ p1.name }}" required>
+                                </div>
+
+                                <div class="row g-2 mb-2">
+                                    <div class="col-7">
+                                        <label class="form-label small" data-i18n="dob">Date of Birth</label>
+                                        <input type="date" id="modal_p1_date" name="p1_date" class="form-control form-control-sm" value="{{ p1.date }}" required>
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-label small text-warning font-weight-bold" data-i18n="exactTime">Hour / Time</label>
+                                        <input type="time" id="modal_p1_time" name="p1_time" class="form-control form-control-sm" value="{{ p1.time }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="cityLabel">City of Birth</label>
+                                    <input type="text" id="modal_p1_city" name="p1_city" class="form-control form-control-sm" value="{{ p1.city }}" required>
+                                </div>
+
+                                <div>
+                                    <label class="form-label small" data-i18n="tzLabel">UTC Timezone</label>
+                                    <input type="text" id="modal_p1_tz" name="p1_tz" class="form-control form-control-sm" value="{{ p1.tz }}" required>
+                                </div>
+                            </div>
+
+                            <!-- Partner B -->
+                            <div class="col-md-6 p-3 rounded" style="background: rgba(244, 114, 182, 0.05); border: 1px solid rgba(244, 114, 182, 0.2);">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="cinzel text-warning mb-0" style="color: var(--p2-color) !important;" data-i18n="partnerB">Partner B</h6>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger small" data-i18n="outerWheel">Outer Wheel</span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="chooseSavedPerson">Choose Saved Person</label>
+                                    <select id="modal_p2_person_select" class="form-select form-select-sm bg-dark text-light border-secondary" onchange="onModalSelectPerson('p2', this.value)">
+                                        <option value="">👤 Choose saved person...</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="fullName">Full Name</label>
+                                    <input type="text" id="modal_p2_name" name="p2_name" class="form-control form-control-sm" value="{{ p2.name }}" required>
+                                </div>
+
+                                <div class="row g-2 mb-2">
+                                    <div class="col-7">
+                                        <label class="form-label small" data-i18n="dob">Date of Birth</label>
+                                        <input type="date" id="modal_p2_date" name="p2_date" class="form-control form-control-sm" value="{{ p2.date }}" required>
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-label small text-warning font-weight-bold" data-i18n="exactTime">Hour / Time</label>
+                                        <input type="time" id="modal_p2_time" name="p2_time" class="form-control form-control-sm" value="{{ p2.time }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small" data-i18n="cityLabel">City of Birth</label>
+                                    <input type="text" id="modal_p2_city" name="p2_city" class="form-control form-control-sm" value="{{ p2.city }}" required>
+                                </div>
+
+                                <div>
+                                    <label class="form-label small" data-i18n="tzLabel">UTC Timezone</label>
+                                    <input type="text" id="modal_p2_tz" name="p2_tz" class="form-control form-control-sm" value="{{ p2.tz }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center my-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="modalSwapPartners()" data-i18n="swapPartnersBtn">
+                                🔄 Swap Partners (A ⇄ B)
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary border-opacity-25 pt-3">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="cancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-warning px-4" data-i18n="recalcCompareBtn">⚡ Recalculate &amp; Compare</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS for modal support -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let resultSavedPeople = [];
+        let editCompareModalInstance = null;
+
+        async function fetchSavedPeopleForResult() {
+            try {
+                const res = await fetch('/api/people');
+                resultSavedPeople = await res.json();
+                populateModalPeopleDropdowns();
+                updateReportSavedBadges();
+            } catch (err) {
+                console.error("Could not fetch saved people on result page:", err);
+            }
+        }
+
+        function populateModalPeopleDropdowns() {
+            ['p1', 'p2'].forEach(partner => {
+                const select = document.getElementById(`modal_${partner}_person_select`);
+                if (!select) return;
+                const chooseText = window.t ? window.t('chooseSavedPerson') : '👤 Choose saved person...';
+                let opts = `<option value="">${chooseText}</option>`;
+                resultSavedPeople.forEach(p => {
+                    opts += `<option value="${p.id}">${escapeHtml(p.name)} (${p.date || 'N/A'}, ${escapeHtml(p.city || '')})</option>`;
+                });
+                select.innerHTML = opts;
+            });
+        }
+
+        function onModalSelectPerson(partner, personId) {
+            if (!personId) return;
+            const person = resultSavedPeople.find(x => x.id === personId);
+            if (!person) return;
+
+            document.getElementById(`modal_${partner}_name`).value = person.name || '';
+            document.getElementById(`modal_${partner}_date`).value = person.date || '';
+            document.getElementById(`modal_${partner}_time`).value = person.time || '12:00';
+            document.getElementById(`modal_${partner}_city`).value = person.city || '';
+            document.getElementById(`modal_${partner}_tz`).value = person.tz || '+03:00';
+        }
+
+        function modalSwapPartners() {
+            const fields = ['name', 'date', 'time', 'city', 'tz'];
+            fields.forEach(f => {
+                const v1 = document.getElementById(`modal_p1_${f}`).value;
+                const v2 = document.getElementById(`modal_p2_${f}`).value;
+                document.getElementById(`modal_p1_${f}`).value = v2;
+                document.getElementById(`modal_p2_${f}`).value = v1;
+            });
+        }
+
+        function updateReportSavedBadges() {
+            const p1Badge = document.getElementById('p1_result_saved_badge');
+            const p2Badge = document.getElementById('p2_result_saved_badge');
+
+            const p1Name = "{{ p1.name }}".trim().toLowerCase();
+            const p2Name = "{{ p2.name }}".trim().toLowerCase();
+
+            const p1Match = resultSavedPeople.find(p => p.name.trim().toLowerCase() === p1Name);
+            const p2Match = resultSavedPeople.find(p => p.name.trim().toLowerCase() === p2Name);
+
+            if (p1Badge) {
+                if (p1Match) {
+                    p1Badge.innerHTML = `<span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-2 py-0" style="font-size: 0.72rem;">✓ Saved</span>`;
+                } else {
+                    p1Badge.innerHTML = `<button type="button" class="btn btn-xs btn-outline-info py-0 px-2 rounded-pill" style="font-size: 0.7rem;" onclick="savePersonFromReport('p1')">💾 Save</button>`;
+                }
+            }
+
+            if (p2Badge) {
+                if (p2Match) {
+                    p2Badge.innerHTML = `<span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 px-2 py-0" style="font-size: 0.72rem;">✓ Saved</span>`;
+                } else {
+                    p2Badge.innerHTML = `<button type="button" class="btn btn-xs btn-outline-info py-0 px-2 rounded-pill" style="font-size: 0.7rem;" onclick="savePersonFromReport('p2')">💾 Save</button>`;
+                }
+            }
+        }
+
+        async function savePersonFromReport(partner) {
+            const isP1 = partner === 'p1';
+            const payload = {
+                name: isP1 ? "{{ p1.name }}" : "{{ p2.name }}",
+                date: isP1 ? "{{ p1.date }}" : "{{ p2.date }}",
+                time: isP1 ? "{{ p1.time }}" : "{{ p2.time }}",
+                city: isP1 ? "{{ p1.city }}" : "{{ p2.city }}",
+                tz: isP1 ? "{{ p1.tz }}" : "{{ p2.tz }}",
+                version: window.APP_VERSION || "{{ app_version }}"
+            };
+
+            try {
+                const res = await fetch('/api/people', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    await fetchSavedPeopleForResult();
+                } else {
+                    alert("Failed to save person.");
+                }
+            } catch (err) {
+                alert("Error saving person: " + err);
+            }
+        }
+
+        function openEditCompareModal(focusPartner) {
+            if (!editCompareModalInstance) {
+                editCompareModalInstance = new bootstrap.Modal(document.getElementById('editCompareModal'));
+            }
+            editCompareModalInstance.show();
+            if (focusPartner === 'p2') {
+                setTimeout(() => {
+                    const sel = document.getElementById('modal_p2_person_select');
+                    if (sel) sel.focus();
+                }, 350);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Initialize Wheel & People on Load
         document.addEventListener('DOMContentLoaded', () => {
             redrawWheel();
+            fetchSavedPeopleForResult();
         });
     </script>
 </body>

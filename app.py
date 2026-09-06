@@ -11,12 +11,13 @@ import uuid
 
 app = Flask(__name__)
 
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CITIES_FILE = os.path.join(BASE_DIR, 'cities.json')
 SAVED_ANALYSES_FILE = os.path.join(BASE_DIR, 'saved_analyses.json')
+SAVED_PEOPLE_FILE = os.path.join(BASE_DIR, 'saved_people.json')
 
 # Load Curated World Cities
 CITIES_DATA = []
@@ -52,6 +53,63 @@ def load_saved_analyses():
 def save_analyses_to_file(data):
     with open(SAVED_ANALYSES_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+def load_saved_people():
+    if not os.path.exists(SAVED_PEOPLE_FILE):
+        return []
+    try:
+        with open(SAVED_PEOPLE_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as err:
+        print(f"Error reading {SAVED_PEOPLE_FILE}: {err}")
+        return []
+
+def save_people_to_file(data):
+    with open(SAVED_PEOPLE_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+def upsert_person_record(person_data):
+    """Helper to save or update an individual person profile in saved_people.json."""
+    if not person_data or not person_data.get("name"):
+        return None
+    people = load_saved_people()
+    p_name = str(person_data.get("name", "")).strip()
+    p_id = person_data.get("id")
+    
+    # Try finding existing record by id first, then by exact name
+    idx = None
+    if p_id:
+        idx = next((i for i, x in enumerate(people) if x.get("id") == p_id), None)
+    if idx is None:
+        idx = next((i for i, x in enumerate(people) if x.get("name", "").strip().lower() == p_name.lower()), None)
+        
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+    if idx is not None:
+        record = people[idx]
+        record["name"] = p_name
+        if "date" in person_data and person_data["date"]: record["date"] = person_data["date"]
+        if "time" in person_data and person_data["time"]: record["time"] = person_data["time"]
+        if "city" in person_data and person_data["city"]: record["city"] = person_data["city"]
+        if "tz" in person_data and person_data["tz"]: record["tz"] = person_data["tz"]
+        record["updated_at"] = now_str
+        record["version"] = APP_VERSION
+        people[idx] = record
+    else:
+        new_id = p_id or f"person-{str(uuid.uuid4())[:8]}"
+        record = {
+            "id": new_id,
+            "name": p_name,
+            "date": person_data.get("date", ""),
+            "time": person_data.get("time", "12:00"),
+            "city": person_data.get("city", ""),
+            "tz": person_data.get("tz", "+03:00"),
+            "created_at": now_str,
+            "version": APP_VERSION
+        }
+        people.insert(0, record)
+        
+    save_people_to_file(people)
+    return record
 
 # --- CONFIG & EPHEMERIS LOADING ---
 # Fix SSL for geopy
@@ -656,6 +714,13 @@ def api_save_analysis():
         }
         saved.insert(0, new_item)
         save_analyses_to_file(saved)
+        
+        # Also ensure Partner A and Partner B are registered/synced in saved_people.json
+        if data.get("p1") and data["p1"].get("name"):
+            upsert_person_record(data["p1"])
+        if data.get("p2") and data["p2"].get("name"):
+            upsert_person_record(data["p2"])
+
         return jsonify({"success": True, "analysis": new_item}), 201
     except Exception as err:
         return jsonify({"error": str(err)}), 500
@@ -704,6 +769,73 @@ def api_delete_analysis(analysis_id):
             return jsonify({"error": "Analysis not found"}), 404
         save_analyses_to_file(saved)
         return jsonify({"success": True, "deleted_id": analysis_id})
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+# --- SAVED PEOPLE PROFILE ENDPOINTS ---
+@app.route('/api/people', methods=['GET'])
+def api_get_people():
+    """List all saved individual person profiles."""
+    return jsonify(load_saved_people())
+
+@app.route('/api/people', methods=['POST'])
+def api_save_person():
+    """Save or update an individual person profile."""
+    try:
+        data = request.get_json(force=True)
+        if not data or not data.get("name"):
+            return jsonify({"error": "Name is required to save person profile"}), 400
+        
+        saved_record = upsert_person_record(data)
+        return jsonify({"success": True, "person": saved_record}), 200
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+@app.route('/api/people/<person_id>', methods=['GET'])
+def api_get_single_person(person_id):
+    """Retrieve a single saved person profile."""
+    people = load_saved_people()
+    item = next((x for x in people if x["id"] == person_id), None)
+    if not item:
+        return jsonify({"error": "Person profile not found"}), 404
+    return jsonify(item)
+
+@app.route('/api/people/<person_id>', methods=['PUT'])
+def api_update_person(person_id):
+    """Update a saved person profile."""
+    try:
+        data = request.get_json(force=True)
+        people = load_saved_people()
+        idx = next((i for i, x in enumerate(people) if x["id"] == person_id), None)
+        if idx is None:
+            return jsonify({"error": "Person profile not found"}), 404
+            
+        item = people[idx]
+        if "name" in data and data["name"]: item["name"] = data["name"].strip()
+        if "date" in data: item["date"] = data["date"]
+        if "time" in data: item["time"] = data["time"]
+        if "city" in data: item["city"] = data["city"]
+        if "tz" in data: item["tz"] = data["tz"]
+        item["version"] = APP_VERSION
+        item["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+        people[idx] = item
+        save_people_to_file(people)
+        return jsonify({"success": True, "person": item})
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+@app.route('/api/people/<person_id>', methods=['DELETE'])
+def api_delete_person(person_id):
+    """Delete a saved person profile."""
+    try:
+        people = load_saved_people()
+        initial_len = len(people)
+        people = [x for x in people if x["id"] != person_id]
+        if len(people) == initial_len:
+            return jsonify({"error": "Person profile not found"}), 404
+        save_people_to_file(people)
+        return jsonify({"success": True, "deleted_id": person_id})
     except Exception as err:
         return jsonify({"error": str(err)}), 500
 
