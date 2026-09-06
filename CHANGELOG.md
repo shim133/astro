@@ -5,6 +5,18 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-09-06
+
+### Added
+- **Professional Astrological Wheel Enhancements**:
+  - Replaced standard equal house system with precise **Porphyry Unequal Houses**.
+  - Dynamic SVG house sectors with calculated exact midpoints for labeling.
+  - Angular axes explicitly labeled with exact degrees (`ASC`, `IC`, `DSC`, `MC`).
+  - Added exact planetary degrees (0-29°) physically rendered next to each glyph on the wheel.
+- **Synastry Aspect Matrix & Planetary Data Tables**:
+  - Implemented a professional triangular/rectangular **Aspect Grid (Matrix)** displaying all calculated planetary aspects and orbs in the UI.
+  - Added a responsive **Planetary Data Table** listing exact longitudes and house placements for all calculated bodies.
+
 ## [2.3.0] - 2026-09-06
 
 ### Added

@@ -1,4 +1,4 @@
-# AstroMatch Pro (v2.3.0)
+# AstroMatch Pro (v2.4.0)
 
 Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
 
@@ -7,6 +7,13 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 ---
 
 ## Key Features
+
+- **Professional Astrological Charts (New in v2.4.0)**:
+  - **Porphyry Unequal Houses**: Transitioned from equal houses to precise Porphyry unequal houses with dynamic visual SVG sectors and centered Roman numerals.
+  - **Exact Degrees on Wheel**: Explicitly rendered degree values (0-29°) next to each planetary glyph on the chart.
+  - **Distinct Angular Axes**: Distinctly labeled ASC, IC, DSC, and MC with their exact calculated degrees on the SVG wheel.
+  - **Aspect Grid (Matrix)**: Triangular (Natal) and Rectangular (Synastry) Aspect Grid tables rendering full aspect and exact orb data.
+  - **Planetary Data Tables**: Tabular display of precise planetary longitude (Sign, Degree, Minute) and house placement alongside the chart.
 
 - **Individual Person Profiles & Partner Comparison System (New in v2.3.0)**:
   - **Saved People Directory (`saved_people.json`)**: Save individual birth profiles (birth date, exact hour of birth, city, timezone) for rapid pairing.
@@ -24,8 +31,8 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
   - User preference persisted across visits in `localStorage`.
 
 - **Version Tracking & Metadata Display**:
-  - Global `APP_VERSION = "2.3.0"` in `app.py`.
-  - All saved analyses and people profiles are stamped with the version number used (`"version": "2.3.0"`).
+  - Global `APP_VERSION = "2.4.0"` in `app.py`.
+  - All saved analyses and people profiles are stamped with the version number used (`"version": "2.4.0"`).
   - Saved cards display a version badge (e.g. `v2.3.0`).
   - Persistent application footer displayed below the program on all screens.
 
@@ -57,7 +64,7 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 - **Expanded Planetary Roster & House Mathematics**:
   - Full 10-body roster: Sun (☉), Moon (☽), Mercury (☿), Venus (♀), Mars (♂), Jupiter (♃), Saturn (♄), Uranus (♅), Neptune (♆), Pluto (♇).
   - Angles: Ascendant ($ASC$), Midheaven ($MC$), Descendant ($DSC$), Imum Coeli ($IC$).
-  - 12 Equal House Cusps with automatic house assignment for each body.
+  - 12 Porphyry Unequal House Cusps with automatic house assignment for each body.
 
 - **Compatibility Breakdown**:
   - Overall Synastry Score (0–100%) with cosmic verdict.
@@ -120,8 +127,8 @@ astroDating/
 │   ├── index.html                     # Celestial form, city search & saved analyses manager
 │   └── result.html                    # SVG Astrological Map & aspect matrix
 ├── .gitignore                         # Git ignore configuration
-├── app.py                             # Core Flask backend & celestial math engine (v2.2.0)
-├── CHANGELOG.md                       # Semantic version history (v2.2.0)
+├── app.py                             # Core Flask backend & celestial math engine (v2.4.0)
+├── CHANGELOG.md                       # Semantic version history (v2.4.0)
 ├── cities.json                        # Curated database of world cities & coordinates
 ├── de421.bsp                          # NASA JPL planetary ephemeris (~16 MB)
 ├── environment.yml                    # Conda environment specification

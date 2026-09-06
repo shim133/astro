@@ -243,6 +243,56 @@
         [dir="rtl"] .aspect-item-card.Sextile { border-right-color: var(--cyan) !important; }
         [dir="rtl"] .aspect-item-card.Square { border-right-color: var(--crimson) !important; }
         [dir="rtl"] .aspect-item-card.Opposition { border-right-color: #f43f5e !important; }
+
+        /* Grid & Table Styles */
+        .astro-grid-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 2px;
+            font-size: 0.85rem;
+        }
+        .astro-grid-table th, .astro-grid-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 4px;
+        }
+        .astro-grid-table th {
+            background: rgba(15, 23, 42, 0.8);
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .aspect-cell {
+            font-weight: bold;
+        }
+        .aspect-cell small {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: normal;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+        .data-table th {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        [dir="rtl"] .data-table th, [dir="rtl"] .data-table td {
+            text-align: right;
+        }
     </style>
 
     <!-- Multi-Language Translation System -->
@@ -561,6 +611,22 @@
             </div>
         </div>
 
+        <!-- Grid & Planetary Table Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="glass-card p-4 h-100" style="overflow-x: auto;">
+                    <h3 class="cinzel h5 text-white mb-3" data-i18n="aspectGridTitle">Aspect Grid</h3>
+                    <div id="aspectGridContainer"></div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="glass-card p-4 h-100" style="overflow-x: auto;">
+                    <h3 class="cinzel h5 text-white mb-3" data-i18n="planetTableTitle">Planetary Data</h3>
+                    <div id="planetTableContainer"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Detailed Aspect Matrix & Interpretations -->
         <div class="glass-card p-4" id="aspectsCatalogSection">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
@@ -797,7 +863,12 @@
                 layer.appendChild(line);
 
                 // House Roman Numeral Label (positioned in house sector)
-                const midHouseAngle = lonToSvgAngle(cuspDeg + 15, ascDeg);
+                let nextCusp = activeChart.houses[(idx + 1) % 12].cusp;
+                let diff = nextCusp - cuspDeg;
+                if (diff < 0) diff += 360;
+                const midCuspDeg = (cuspDeg + diff / 2.0) % 360;
+                const midHouseAngle = lonToSvgAngle(midCuspDeg, ascDeg);
+                
                 const labelPos = polarToCartesian(CX, CY, 200, midHouseAngle);
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 text.setAttribute('x', labelPos.x);
@@ -811,31 +882,33 @@
                 layer.appendChild(text);
             });
 
-            // ASC & MC Callouts
-            const ascP = polarToCartesian(CX, CY, R_ZODIAC_OUT + 15, 180);
-            const ascText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            ascText.setAttribute('x', ascP.x);
-            ascText.setAttribute('y', ascP.y);
-            ascText.setAttribute('fill', '#ec4899');
-            ascText.setAttribute('font-size', '11');
-            ascText.setAttribute('font-weight', 'bold');
-            ascText.setAttribute('text-anchor', 'end');
-            ascText.setAttribute('dominant-baseline', 'central');
-            ascText.textContent = 'ASC ◄';
-            layer.appendChild(ascText);
+            // Angular Axes Callouts (ASC, IC, DSC, MC) with Exact Degrees
+            const axisLabels = [
+                { idx: 0, prefix: 'ASC', suffix: '◄', align: 'end', rOut: R_ZODIAC_OUT + 15, color: '#ec4899' },
+                { idx: 3, prefix: 'IC', suffix: '▼', align: 'middle', rOut: R_ZODIAC_OUT + 20, color: '#38bdf8' },
+                { idx: 6, prefix: '►', suffix: 'DSC', align: 'start', rOut: R_ZODIAC_OUT + 15, color: '#ec4899' },
+                { idx: 9, prefix: 'MC', suffix: '▲', align: 'middle', rOut: R_ZODIAC_OUT + 20, color: '#8b5cf6' }
+            ];
 
-            const mcAngle = lonToSvgAngle(activeChart.mc, ascDeg);
-            const mcP = polarToCartesian(CX, CY, R_ZODIAC_OUT + 15, mcAngle);
-            const mcText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            mcText.setAttribute('x', mcP.x);
-            mcText.setAttribute('y', mcP.y);
-            mcText.setAttribute('fill', '#8b5cf6');
-            mcText.setAttribute('font-size', '11');
-            mcText.setAttribute('font-weight', 'bold');
-            mcText.setAttribute('text-anchor', 'middle');
-            mcText.setAttribute('dominant-baseline', 'central');
-            mcText.textContent = 'MC ▲';
-            layer.appendChild(mcText);
+            axisLabels.forEach(axis => {
+                const h = activeChart.houses[axis.idx];
+                const angle = lonToSvgAngle(h.cusp, ascDeg);
+                const pos = polarToCartesian(CX, CY, axis.rOut, angle);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', pos.x);
+                text.setAttribute('y', pos.y);
+                text.setAttribute('fill', axis.color);
+                text.setAttribute('font-size', '11');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('text-anchor', axis.align);
+                text.setAttribute('dominant-baseline', 'central');
+                
+                if (axis.align === 'end') text.textContent = `${axis.prefix} ${h.zodiac.deg}° ${axis.suffix}`;
+                else if (axis.align === 'start') text.textContent = `${axis.prefix} ${h.zodiac.deg}° ${axis.suffix}`;
+                else text.textContent = `${axis.prefix} ${h.zodiac.deg}° ${axis.suffix}`;
+                
+                layer.appendChild(text);
+            });
         }
 
         // Render Planets
@@ -921,12 +994,13 @@
                 g.appendChild(glyph);
 
                 // Small degree badge
-                const degP = polarToCartesian(CX, CY, p.r > baseRadius ? p.r + 14 : p.r - 14, angle);
+                const degP = polarToCartesian(CX, CY, p.r > baseRadius ? p.r + 17 : p.r - 17, angle);
                 const degText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 degText.setAttribute('x', degP.x);
                 degText.setAttribute('y', degP.y);
-                degText.setAttribute('fill', 'rgba(255,255,255,0.7)');
-                degText.setAttribute('font-size', '8');
+                degText.setAttribute('fill', 'rgba(255,255,255,0.95)');
+                degText.setAttribute('font-size', '10');
+                degText.setAttribute('font-weight', '500');
                 degText.setAttribute('text-anchor', 'middle');
                 degText.setAttribute('dominant-baseline', 'central');
                 degText.textContent = `${p.sign_deg}°`;
@@ -1123,6 +1197,175 @@
             renderAspects(currentMode);
             renderPlanets(currentMode);
             renderCenterInfo(currentMode);
+            renderDataTables(currentMode);
+        }
+
+        // Render Data Tables
+        function renderDataTables(mode) {
+            const gridContainer = document.getElementById('aspectGridContainer');
+            const tableContainer = document.getElementById('planetTableContainer');
+            
+            const formatPos = (p) => {
+                if (!p || !p.formatted) return '-';
+                const parts = p.formatted.split(' ');
+                if (parts.length < 4) return `<span dir="ltr">${p.formatted}</span>`; // Fallback
+                const deg = parts[0];
+                const min = parts[1];
+                const sym = parts[2];
+                const signName = parts[3];
+                
+                const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                const translatedSign = window.tZodiac ? window.tZodiac(p.sign || signName) : signName;
+                
+                if (isHe) {
+                    return `${translatedSign} <span style="color: ${p.sign_color || '#fff'}">${sym}</span> <span dir="ltr" style="display:inline-block;">${deg} ${min}</span>`;
+                }
+                return `<span dir="ltr" style="display:inline-block;">${deg} ${min}</span> <span style="color: ${p.sign_color || '#fff'}">${sym}</span> ${translatedSign}`;
+            };
+            
+            // 1. Planetary Data Table
+            const chart = mode === 'synastry' ? null : (mode === 'natal1' ? chart1 : chart2);
+            let htmlTable = '';
+            
+            if (chart) {
+                // Natal Data Table
+                htmlTable = `<table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Body</th>
+                            <th>Longitude</th>
+                            <th>House</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                const allPoints = [...chart.planets, chart.asc_point, chart.mc_point];
+                allPoints.forEach(p => {
+                    const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                    const pName = window.tPlanet ? window.tPlanet(p.name) : p.name;
+                    htmlTable += `<tr>
+                        <td><strong style="color: ${p.color || '#fff'}">${p.symbol}</strong> ${pName}</td>
+                        <td>${formatPos(p)}</td>
+                        <td>${p.house || '-'}</td>
+                    </tr>`;
+                });
+                htmlTable += `</tbody></table>`;
+            } else {
+                // Synastry Data Table
+                htmlTable = `<table class="data-table" style="font-size: 0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>Body</th>
+                            <th style="color: var(--p1-color)">${chart1.name}</th>
+                            <th style="color: var(--p2-color)">${chart2.name}</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                const names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Ascendant', 'Midheaven'];
+                const p1Dict = {...chart1.planets_dict, 'Ascendant': chart1.asc_point, 'Midheaven': chart1.mc_point};
+                const p2Dict = {...chart2.planets_dict, 'Ascendant': chart2.asc_point, 'Midheaven': chart2.mc_point};
+                
+                names.forEach(n => {
+                    const p1 = p1Dict[n];
+                    const p2 = p2Dict[n];
+                    if(p1 && p2) {
+                        const pName = window.tPlanet ? window.tPlanet(n) : n;
+                        htmlTable += `<tr>
+                            <td><strong style="color: ${p1.color}">${p1.symbol}</strong> ${pName}</td>
+                            <td>${formatPos(p1)}</td>
+                            <td>${formatPos(p2)}</td>
+                        </tr>`;
+                    }
+                });
+                htmlTable += `</tbody></table>`;
+            }
+            tableContainer.innerHTML = htmlTable;
+            
+            // 2. Aspect Grid
+            let htmlGrid = '<table class="astro-grid-table">';
+            
+            const getSym = (chartObj, name) => {
+                if(name === 'Ascendant') return chartObj.asc_point.symbol;
+                if(name === 'Midheaven') return chartObj.mc_point.symbol;
+                return chartObj.planets_dict[name] ? chartObj.planets_dict[name].symbol : name;
+            };
+            const aspectLookup = {};
+            const getAspectChar = (aspName) => {
+                const map = {
+                    'Conjunction': '☌', 'Opposition': '☍', 'Trine': '△', 'Square': '□', 'Sextile': '⚹'
+                };
+                return map[aspName] || aspName;
+            };
+
+            if (mode === 'synastry') {
+                // Synastry Grid: P1 on Y-axis, P2 on X-axis
+                const pts1 = [...chart1.planets, chart1.asc_point].map(p => p.name);
+                const pts2 = [...chart2.planets, chart2.asc_point].map(p => p.name);
+                
+                synastry.aspects.forEach(asp => {
+                    aspectLookup[`${asp.p1_planet}-${asp.p2_planet}`] = asp;
+                });
+                
+                htmlGrid += '<thead><tr><th></th>';
+                pts2.forEach(p2 => {
+                    htmlGrid += `<th style="color: var(--p2-color)">${getSym(chart2, p2)}</th>`;
+                });
+                htmlGrid += '</tr></thead><tbody>';
+                
+                pts1.forEach(p1 => {
+                    htmlGrid += `<tr><th style="color: var(--p1-color)">${getSym(chart1, p1)}</th>`;
+                    pts2.forEach(p2 => {
+                        const key = `${p1}-${p2}`;
+                        const asp = aspectLookup[key];
+                        if (asp) {
+                            htmlGrid += `<td class="aspect-cell" style="color: ${asp.color}">
+                                ${getAspectChar(asp.aspect)}<br/><small>${asp.orb}°</small>
+                            </td>`;
+                        } else {
+                            htmlGrid += `<td></td>`;
+                        }
+                    });
+                    htmlGrid += `</tr>`;
+                });
+                htmlGrid += '</tbody></table>';
+                
+            } else {
+                // Natal Grid (Triangular)
+                const c = mode === 'natal1' ? chart1 : chart2;
+                const pts = [...c.planets, c.asc_point].map(p => p.name);
+                
+                c.natal_aspects.forEach(asp => {
+                    aspectLookup[`${asp.p1}-${asp.p2}`] = asp;
+                    aspectLookup[`${asp.p2}-${asp.p1}`] = asp;
+                });
+                
+                htmlGrid += '<tbody>';
+                for(let i = 1; i < pts.length; i++) {
+                    const pY = pts[i];
+                    htmlGrid += `<tr><th style="color: ${c.planets_dict[pY] ? c.planets_dict[pY].color : '#ec4899'}">${getSym(c, pY)}</th>`;
+                    for(let j = 0; j < i; j++) {
+                        const pX = pts[j];
+                        const key = `${pY}-${pX}`;
+                        const asp = aspectLookup[key];
+                        if (asp) {
+                            htmlGrid += `<td class="aspect-cell" style="color: ${asp.color}">
+                                ${getAspectChar(asp.aspect)}<br/><small>${asp.orb}°</small>
+                            </td>`;
+                        } else {
+                            htmlGrid += `<td></td>`;
+                        }
+                    }
+                    htmlGrid += `</tr>`;
+                }
+                
+                htmlGrid += '<tr><th></th>';
+                for(let j = 0; j < pts.length - 1; j++) {
+                    const pX = pts[j];
+                    htmlGrid += `<th style="color: ${c.planets_dict[pX] ? c.planets_dict[pX].color : '#ec4899'}">${getSym(c, pX)}</th>`;
+                }
+                htmlGrid += '</tr></tbody></table>';
+            }
+            
+            gridContainer.innerHTML = htmlGrid;
         }
 
         // Mode Switching

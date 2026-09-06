@@ -11,7 +11,7 @@ import uuid
 
 app = Flask(__name__)
 
-APP_VERSION = "2.3.0"
+APP_VERSION = "2.4.0"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -239,8 +239,8 @@ def calculate_angles_and_houses(t, lat, lon):
     lat_rad = np.radians(lat)
     
     # Ascendant
-    num = -np.cos(ramc_rad)
-    den = (np.sin(ramc_rad) * np.cos(eps_rad)) + (np.tan(lat_rad) * np.sin(eps_rad))
+    num = np.cos(ramc_rad)
+    den = -((np.sin(ramc_rad) * np.cos(eps_rad)) + (np.tan(lat_rad) * np.sin(eps_rad)))
     asc_deg = float(np.degrees(np.arctan2(num, den)) % 360)
     
     # Midheaven (MC)
@@ -250,14 +250,44 @@ def calculate_angles_and_houses(t, lat, lon):
     dsc_deg = float((asc_deg + 180) % 360)
     ic_deg = float((mc_deg + 180) % 360)
     
-    # 12 Equal Houses (House 1 starts at ASC)
+    # Porphyry Houses Calculation
+    def normalize_angle(deg):
+        return deg % 360
+        
+    arc_asc_ic = normalize_angle(ic_deg - asc_deg)
+    arc_ic_dsc = normalize_angle(dsc_deg - ic_deg)
+    arc_dsc_mc = normalize_angle(mc_deg - dsc_deg)
+    arc_mc_asc = normalize_angle(asc_deg - mc_deg)
+    
+    cusps = []
+    
+    # Q1: ASC to IC
+    cusps.append(asc_deg)
+    cusps.append(normalize_angle(asc_deg + arc_asc_ic / 3.0))
+    cusps.append(normalize_angle(asc_deg + 2.0 * arc_asc_ic / 3.0))
+    
+    # Q2: IC to DSC
+    cusps.append(ic_deg)
+    cusps.append(normalize_angle(ic_deg + arc_ic_dsc / 3.0))
+    cusps.append(normalize_angle(ic_deg + 2.0 * arc_ic_dsc / 3.0))
+    
+    # Q3: DSC to MC
+    cusps.append(dsc_deg)
+    cusps.append(normalize_angle(dsc_deg + arc_dsc_mc / 3.0))
+    cusps.append(normalize_angle(dsc_deg + 2.0 * arc_dsc_mc / 3.0))
+    
+    # Q4: MC to ASC
+    cusps.append(mc_deg)
+    cusps.append(normalize_angle(mc_deg + arc_mc_asc / 3.0))
+    cusps.append(normalize_angle(mc_deg + 2.0 * arc_mc_asc / 3.0))
+    
     houses = []
-    for h in range(12):
-        cusp = (asc_deg + h * 30.0) % 360
+    for i in range(12):
+        cusp_deg = cusps[i]
         houses.append({
-            "house": h + 1,
-            "cusp": round(float(cusp), 2),
-            "zodiac": format_zodiac(cusp)
+            "house": i + 1,
+            "cusp": round(float(cusp_deg), 2),
+            "zodiac": format_zodiac(cusp_deg)
         })
         
     return {
@@ -268,10 +298,19 @@ def calculate_angles_and_houses(t, lat, lon):
         "houses": houses
     }
 
-def get_house_for_lon(lon_deg, asc_deg):
-    """Determine which equal house (1-12) an ecliptic longitude falls into."""
-    diff = (lon_deg - asc_deg) % 360
-    return int(diff // 30) + 1
+def get_house_for_lon(lon_deg, cusps_list):
+    """Determine which unequal house (1-12) an ecliptic longitude falls into."""
+    lon_deg = lon_deg % 360
+    for i in range(12):
+        cusp_current = cusps_list[i]
+        cusp_next = cusps_list[(i + 1) % 12]
+        if cusp_current < cusp_next:
+            if cusp_current <= lon_deg < cusp_next:
+                return i + 1
+        else:
+            if lon_deg >= cusp_current or lon_deg < cusp_next:
+                return i + 1
+    return 1
 
 def compute_chart(name, date_str, time_str, tz_str, city_str):
     """Calculates all planetary coordinates, angles, houses, and natal aspects."""
@@ -314,6 +353,7 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
     # Calculate celestial angles & houses
     angles = calculate_angles_and_houses(t, lat, lon)
     asc_deg = angles["asc"]
+    cusps_deg_list = [h["cusp"] for h in angles["houses"]]
     
     # Calculate all planets
     planets_list = []
@@ -321,12 +361,12 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
     
     for p_name, p_info in PLANETS_CONFIG.items():
         p_obj = eph[p_info['target']]
-        astrometric = earth.at(t).observe(p_obj)
-        _, lon_ecl, _ = astrometric.ecliptic_latlon()
+        apparent = earth.at(t).observe(p_obj).apparent()
+        _, lon_ecl, _ = apparent.ecliptic_latlon('date')
         deg = float(lon_ecl.degrees % 360)
         
         zodiac = format_zodiac(deg)
-        house_num = get_house_for_lon(deg, asc_deg)
+        house_num = get_house_for_lon(deg, cusps_deg_list)
         
         planet_entry = {
             "name": p_name,
@@ -381,7 +421,7 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         "min": mc_zodiac["min"],
         "sign_color": mc_zodiac["color"],
         "formatted": mc_zodiac["formatted"],
-        "house": get_house_for_lon(angles["mc"], asc_deg)
+        "house": get_house_for_lon(angles["mc"], cusps_deg_list)
     }
 
     # Natal aspects for this individual

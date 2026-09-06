@@ -708,9 +708,9 @@ export function applyLanguage(lang) {
     const min = (minVal !== null && minVal !== undefined && minVal !== '') ? String(minVal).padStart(2, '0') : '00';
     const signTranslated = tZodiac(sign, lang);
     if (lang === 'he') {
-      el.textContent = `${signTranslated} ${symbol} ${deg}° ${min}'`;
+      el.innerHTML = `${signTranslated} <span style="color: inherit;">${symbol}</span> <span dir="ltr" style="display:inline-block;">${deg}° ${min}'</span>`;
     } else {
-      el.textContent = `${deg}° ${min}' ${symbol} ${signTranslated}`;
+      el.innerHTML = `<span dir="ltr" style="display:inline-block;">${deg}° ${min}'</span> <span style="color: inherit;">${symbol}</span> ${signTranslated}`;
     }
   });
 
