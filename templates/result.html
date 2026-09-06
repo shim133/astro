@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Synastry Report & Astrological Maps | {{ p1.name }} & {{ p2.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #070913;
+            --bg-card: rgba(17, 24, 43, 0.85);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --gold: #fbbf24;
+            --p1-color: #38bdf8;
+            --p2-color: #f472b6;
+            --emerald: #10b981;
+            --crimson: #ef4444;
+            --cyan: #06b6d4;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 15%, rgba(244, 114, 182, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 60%, rgba(251, 191, 36, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #070913 0%, #0b0f1f 100%);
+            color: #f8fafc;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.8px;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-tabs .nav-link {
+            color: #94a3b8;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 0.75rem 1.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #f8fafc;
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: transparent;
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+            font-weight: 700;
+        }
+
+        /* SVG Map Styling */
+        #chartSvgContainer {
+            width: 100%;
+            max-width: 820px;
+            margin: 0 auto;
+            position: relative;
+            user-select: none;
+        }
+
+        #astroWheelSvg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 35px rgba(0, 0, 0, 0.7));
+        }
+
+        .planet-badge {
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .planet-badge:hover {
+            filter: drop-shadow(0 0 10px #fff);
+            transform: scale(1.2);
+        }
+
+        .aspect-chord {
+            cursor: pointer;
+            transition: stroke-width 0.2s ease, opacity 0.2s ease, stroke 0.2s ease;
+        }
+
+        .aspect-chord:hover {
+            stroke-width: 3.5px !important;
+            opacity: 1 !important;
+            filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        /* Floating Tooltip */
+        #wheelTooltip {
+            position: absolute;
+            display: none;
+            pointer-events: none;
+            background: rgba(11, 15, 29, 0.95);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #f8fafc;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            max-width: 280px;
+        }
+
+        /* Score Ring */
+        .score-circle {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: conic-gradient(var(--gold) calc(var(--score-pct) * 1%), rgba(255, 255, 255, 0.08) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.2);
+        }
+
+        .score-circle-inner {
+            width: 106px;
+            height: 106px;
+            background: #0b0f1d;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metric-bar-wrap {
+            background: rgba(255, 255, 255, 0.06);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Aspect cards */
+        .aspect-item-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-left: 4px solid #64748b;
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .aspect-item-card:hover {
+            transform: translateX(4px);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .aspect-item-card.Conjunction { border-left-color: var(--gold); }
+        .aspect-item-card.Trine { border-left-color: var(--emerald); }
+        .aspect-item-card.Sextile { border-left-color: var(--cyan); }
+        .aspect-item-card.Square { border-left-color: var(--crimson); }
+        .aspect-item-card.Opposition { border-left-color: #f43f5e; }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.82rem;
+            border-radius: 20px;
+            padding: 0.35rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .badge-element {
+            font-size: 0.75rem;
+            border-radius: 12px;
+            padding: 0.2rem 0.55rem;
+        }
+        .element-fire { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .element-earth { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .element-air { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+        .element-water { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            padding: 0.35rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .btn-export:hover {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: var(--gold);
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="py-4">
+    <div class="container-fluid px-lg-5">
+        
+        <!-- Header & Nav -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill mb-1">← New Calculation</a>
+                <h1 class="cinzel h3 text-white mb-0">
+                    <span style="color: var(--p1-color)">{{ p1.name }}</span> 
+                    <span class="text-secondary">&amp;</span> 
+                    <span style="color: var(--p2-color)">{{ p2.name }}</span>
+                </h1>
+                <small class="text-muted">High-Precision Geocentric Synastry Analysis</small>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-export" onclick="exportSvg()">⬇️ Export SVG Map</button>
+                <button type="button" class="btn btn-export" onclick="exportPng()">🖼️ Export PNG Map</button>
+            </div>
+        </div>
+
+        <!-- Executive Summary & Big Three Cards -->
+        <div class="row g-4 mb-4">
+            
+            <!-- Overall Score & Verdict -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="cinzel text-uppercase tracking-wider text-warning" style="font-size: 0.85rem;">Synastry Index</span>
+                            <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1" style="font-size: 0.78rem;">{{ synastry.aspects|length }} Aspects</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-4 mb-4">
+                            <div class="score-circle" style="--score-pct: {{ synastry.overall_score }};">
+                                <div class="score-circle-inner">
+                                    <span class="cinzel h2 mb-0 text-white font-weight-bold">{{ synastry.overall_score }}</span>
+                                    <span class="text-muted" style="font-size: 0.7rem;">/ 100</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="h5 mb-1 text-white">Compatibility Rating</h4>
+                                <div class="text-secondary" style="font-size: 0.85rem;">
+                                    {% if synastry.overall_score >= 80 %}
+                                        ✨ Soulmate Potential
+                                    {% elif synastry.overall_score >= 65 %}
+                                        💫 Harmonious Resonance
+                                    {% else %}
+                                        ⚡ Dynamic Growth Catalyst
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary mb-3" style="font-size: 0.88rem; line-height: 1.55;">
+                            {{ synastry.verdict }}
+                        </p>
+                    </div>
+
+                    <!-- Category Bars -->
+                    <div class="pt-2 border-top border-secondary border-opacity-25">
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span>🔥 Romantic Chemistry</span>
+                                <span class="text-white">{{ synastry.chemistry_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ synastry.chemistry_score }}%; background: #f43f5e;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span>🌊 Emotional Safety</span>
+                                <span class="text-white">{{ synastry.emotional_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ synastry.emotional_score }}%; background: #818cf8;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span>⚡ Mental Rapport</span>
+                                <span class="text-white">{{ synastry.intellectual_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ synastry.intellectual_score }}%; background: #38bdf8;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span>🏛️ Long-Term Stability</span>
+                                <span class="text-white">{{ synastry.stability_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ synastry.stability_score }}%; background: #10b981;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big Three Comparison -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="row g-3 h-100">
+                    <!-- Partner A Profile -->
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100" style="border-top: 3px solid var(--p1-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h3 class="h5 cinzel mb-0" style="color: var(--p1-color);">{{ p1.name }}</h3>
+                                    <small class="text-muted">{{ p1.city }} ({{ p1.date }})</small>
+                                </div>
+                                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--p1-color); border: 1px solid rgba(56, 189, 248, 0.3);">Inner Wheel</span>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong class="text-warning">☉ Sun:</strong></span>
+                                    <span class="fw-semibold">{{ p1.planets_dict['Sun'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #cbd5e1;">☽ Moon:</strong></span>
+                                    <span class="fw-semibold">{{ p1.planets_dict['Moon'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #ec4899;">ASC Rising:</strong></span>
+                                    <span class="fw-semibold">{{ p1.asc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #f472b6;">♀ Venus:</strong></span>
+                                    <span class="fw-semibold">{{ p1.planets_dict['Venus'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #ef4444;">♂ Mars:</strong></span>
+                                    <span class="fw-semibold">{{ p1.planets_dict['Mars'].formatted }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Partner B Profile -->
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100" style="border-top: 3px solid var(--p2-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h3 class="h5 cinzel mb-0" style="color: var(--p2-color);">{{ p2.name }}</h3>
+                                    <small class="text-muted">{{ p2.city }} ({{ p2.date }})</small>
+                                </div>
+                                <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);">Outer Wheel</span>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong class="text-warning">☉ Sun:</strong></span>
+                                    <span class="fw-semibold">{{ p2.planets_dict['Sun'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #cbd5e1;">☽ Moon:</strong></span>
+                                    <span class="fw-semibold">{{ p2.planets_dict['Moon'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #ec4899;">ASC Rising:</strong></span>
+                                    <span class="fw-semibold">{{ p2.asc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #f472b6;">♀ Venus:</strong></span>
+                                    <span class="fw-semibold">{{ p2.planets_dict['Venus'].formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary"><strong style="color: #ef4444;">♂ Mars:</strong></span>
+                                    <span class="fw-semibold">{{ p2.planets_dict['Mars'].formatted }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Interactive Map & Aspects Centerpiece -->
+        <div class="glass-card p-4 mb-5">
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4 justify-content-center" id="mapTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="switchMapMode('synastry')">
+                        🔮 Synastry Bi-Wheel
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="switchMapMode('natal1')">
+                        🪐 {{ p1.name }}'s Natal Map
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="switchMapMode('natal2')">
+                        🌙 {{ p2.name }}'s Natal Map
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="scrollToAspects()">
+                        📜 Aspect Catalog ({{ synastry.aspects|length }})
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Map Controls & Filter Legend -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 px-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-secondary small">Wheel Mode:</span>
+                    <span id="currentModeLabel" class="badge bg-secondary bg-opacity-25 text-warning font-monospace">Synastry Bi-Wheel</span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="text-secondary small me-1">Aspect Filters:</span>
+                    <button class="filter-btn active" id="btn-all" onclick="filterAspects('all')">All</button>
+                    <button class="filter-btn" id="btn-trine" onclick="filterAspects('Trine')">🟢 Trines (120°)</button>
+                    <button class="filter-btn" id="btn-sextile" onclick="filterAspects('Sextile')">🔵 Sextiles (60°)</button>
+                    <button class="filter-btn" id="btn-conjunction" onclick="filterAspects('Conjunction')">🟡 Conjunctions (0°)</button>
+                    <button class="filter-btn" id="btn-square" onclick="filterAspects('Square')">🔴 Squares (90°)</button>
+                    <button class="filter-btn" id="btn-opposition" onclick="filterAspects('Opposition')">🟣 Oppositions (180°)</button>
+                </div>
+            </div>
+
+            <!-- SVG Container -->
+            <div id="chartSvgContainer">
+                <div id="wheelTooltip"></div>
+                <svg id="astroWheelSvg" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="spaceGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.35"/>
+                            <stop offset="60%" stop-color="#0f172a" stop-opacity="0.7"/>
+                            <stop offset="100%" stop-color="#070913" stop-opacity="1"/>
+                        </radialGradient>
+                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+                    <!-- Background Circle -->
+                    <circle cx="450" cy="450" r="445" fill="url(#spaceGlow)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+                    <!-- Dynamic SVG layers generated by JS -->
+                    <g id="zodiacRingLayer"></g>
+                    <g id="houseCuspsLayer"></g>
+                    <g id="aspectsLayer"></g>
+                    <g id="planetsLayer"></g>
+                    <g id="centerInfoLayer"></g>
+                </svg>
+            </div>
+            
+            <div class="text-center mt-3 text-secondary" style="font-size: 0.8rem;">
+                💡 <em>Hover over any planet glyph or aspect line to view exact degrees, house placements, and astrological interpretations.</em>
+            </div>
+        </div>
+
+        <!-- Detailed Aspect Matrix & Interpretations -->
+        <div class="glass-card p-4" id="aspectsCatalogSection">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+                <div>
+                    <h3 class="cinzel h4 text-white mb-1">Synastry Aspect Matrix &amp; Interpretations</h3>
+                    <p class="text-secondary small mb-0">Detailed geometric angular relationships between {{ p1.name }} and {{ p2.name }}'s charts</p>
+                </div>
+
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <button class="filter-btn active" onclick="filterCardList('all')">Show All</button>
+                    <button class="filter-btn" onclick="filterCardList('harmonious')">Harmonious</button>
+                    <button class="filter-btn" onclick="filterCardList('challenging')">Dynamic / Friction</button>
+                </div>
+            </div>
+
+            <div class="row g-3" id="aspectCardsContainer">
+                {% for item in synastry.aspects %}
+                <div class="col-lg-6 aspect-card-col" data-nature="{{ item.nature }}" data-aspect="{{ item.aspect }}">
+                    <div class="aspect-item-card {{ item.aspect }} h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold" style="color: var(--p1-color)">{{ p1.name }}'s {{ item.p1_symbol }} {{ item.p1_planet }}</span>
+                                    <span class="text-secondary">✕</span>
+                                    <span class="fw-bold" style="color: var(--p2-color)">{{ p2.name }}'s {{ item.p2_symbol }} {{ item.p2_planet }}</span>
+                                </div>
+                                <span class="badge" style="background: rgba(255,255,255,0.08); color: {{ item.color }}; border: 1px solid {{ item.color }}66;">
+                                    {{ item.aspect }} ({{ item.angle }}°)
+                                </span>
+                            </div>
+
+                            <p class="text-light text-opacity-90 mb-2" style="font-size: 0.88rem; line-height: 1.5;">
+                                {{ item.meaning }}
+                            </p>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-10 text-muted" style="font-size: 0.75rem;">
+                            <span>Orb: <strong class="text-white">{{ item.orb }}°</strong> (Tightness: {{ (item.tightness * 100)|round }}%)</span>
+                            <span>
+                                {% if item.nature == 'harmonious' %}
+                                    <span class="text-success">● Harmonious Flow</span>
+                                {% else %}
+                                    <span class="text-danger">● Dynamic Catalyst</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Inject Backend Payload for Dynamic SVG -->
+    <script id="astroData" type="application/json">
+        {{ payload_json | safe }}
+    </script>
+
+    <script>
+        const astroData = JSON.parse(document.getElementById('astroData').textContent);
+        const { chart1, chart2, synastry, zodiac_data } = astroData;
+
+        let currentMode = 'synastry'; // 'synastry' | 'natal1' | 'natal2'
+        let activeAspectFilter = 'all';
+
+        const CX = 450;
+        const CY = 450;
+        const R_OUTER = 440;
+        const R_ZODIAC_OUT = 430;
+        const R_ZODIAC_IN = 370;
+
+        // Astrological coordinate conversion: Ascendant placed at 9 o'clock (180 deg)
+        // Standard chart math: Longitude increases counter-clockwise
+        function lonToSvgAngle(lonDeg, ascDeg) {
+            // Ascendant at 180 degrees (9 o'clock)
+            return (180 - (lonDeg - ascDeg)) % 360;
+        }
+
+        function polarToCartesian(cx, cy, r, angleDeg) {
+            const rad = (angleDeg * Math.PI) / 180.0;
+            return {
+                x: cx + r * Math.cos(rad),
+                y: cy - r * Math.sin(rad)
+            };
+        }
+
+        function describeArc(cx, cy, rIn, rOut, startAngle, endAngle) {
+            const p1 = polarToCartesian(cx, cy, rOut, startAngle);
+            const p2 = polarToCartesian(cx, cy, rOut, endAngle);
+            const p3 = polarToCartesian(cx, cy, rIn, endAngle);
+            const p4 = polarToCartesian(cx, cy, rIn, startAngle);
+
+            let diff = (endAngle - startAngle);
+            while (diff < 0) diff += 360;
+            const largeArc = diff > 180 ? 1 : 0;
+
+            return [
+                "M", p1.x, p1.y,
+                "A", rOut, rOut, 0, largeArc, 0, p2.x, p2.y,
+                "L", p3.x, p3.y,
+                "A", rIn, rIn, 0, largeArc, 1, p4.x, p4.y,
+                "Z"
+            ].join(" ");
+        }
+
+        // Draw Zodiac Ring
+        function renderZodiacRing(ascDeg) {
+            const layer = document.getElementById('zodiacRingLayer');
+            layer.innerHTML = '';
+
+            const elementThemes = {
+                fire: { fill: 'rgba(239, 68, 68, 0.16)', stroke: '#ef4444', text: '#fca5a5' },
+                earth: { fill: 'rgba(16, 185, 129, 0.16)', stroke: '#10b981', text: '#6ee7b7' },
+                air: { fill: 'rgba(56, 189, 248, 0.16)', stroke: '#38bdf8', text: '#7dd3fc' },
+                water: { fill: 'rgba(99, 102, 241, 0.16)', stroke: '#818cf8', text: '#c7d2fe' }
+            };
+
+            for (let i = 0; i < 12; i++) {
+                const z = zodiac_data[i];
+                const startLon = z.start;
+                const endLon = (z.start + 30) % 360;
+
+                const startAngle = lonToSvgAngle(startLon, ascDeg);
+                const endAngle = lonToSvgAngle(endLon, ascDeg);
+
+                const theme = elementThemes[z.element];
+                const d = describeArc(CX, CY, R_ZODIAC_IN, R_ZODIAC_OUT, startAngle, endAngle);
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', d);
+                path.setAttribute('fill', theme.fill);
+                path.setAttribute('stroke', 'rgba(255,255,255,0.15)');
+                path.setAttribute('stroke-width', '1');
+                layer.appendChild(path);
+
+                // Midpoint for glyph & label
+                const midAngle = lonToSvgAngle(startLon + 15, ascDeg);
+                const glyphPos = polarToCartesian(CX, CY, (R_ZODIAC_IN + R_ZODIAC_OUT) / 2 + 5, midAngle);
+                const textPos = polarToCartesian(CX, CY, R_ZODIAC_IN + 12, midAngle);
+
+                // Glyph
+                const glyphText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                glyphText.setAttribute('x', glyphPos.x);
+                glyphText.setAttribute('y', glyphPos.y);
+                glyphText.setAttribute('fill', theme.text);
+                glyphText.setAttribute('font-size', '17');
+                glyphText.setAttribute('font-weight', 'bold');
+                glyphText.setAttribute('text-anchor', 'middle');
+                glyphText.setAttribute('dominant-baseline', 'central');
+                glyphText.textContent = z.symbol;
+                layer.appendChild(glyphText);
+
+                // Small name label
+                const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                labelText.setAttribute('x', textPos.x);
+                labelText.setAttribute('y', textPos.y);
+                labelText.setAttribute('fill', 'rgba(255,255,255,0.6)');
+                labelText.setAttribute('font-size', '8');
+                labelText.setAttribute('text-anchor', 'middle');
+                labelText.setAttribute('dominant-baseline', 'central');
+                labelText.textContent = z.name.slice(0, 3).toUpperCase();
+                layer.appendChild(labelText);
+            }
+
+            // 360 degree ticks
+            for (let deg = 0; deg < 360; deg += 5) {
+                const angle = lonToSvgAngle(deg, ascDeg);
+                const isTen = deg % 10 === 0;
+                const rTick = isTen ? R_ZODIAC_OUT - 6 : R_ZODIAC_OUT - 3;
+                const p1 = polarToCartesian(CX, CY, R_ZODIAC_OUT, angle);
+                const p2 = polarToCartesian(CX, CY, rTick, angle);
+
+                const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                tick.setAttribute('x1', p1.x);
+                tick.setAttribute('y1', p1.y);
+                tick.setAttribute('x2', p2.x);
+                tick.setAttribute('y2', p2.y);
+                tick.setAttribute('stroke', isTen ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)');
+                tick.setAttribute('stroke-width', '1');
+                layer.appendChild(tick);
+            }
+        }
+
+        // Draw House Cusps
+        function renderHouseCusps(activeChart) {
+            const layer = document.getElementById('houseCuspsLayer');
+            layer.innerHTML = '';
+
+            const ascDeg = activeChart.asc;
+            const romanHouses = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
+            activeChart.houses.forEach((h, idx) => {
+                const cuspDeg = h.cusp;
+                const angle = lonToSvgAngle(cuspDeg, ascDeg);
+                const pIn = polarToCartesian(CX, CY, 180, angle);
+                const pOut = polarToCartesian(CX, CY, R_ZODIAC_IN, angle);
+
+                const isMainAxis = (idx === 0 || idx === 3 || idx === 6 || idx === 9);
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', pIn.x);
+                line.setAttribute('y1', pIn.y);
+                line.setAttribute('x2', pOut.x);
+                line.setAttribute('y2', pOut.y);
+                line.setAttribute('stroke', isMainAxis ? 'rgba(251, 191, 36, 0.65)' : 'rgba(255, 255, 255, 0.12)');
+                line.setAttribute('stroke-width', isMainAxis ? '1.8' : '0.8');
+                if (!isMainAxis) line.setAttribute('stroke-dasharray', '3,3');
+                layer.appendChild(line);
+
+                // House Roman Numeral Label (positioned in house sector)
+                const midHouseAngle = lonToSvgAngle(cuspDeg + 15, ascDeg);
+                const labelPos = polarToCartesian(CX, CY, 200, midHouseAngle);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', labelPos.x);
+                text.setAttribute('y', labelPos.y);
+                text.setAttribute('fill', 'rgba(255, 255, 255, 0.35)');
+                text.setAttribute('font-size', '10');
+                text.setAttribute('font-weight', '500');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'central');
+                text.textContent = romanHouses[idx];
+                layer.appendChild(text);
+            });
+
+            // ASC & MC Callouts
+            const ascP = polarToCartesian(CX, CY, R_ZODIAC_OUT + 15, 180);
+            const ascText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            ascText.setAttribute('x', ascP.x);
+            ascText.setAttribute('y', ascP.y);
+            ascText.setAttribute('fill', '#ec4899');
+            ascText.setAttribute('font-size', '11');
+            ascText.setAttribute('font-weight', 'bold');
+            ascText.setAttribute('text-anchor', 'end');
+            ascText.setAttribute('dominant-baseline', 'central');
+            ascText.textContent = 'ASC ◄';
+            layer.appendChild(ascText);
+
+            const mcAngle = lonToSvgAngle(activeChart.mc, ascDeg);
+            const mcP = polarToCartesian(CX, CY, R_ZODIAC_OUT + 15, mcAngle);
+            const mcText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            mcText.setAttribute('x', mcP.x);
+            mcText.setAttribute('y', mcP.y);
+            mcText.setAttribute('fill', '#8b5cf6');
+            mcText.setAttribute('font-size', '11');
+            mcText.setAttribute('font-weight', 'bold');
+            mcText.setAttribute('text-anchor', 'middle');
+            mcText.setAttribute('dominant-baseline', 'central');
+            mcText.textContent = 'MC ▲';
+            layer.appendChild(mcText);
+        }
+
+        // Render Planets
+        function renderPlanets(mode) {
+            const layer = document.getElementById('planetsLayer');
+            layer.innerHTML = '';
+
+            const ascDeg = chart1.asc;
+
+            if (mode === 'synastry') {
+                // Partner B: Outer Planet Track (r = 338)
+                drawPlanetTrack(chart2.planets, ascDeg, 338, 'p2', chart2.name, '#f472b6', layer);
+
+                // Separator circle between track 1 and 2
+                const sep = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                sep.setAttribute('cx', CX);
+                sep.setAttribute('cy', CY);
+                sep.setAttribute('r', 312);
+                sep.setAttribute('fill', 'none');
+                sep.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+                sep.setAttribute('stroke-dasharray', '2,4');
+                layer.appendChild(sep);
+
+                // Partner A: Inner Planet Track (r = 285)
+                drawPlanetTrack(chart1.planets, ascDeg, 285, 'p1', chart1.name, '#38bdf8', layer);
+
+            } else {
+                const chart = mode === 'natal1' ? chart1 : chart2;
+                const trackColor = mode === 'natal1' ? '#38bdf8' : '#f472b6';
+                drawPlanetTrack(chart.planets, chart.asc, 310, 'natal', chart.name, trackColor, layer);
+            }
+        }
+
+        // Anti-collision radial staggering algorithm
+        function drawPlanetTrack(planets, ascDeg, baseRadius, groupTag, personName, ringColor, container) {
+            // Sort by longitude to detect clusters
+            const sorted = [...planets].sort((a, b) => a.lon - b.lon);
+
+            // Stagger radius if within 8 degrees
+            const placed = [];
+            sorted.forEach((p, i) => {
+                let r = baseRadius;
+                if (i > 0) {
+                    const prev = placed[i - 1];
+                    let diff = Math.abs(p.lon - prev.lon);
+                    diff = Math.min(diff, 360 - diff);
+                    if (diff < 9.0) {
+                        r = prev.r === baseRadius ? baseRadius + 15 : baseRadius;
+                    }
+                }
+                placed.push({ ...p, r });
+            });
+
+            placed.forEach(p => {
+                const angle = lonToSvgAngle(p.lon, ascDeg);
+                const pos = polarToCartesian(CX, CY, p.r, angle);
+
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', `planet-badge planet-${groupTag}-${p.name.toLowerCase()}`);
+                g.setAttribute('data-name', p.name);
+                g.setAttribute('data-group', groupTag);
+
+                // Glow ring
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', pos.x);
+                circle.setAttribute('cy', pos.y);
+                circle.setAttribute('r', '13.5');
+                circle.setAttribute('fill', '#0f172a');
+                circle.setAttribute('stroke', ringColor);
+                circle.setAttribute('stroke-width', '1.8');
+                g.appendChild(circle);
+
+                // Glyph text
+                const glyph = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                glyph.setAttribute('x', pos.x);
+                glyph.setAttribute('y', pos.y + 0.5);
+                glyph.setAttribute('fill', p.color || '#fff');
+                glyph.setAttribute('font-size', '14');
+                glyph.setAttribute('font-weight', 'bold');
+                glyph.setAttribute('text-anchor', 'middle');
+                glyph.setAttribute('dominant-baseline', 'central');
+                glyph.textContent = p.symbol;
+                g.appendChild(glyph);
+
+                // Small degree badge
+                const degP = polarToCartesian(CX, CY, p.r > baseRadius ? p.r + 14 : p.r - 14, angle);
+                const degText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                degText.setAttribute('x', degP.x);
+                degText.setAttribute('y', degP.y);
+                degText.setAttribute('fill', 'rgba(255,255,255,0.7)');
+                degText.setAttribute('font-size', '8');
+                degText.setAttribute('text-anchor', 'middle');
+                degText.setAttribute('dominant-baseline', 'central');
+                degText.textContent = `${p.sign_deg}°`;
+                g.appendChild(degText);
+
+                // Hover events
+                g.addEventListener('mouseenter', (e) => {
+                    showTooltip(e, `
+                        <div class="fw-bold" style="color: ${ringColor}">
+                            ${personName}: ${p.symbol} ${p.name}
+                        </div>
+                        <div class="text-warning small mb-1">${p.formatted}</div>
+                        <div class="text-secondary small">House: <strong>${p.house}</strong> | Element: <strong style="color:${p.sign_color}">${p.sign}</strong></div>
+                    `);
+                    highlightPlanetAspects(p.name, groupTag);
+                });
+
+                g.addEventListener('mouseleave', () => {
+                    hideTooltip();
+                    resetAspectHighlights();
+                });
+
+                container.appendChild(g);
+            });
+        }
+
+        // Render Aspects
+        function renderAspects(mode) {
+            const layer = document.getElementById('aspectsLayer');
+            layer.innerHTML = '';
+
+            const ascDeg = mode === 'synastry' ? chart1.asc : (mode === 'natal1' ? chart1.asc : chart2.asc);
+
+            if (mode === 'synastry') {
+                const aspects = synastry.aspects;
+                aspects.forEach((asp, idx) => {
+                    if (activeAspectFilter !== 'all' && asp.aspect !== activeAspectFilter) {
+                        return;
+                    }
+
+                    const angle1 = lonToSvgAngle(asp.p1_lon, ascDeg);
+                    const angle2 = lonToSvgAngle(asp.p2_lon, ascDeg);
+
+                    // Connect inner radius boundary (r = 250)
+                    const p1 = polarToCartesian(CX, CY, 240, angle1);
+                    const p2 = polarToCartesian(CX, CY, 240, angle2);
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', p1.x);
+                    line.setAttribute('y1', p1.y);
+                    line.setAttribute('x2', p2.x);
+                    line.setAttribute('y2', p2.y);
+                    line.setAttribute('stroke', asp.color);
+                    line.setAttribute('stroke-width', Math.max(1.0, 3.0 * asp.tightness));
+                    line.setAttribute('stroke-opacity', Math.max(0.35, 0.85 * asp.tightness));
+                    line.setAttribute('class', `aspect-chord aspect-${asp.aspect.toLowerCase()}`);
+                    line.setAttribute('data-p1', asp.p1_planet);
+                    line.setAttribute('data-p2', asp.p2_planet);
+
+                    line.addEventListener('mouseenter', (e) => {
+                        showTooltip(e, `
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color: ${asp.color}">${asp.aspect} (${asp.angle}°)</span>
+                                <span class="badge bg-dark">Orb ${asp.orb}°</span>
+                            </div>
+                            <div class="small mb-1 text-light">
+                                <strong style="color: var(--p1-color)">${chart1.name}'s ${asp.p1_planet}</strong> 
+                                ↔ 
+                                <strong style="color: var(--p2-color)">${chart2.name}'s ${asp.p2_planet}</strong>
+                            </div>
+                            <div class="small text-secondary" style="font-size:0.78rem;">${asp.meaning}</div>
+                        `);
+                    });
+
+                    line.addEventListener('mouseleave', hideTooltip);
+
+                    layer.appendChild(line);
+                });
+            } else {
+                const chart = mode === 'natal1' ? chart1 : chart2;
+                chart.natal_aspects.forEach((asp) => {
+                    if (activeAspectFilter !== 'all' && asp.aspect !== activeAspectFilter) {
+                        return;
+                    }
+
+                    const angle1 = lonToSvgAngle(asp.p1_lon, chart.asc);
+                    const angle2 = lonToSvgAngle(asp.p2_lon, chart.asc);
+
+                    const p1 = polarToCartesian(CX, CY, 250, angle1);
+                    const p2 = polarToCartesian(CX, CY, 250, angle2);
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', p1.x);
+                    line.setAttribute('y1', p1.y);
+                    line.setAttribute('x2', p2.x);
+                    line.setAttribute('y2', p2.y);
+                    line.setAttribute('stroke', asp.color);
+                    line.setAttribute('stroke-width', '1.6');
+                    line.setAttribute('stroke-opacity', '0.65');
+                    line.setAttribute('class', `aspect-chord aspect-${asp.aspect.toLowerCase()}`);
+
+                    line.addEventListener('mouseenter', (e) => {
+                        showTooltip(e, `
+                            <div class="fw-bold" style="color: ${asp.color}">Natal ${asp.aspect} (${asp.angle}°)</div>
+                            <div class="small text-light">${asp.p1} ↔ ${asp.p2} (Orb: ${asp.orb}°)</div>
+                        `);
+                    });
+                    line.addEventListener('mouseleave', hideTooltip);
+
+                    layer.appendChild(line);
+                });
+            }
+        }
+
+        // Render Center Emblem
+        function renderCenterInfo(mode) {
+            const layer = document.getElementById('centerInfoLayer');
+            layer.innerHTML = '';
+
+            // Center dark disc
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', CX);
+            circle.setAttribute('cy', CY);
+            circle.setAttribute('r', '65');
+            circle.setAttribute('fill', '#090d1a');
+            circle.setAttribute('stroke', 'rgba(251, 191, 36, 0.4)');
+            circle.setAttribute('stroke-width', '1.5');
+            layer.appendChild(circle);
+
+            const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            title.setAttribute('x', CX);
+            title.setAttribute('y', CY - 10);
+            title.setAttribute('fill', '#fbbf24');
+            title.setAttribute('font-family', 'Cinzel, serif');
+            title.setAttribute('font-size', '13');
+            title.setAttribute('font-weight', 'bold');
+            title.setAttribute('text-anchor', 'middle');
+
+            const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            subtitle.setAttribute('x', CX);
+            subtitle.setAttribute('y', CY + 14);
+            subtitle.setAttribute('fill', '#94a3b8');
+            subtitle.setAttribute('font-size', '10');
+            subtitle.setAttribute('text-anchor', 'middle');
+
+            if (mode === 'synastry') {
+                title.textContent = `${synastry.overall_score}% MATCH`;
+                subtitle.textContent = 'SYNASTRY';
+            } else if (mode === 'natal1') {
+                title.textContent = chart1.name.toUpperCase();
+                subtitle.textContent = `☉ ${chart1.sun_sign}`;
+            } else {
+                title.textContent = chart2.name.toUpperCase();
+                subtitle.textContent = `☉ ${chart2.sun_sign}`;
+            }
+
+            layer.appendChild(title);
+            layer.appendChild(subtitle);
+        }
+
+        // Refresh entire Wheel
+        function redrawWheel() {
+            const activeAsc = currentMode === 'synastry' ? chart1.asc : (currentMode === 'natal1' ? chart1.asc : chart2.asc);
+            renderZodiacRing(activeAsc);
+            renderHouseCusps(currentMode === 'natal2' ? chart2 : chart1);
+            renderAspects(currentMode);
+            renderPlanets(currentMode);
+            renderCenterInfo(currentMode);
+        }
+
+        // Mode Switching
+        function switchMapMode(mode) {
+            currentMode = mode;
+            const tabs = document.querySelectorAll('#mapTabs .nav-link');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const label = document.getElementById('currentModeLabel');
+
+            if (mode === 'synastry') {
+                tabs[0].classList.add('active');
+                label.textContent = 'Synastry Bi-Wheel (Inner: ' + chart1.name + ' / Outer: ' + chart2.name + ')';
+            } else if (mode === 'natal1') {
+                tabs[1].classList.add('active');
+                label.textContent = chart1.name + ' - Natal Chart Map';
+            } else if (mode === 'natal2') {
+                tabs[2].classList.add('active');
+                label.textContent = chart2.name + ' - Natal Chart Map';
+            }
+
+            redrawWheel();
+        }
+
+        // Tooltip handlers
+        const tooltip = document.getElementById('wheelTooltip');
+        const container = document.getElementById('chartSvgContainer');
+
+        function showTooltip(e, html) {
+            tooltip.innerHTML = html;
+            tooltip.style.display = 'block';
+
+            const rect = container.getBoundingClientRect();
+            let x = e.clientX - rect.left + 15;
+            let y = e.clientY - rect.top + 15;
+
+            // Boundary checks
+            if (x + 280 > rect.width) x = x - 300;
+            if (y + 120 > rect.height) y = y - 100;
+
+            tooltip.style.left = `${Math.max(10, x)}px`;
+            tooltip.style.top = `${Math.max(10, y)}px`;
+        }
+
+        function hideTooltip() {
+            tooltip.style.display = 'none';
+        }
+
+        function highlightPlanetAspects(planetName, group) {
+            const chords = document.querySelectorAll('.aspect-chord');
+            chords.forEach(c => {
+                const p1 = c.getAttribute('data-p1');
+                const p2 = c.getAttribute('data-p2');
+                if (p1 === planetName || p2 === planetName) {
+                    c.style.opacity = '1';
+                    c.style.strokeWidth = '3px';
+                } else {
+                    c.style.opacity = '0.1';
+                }
+            });
+        }
+
+        function resetAspectHighlights() {
+            const chords = document.querySelectorAll('.aspect-chord');
+            chords.forEach(c => {
+                c.style.opacity = '';
+                c.style.strokeWidth = '';
+            });
+        }
+
+        // Filter Aspects on Wheel
+        function filterAspects(aspectType) {
+            activeAspectFilter = aspectType;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            const btnId = aspectType === 'all' ? 'btn-all' : `btn-${aspectType.toLowerCase()}`;
+            const btn = document.getElementById(btnId);
+            if (btn) btn.classList.add('active');
+
+            renderAspects(currentMode);
+        }
+
+        // Filter Aspect Cards in Catalog
+        function filterCardList(filter) {
+            const cols = document.querySelectorAll('.aspect-card-col');
+            cols.forEach(c => {
+                if (filter === 'all') {
+                    c.style.display = 'block';
+                } else {
+                    const nature = c.getAttribute('data-nature');
+                    c.style.display = nature === filter ? 'block' : 'none';
+                }
+            });
+        }
+
+        function scrollToAspects() {
+            document.getElementById('aspectsCatalogSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Export SVG
+        function exportSvg() {
+            const svg = document.getElementById('astroWheelSvg');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svg);
+            const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `astromatch_${chart1.name}_${chart2.name}_${currentMode}.svg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export PNG
+        function exportPng() {
+            const svg = document.getElementById('astroWheelSvg');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            canvas.width = 1800;
+            canvas.height = 1800;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            const svgBlob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, 1800, 1800);
+                URL.revokeObjectURL(url);
+                const pngUrl = canvas.toDataURL("image/png");
+                const downloadLink = document.createElement("a");
+                downloadLink.href = pngUrl;
+                downloadLink.download = `astromatch_${chart1.name}_${chart2.name}_${currentMode}.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            };
+            img.src = url;
+        }
+
+        // Initialize Wheel on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            redrawWheel();
+        });
+    </script>
+</body>
+</html>

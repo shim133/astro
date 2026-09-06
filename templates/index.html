@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMatch Pro | Celestial Synastry & Astrological Maps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #070913;
+            --bg-card: rgba(17, 24, 43, 0.75);
+            --border-glow: rgba(255, 215, 0, 0.2);
+            --gold: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.35);
+            --p1-color: #38bdf8;
+            --p1-glow: rgba(56, 189, 248, 0.35);
+            --p2-color: #f472b6;
+            --p2-glow: rgba(244, 114, 182, 0.35);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 25%, rgba(244, 114, 182, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+                linear-gradient(180deg, #070913 0%, #0c1021 100%);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .header-title {
+            background: linear-gradient(135deg, #fff 20%, #fde68a 60%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+            font-weight: 900;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+            transition: all 0.3s ease;
+        }
+
+        .partner-card-1 {
+            border-top: 3px solid var(--p1-color);
+        }
+        .partner-card-1:hover {
+            box-shadow: 0 16px 40px var(--p1-glow);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .partner-card-2 {
+            border-top: 3px solid var(--p2-color);
+        }
+        .partner-card-2:hover {
+            box-shadow: 0 16px 40px var(--p2-glow);
+            border-color: rgba(244, 114, 182, 0.4);
+        }
+
+        .form-label {
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 0.88rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f8fafc;
+            border-radius: 10px;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(15, 23, 42, 0.95);
+            color: #fff;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+            color: #0b0f19;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: 1.5px;
+            border: none;
+            border-radius: 50px;
+            padding: 0.9rem 3.2rem;
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.55);
+            color: #000;
+        }
+
+        .btn-demo {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            padding: 0.4rem 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-demo:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--gold);
+        }
+
+        .badge-partner-1 {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--p1-color);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 30px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        .badge-partner-2 {
+            background: rgba(244, 114, 182, 0.15);
+            color: var(--p2-color);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+            border-radius: 30px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        .tz-pills button {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.72rem;
+            border-radius: 6px;
+            padding: 0.15rem 0.45rem;
+            margin-right: 0.25rem;
+            margin-top: 0.25rem;
+            transition: all 0.15s ease;
+        }
+        .tz-pills button:hover {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .cosmic-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            height: 700px;
+            border: 1px dashed rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            animation: rotateSky 180s linear infinite;
+        }
+
+        @keyframes rotateSky {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="py-5 position-relative">
+    <div class="cosmic-rings"></div>
+
+    <div class="container py-3">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="d-inline-flex align-items-center gap-2 mb-2">
+                <span style="font-size: 1.4rem;">✨</span>
+                <span class="text-uppercase tracking-widest" style="font-size: 0.8rem; letter-spacing: 3px; color: var(--gold);">Pure NASA Ephemeris Engine</span>
+                <span style="font-size: 1.4rem;">✨</span>
+            </div>
+            <h1 class="header-title cinzel display-4 mb-2">AstroMatch Pro</h1>
+            <p class="lead text-secondary mx-auto" style="max-width: 650px; font-size: 1.05rem;">
+                Professional Astrological Compatibility & Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield & NASA DE421.
+            </p>
+
+            <div class="mt-3">
+                <button type="button" class="btn btn-demo" onclick="loadSampleMatch()">
+                    💫 Load Sample Couple: Alex & Jordan
+                </button>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger mx-auto mb-4 p-3" style="max-width: 700px; background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 12px;">
+            <strong>⚠️ Notice:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form action="/analyze" method="POST" id="astroForm">
+            <div class="row g-4 justify-content-center mb-5">
+                
+                <!-- Partner A -->
+                <div class="col-lg-5 col-md-6">
+                    <div class="glass-card partner-card-1 p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;">Partner A</h3>
+                            <span class="badge-partner-1">Inner Wheel</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name or Alias</label>
+                            <input type="text" id="p1_name" name="p1_name" class="form-control" placeholder="e.g. Alex" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" id="p1_date" name="p1_date" class="form-control" required>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label">Exact Time</label>
+                                <input type="time" id="p1_time" name="p1_time" class="form-control" value="12:00" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <span>UTC Timezone Offset</span>
+                                <span class="text-muted" style="font-size: 0.75rem;">e.g. +03:00, -05:00</span>
+                            </label>
+                            <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required>
+                            <div class="tz-pills mt-1">
+                                <button type="button" onclick="setTZ('p1_tz', '+03:00')">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '-05:00')">NYC (-5)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+00:00')">LON (+0)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+01:00')">PAR (+1)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '-08:00')">LAX (-8)</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">City of Birth</label>
+                            <input type="text" id="p1_city" name="p1_city" class="form-control" placeholder="e.g. Tel Aviv, Israel" required>
+                            <small class="text-muted" style="font-size: 0.75rem;">Used for precise latitude, longitude & Ascendant calculation</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner B -->
+                <div class="col-lg-5 col-md-6">
+                    <div class="glass-card partner-card-2 p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="cinzel mb-0 text-white" style="font-size: 1.35rem;">Partner B</h3>
+                            <span class="badge-partner-2">Outer Wheel</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name or Alias</label>
+                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" id="p2_date" name="p2_date" class="form-control" required>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label">Exact Time</label>
+                                <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <span>UTC Timezone Offset</span>
+                                <span class="text-muted" style="font-size: 0.75rem;">e.g. -05:00, +02:00</span>
+                            </label>
+                            <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required>
+                            <div class="tz-pills mt-1">
+                                <button type="button" onclick="setTZ('p2_tz', '+03:00')">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '-05:00')">NYC (-5)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+00:00')">LON (+0)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+01:00')">PAR (+1)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '-08:00')">LAX (-8)</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">City of Birth</label>
+                            <input type="text" id="p2_city" name="p2_city" class="form-control" placeholder="e.g. New York, USA" required>
+                            <small class="text-muted" style="font-size: 0.75rem;">Used for precise latitude, longitude & Ascendant calculation</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-analyze" id="submitBtn">
+                    🔮 Calculate Synastry & Draw Astrological Maps
+                </button>
+                <div class="mt-3 text-muted" style="font-size: 0.8rem;">
+                    Generates interactive Synastry Bi-Wheel, Natal House Maps, and In-Depth Aspect Interpretations
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function setTZ(elementId, val) {
+            document.getElementById(elementId).value = val;
+        }
+
+        function loadSampleMatch() {
+            document.getElementById('p1_name').value = 'Alex';
+            document.getElementById('p1_date').value = '1992-04-15';
+            document.getElementById('p1_time').value = '14:30';
+            document.getElementById('p1_tz').value = '+03:00';
+            document.getElementById('p1_city').value = 'Tel Aviv, Israel';
+
+            document.getElementById('p2_name').value = 'Jordan';
+            document.getElementById('p2_date').value = '1994-11-20';
+            document.getElementById('p2_time').value = '08:15';
+            document.getElementById('p2_tz').value = '-05:00';
+            document.getElementById('p2_city').value = 'New York, USA';
+        }
+
+        document.getElementById('astroForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '✨ Computing Celestial Positions...';
+            btn.style.opacity = '0.85';
+            btn.style.pointerEvents = 'none';
+        });
+    </script>
+</body>
+</html>

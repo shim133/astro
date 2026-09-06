@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Flask (app.py)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "app.py",
+        "FLASK_DEBUG": "1"
+      },
+      "args": [
+        "run",
+        "--port=5050",
+        "--no-debugger",
+        "--no-reload"
+      ],
+      "jinja": true,
+      "python": "D:\\Resources\\Anaconda3\\envs\\astromatch\\python.exe"
+    },
+    {
+      "name": "Python: Run app.py directly",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "python": "D:\\Resources\\Anaconda3\\envs\\astromatch\\python.exe"
+    }
+  ]
+}
