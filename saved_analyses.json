@@ -1,5 +1,47 @@
 [
   {
+    "id": "match-elon-spacex",
+    "title": "Elon Musk & SpaceX (Entity Verification)",
+    "created_at": "2026-11-04 18:35",
+    "version": "2.5.0",
+    "p1": {
+      "name": "Elon Musk",
+      "date": "1971-06-28",
+      "time": "07:30",
+      "city": "Pretoria, South Africa",
+      "tz": "+02:00"
+    },
+    "p2": {
+      "name": "SpaceX (Company)",
+      "date": "2002-03-14",
+      "time": "12:00",
+      "city": "Hawthorne, USA",
+      "tz": "-08:00"
+    },
+    "notes": "Expert Verification Case Study: 98% Cosmic Synergy, 99% Power & 99% Wealth Flow"
+  },
+  {
+    "id": "match-elon-tesla",
+    "title": "Elon Musk & Tesla, Inc. (Entity Verification)",
+    "created_at": "2026-11-04 18:35",
+    "version": "2.5.0",
+    "p1": {
+      "name": "Elon Musk",
+      "date": "1971-06-28",
+      "time": "07:30",
+      "city": "Pretoria, South Africa",
+      "tz": "+02:00"
+    },
+    "p2": {
+      "name": "Tesla, Inc. (Company)",
+      "date": "2003-07-01",
+      "time": "12:00",
+      "city": "Palo Alto, USA",
+      "tz": "-08:00"
+    },
+    "notes": "Founder/CEO & Corporation Synastry (Sun-Sun Conjunction in Cancer)"
+  },
+  {
     "id": "match-3f8fc5f0",
     "title": "sa & ys",
     "created_at": "2026-09-06 08:38",

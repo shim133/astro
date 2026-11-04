@@ -5,6 +5,28 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-11-04
+
+### Added
+- **Expert Astrologist Synthesis Engine (`astro_expert.py`) — Bilingual (Hebrew & English)**:
+  - **אופק (Ascendant / Rising Sign) & Chart Ruler (שליט המפה)**: Deep analysis of the Rising Sign degree, its traditional and modern planetary rulers, and the exact Sign and Natal House where the Chart Ruler is placed.
+  - **Midheaven (רום שמיים - MC / 10th House) & MC Ruler**: Full analysis of the career/public destiny axis and its ruling planet's placement.
+  - **Lunar North Node (ראש הדרקון ☊)**: Astronomical mean Lunar North Node calculation, house placement, and karmic trajectory synthesis.
+  - **Apparent Retrograde Motion (`Rx`) & Essential Dignities**: Computes daily ecliptic speed (`deg/day`) to detect Retrograde motion (`Rx`) and evaluates Essential Dignities (`Domicile / שליט ביתו`, `Exaltation / נעלה`, `Detriment / ירוד`, `Fall / מפלה`, `Peregrine`).
+  - **Geometric Patterns & Mutual Receptions**: Automatically detects Angular planets conjunct `ASC` or `MC`, Mutual Receptions (`קבלה הדדית`, e.g., Moon in Virgo ⇄ Mercury in Cancer), Stelliums, Focal Squares/T-Squares, and Oppositions channeled via a 3rd planet (Mystic Wedge).
+  - **Elemental, Modal & Hemisphere Balance**: Computes weighted percentages across Fire/Earth/Air/Water, Cardinal/Fixed/Mutable, and Upper/Lower/Eastern/Western hemispheres.
+  - **Complete Natal Aspects Catalog**: Interprets every internal aspect in the birth chart, including aspects to `Ascendant`, `Midheaven`, and `North Node`.
+  - **🕵️ Blind Portrait & Blind Mode Toggle ("Who Is This Without Knowing Their Name?")**: Synthesizes a 4-part psychological, intellectual, material, and vocational portrait purely from the chart math without relying on the subject's name, plus a 1-click UI toggle (`🕵️ Blind Mode`) that masks names across the report.
+- **Current Date Transits & Executive Forecast (`calculate_transits`)**:
+  - Calculates real-time planetary positions for the current date/time (or any custom reference date) and maps them into Entity A's and Entity B's 12 Natal Houses and Transit-to-Natal aspects.
+  - Added two interactive **Transits Bi-Wheel** modes (`🌍 Current Transits - Entity A` and `🌍 Current Transits - Entity B`) on the SVG wheel.
+- **2-Entity Interaction & House Overlays (Person, Company, Organization, or Event)**:
+  - Supports analyzing 2 People, a Person + Company (e.g., Founder & Corporation), 2 Companies, or a Single Entity against Current Sky Transits.
+  - Computes **House Overlays (`השלכות בתים`)** showing how each entity's planets activate the other entity's 12 houses.
+  - Added 2 new Synergy metrics (**6-Dimensional Synergy**): `⚡ Executive Power & Drive` and `💎 Wealth & Resource Flow`.
+- **🧪 Elon Musk + SpaceX / Tesla Blind Verification Case Study**:
+  - Pre-seeded verified birth/founding profiles for **Elon Musk** (`1971-06-28`, `07:30` SAST `+02:00`, `Pretoria, South Africa`), **SpaceX** (`2002-03-14`, `12:00`, `Hawthorne, USA`), and **Tesla, Inc.** (`2003-07-01`, `12:00`, `Palo Alto, USA`), plus a dedicated side-by-side verification tab comparing blind algorithmic chart deductions against documented reality.
+
 ## [2.4.1] - 2026-09-06
 
 ### Added

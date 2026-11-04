@@ -324,13 +324,22 @@
                 Professional Astrological Compatibility &amp; Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield &amp; NASA DE421.
             </p>
 
-            <div class="d-flex justify-content-center gap-2 mt-3">
+            <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+                <button type="button" class="btn btn-action-pill border-warning text-warning" onclick="loadElonSpaceX()" data-i18n="loadElonBtn">
+                    🧪 Load Blind Test: Elon Musk + SpaceX
+                </button>
+                <button type="button" class="btn btn-action-pill border-info text-info" onclick="loadElonTesla()" data-i18n="loadElonTeslaBtn">
+                    ⚡ Elon Musk + Tesla
+                </button>
                 <button type="button" class="btn btn-action-pill" onclick="loadSampleMatch()" data-i18n="quickSample">
                     💫 Quick Sample Match
                 </button>
                 <button type="button" class="btn btn-action-pill" onclick="scrollToSaved()">
                     <span data-i18n="viewSaved">📁 View Saved Analyses</span> (<span id="savedCountBadge">0</span>)
                 </button>
+            </div>
+            <div class="small text-info mt-2 opacity-75" data-i18n="entitySubtitleHint">
+                Supports People, Companies, Organizations &amp; Historical Events · Leave Entity B blank to analyze against Current Sky Transits
             </div>
         </div>
 
@@ -438,17 +447,17 @@
                                 <label class="form-label mb-0" data-i18n="fullName">Full Name or Alias</label>
                                 <div id="p2_saved_indicator" class="d-flex align-items-center gap-1"></div>
                             </div>
-                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan" data-i18n-placeholder="namePlaceholderP2" required oninput="checkPersonSavedState('p2')">
+                            <input type="text" id="p2_name" name="p2_name" class="form-control" placeholder="e.g. Jordan or SpaceX (Optional)" data-i18n-placeholder="namePlaceholderP2" oninput="checkPersonSavedState('p2')">
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-7">
                                 <label class="form-label" data-i18n="dob">Date of Birth</label>
-                                <input type="date" id="p2_date" name="p2_date" class="form-control" required onchange="checkPersonSavedState('p2')">
+                                <input type="date" id="p2_date" name="p2_date" class="form-control" onchange="checkPersonSavedState('p2')">
                             </div>
                             <div class="col-5">
                                 <label class="form-label" data-i18n="exactTime">Exact Time</label>
-                                <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" required oninput="checkPersonSavedState('p2')" onchange="checkPersonSavedState('p2')">
+                                <input type="time" id="p2_time" name="p2_time" class="form-control" value="12:00" oninput="checkPersonSavedState('p2')" onchange="checkPersonSavedState('p2')">
                             </div>
                         </div>
 
@@ -458,7 +467,7 @@
                                 <span data-i18n="cityLabel">City / Town of Birth (Worldwide)</span>
                                 <span class="text-secondary small cursor-pointer" onclick="triggerCityVerify('p2_city', 'p2_tz', 'p2_city_status')" style="cursor: pointer; text-decoration: underline;" data-i18n="checkLocation">🔍 Check Location</span>
                             </label>
-                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" required onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');">
+                            <input type="text" id="p2_city" name="p2_city" list="citiesList" class="form-control" placeholder="e.g. Ramat Gan, Kiryat Gat, Paris, Brooklyn..." data-i18n-placeholder="cityPlaceholder" autocomplete="off" onchange="onCitySelected('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');" oninput="onCityInput('p2_city', 'p2_tz', 'p2_city_status'); checkPersonSavedState('p2');">
                             <div id="p2_city_status"></div>
                             <small class="text-muted d-block mt-1" style="font-size: 0.74rem;" data-i18n="cityHelp">
                                 Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.
@@ -470,7 +479,7 @@
                                 <span data-i18n="tzLabel">UTC Timezone Offset</span>
                                 <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
-                            <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required oninput="checkPersonSavedState('p2')">
+                            <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" oninput="checkPersonSavedState('p2')">
                             <div class="tz-pills mt-1">
                                 <button type="button" onclick="setTZ('p2_tz', '+02:00'); checkPersonSavedState('p2');">TLV (+2)</button>
                                 <button type="button" onclick="setTZ('p2_tz', '-05:00'); checkPersonSavedState('p2');">NYC (-5)</button>
@@ -485,6 +494,35 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Current / Transit Reference Date Bar -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-10">
+                    <div class="glass-card p-3" style="border-top: 2px solid var(--gold);">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-6">
+                                <div class="fw-bold text-warning" style="font-size: 0.95rem;" data-i18n="transitBarTitle">
+                                    🌍 Current / Transit Reference Date &amp; Time
+                                </div>
+                                <div class="text-secondary small" data-i18n="transitBarSub">
+                                    Computes real-time sky positions on the selected date and their transits through natal houses &amp; planets
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label small mb-1" data-i18n="transitDateLabel">Transit Date (Default: Today)</label>
+                                <input type="date" id="transit_date" name="transit_date" class="form-control form-control-sm" value="{{ now_date }}">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label small mb-1 d-flex justify-content-between">
+                                    <span data-i18n="transitTimeLabel">Transit Time</span>
+                                    <a href="javascript:void(0)" class="text-warning text-decoration-none" onclick="resetTransitToday()" data-i18n="resetTodayBtn">📅 Today</a>
+                                </label>
+                                <input type="time" id="transit_time" name="transit_time" class="form-control form-control-sm" value="{{ now_time }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Action Buttons -->
@@ -846,6 +884,55 @@
             document.getElementById('p2_time').value = '08:15';
             document.getElementById('p2_city').value = 'New York, USA';
             onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
+        }
+
+        function loadElonSpaceX() {
+            document.getElementById('p1_name').value = 'Elon Musk';
+            document.getElementById('p1_date').value = '1971-06-28';
+            document.getElementById('p1_time').value = '07:30';
+            document.getElementById('p1_city').value = 'Pretoria, South Africa';
+            document.getElementById('p1_tz').value = '+02:00';
+            onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
+
+            document.getElementById('p2_name').value = 'SpaceX (Company)';
+            document.getElementById('p2_date').value = '2002-03-14';
+            document.getElementById('p2_time').value = '12:00';
+            document.getElementById('p2_city').value = 'Hawthorne, USA';
+            document.getElementById('p2_tz').value = '-08:00';
+            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
+        }
+
+        function loadElonTesla() {
+            document.getElementById('p1_name').value = 'Elon Musk';
+            document.getElementById('p1_date').value = '1971-06-28';
+            document.getElementById('p1_time').value = '07:30';
+            document.getElementById('p1_city').value = 'Pretoria, South Africa';
+            document.getElementById('p1_tz').value = '+02:00';
+            onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
+
+            document.getElementById('p2_name').value = 'Tesla, Inc. (Company)';
+            document.getElementById('p2_date').value = '2003-07-01';
+            document.getElementById('p2_time').value = '12:00';
+            document.getElementById('p2_city').value = 'Palo Alto, USA';
+            document.getElementById('p2_tz').value = '-08:00';
+            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
+        }
+
+        function resetTransitToday() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('transit_date').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('transit_time').value = `${hh}:${min}`;
         }
 
         // --- SAVED ANALYSES MANAGEMENT ---

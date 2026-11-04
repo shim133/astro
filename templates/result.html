@@ -293,6 +293,45 @@
         [dir="rtl"] .data-table th, [dir="rtl"] .data-table td {
             text-align: right;
         }
+        .expert-sub-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 14px;
+            padding: 1.15rem;
+            transition: all 0.2s ease;
+        }
+        .expert-sub-card:hover {
+            border-color: rgba(251, 191, 36, 0.35);
+            background: rgba(15, 23, 42, 0.85);
+        }
+        .blind-portrait-box {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-left: 4px solid #fbbf24;
+            border-radius: 16px;
+            padding: 1.4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        [dir="rtl"] .blind-portrait-box {
+            border-left: 1px solid rgba(251, 191, 36, 0.4);
+            border-right: 4px solid #fbbf24;
+        }
+        .rx-badge {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            font-size: 0.68rem;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .dignity-badge {
+            font-size: 0.68rem;
+            padding: 1px 7px;
+            border-radius: 6px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+        }
     </style>
 
     <!-- Multi-Language Translation System -->
@@ -324,14 +363,15 @@
             <div>
                 <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill mb-1" data-i18n="newCalc">← New Calculation</a>
                 <h1 class="cinzel h3 text-white mb-0">
-                    <span style="color: var(--p1-color)">{{ p1.name }}</span> 
+                    <span class="entity-name-label" data-entity="p1" data-real-name="{{ p1.name }}" style="color: var(--p1-color)">{{ p1.name }}</span> 
                     <span class="text-secondary">&amp;</span> 
-                    <span style="color: var(--p2-color)">{{ p2.name }}</span>
+                    <span class="entity-name-label" data-entity="p2" data-real-name="{{ p2.name }}" style="color: var(--p2-color)">{{ p2.name }}</span>
                 </h1>
-                <small class="text-muted" data-i18n="reportSubtitle">High-Precision Geocentric Synastry Analysis</small>
+                <small class="text-muted"><span data-i18n="reportSubtitle">High-Precision Geocentric Synastry Analysis</span> · <span class="text-warning">🌍 Transits: {{ transits.date }} {{ transits.time }}</span></small>
             </div>
 
             <div class="d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" id="blindModeBtn" class="btn btn-export border-warning text-warning" onclick="toggleBlindMode()" data-i18n="blindModeToggle">🕵️ Blind Mode (Hide Names &amp; Deduce Purely from Chart)</button>
                 <button type="button" class="btn btn-export" onclick="openEditCompareModal()" data-i18n="editDetailsCompareBtn">✏️ Edit Details / Compare Partner</button>
                 <button type="button" id="langToggleBtn" class="btn btn-export" onclick="toggleLanguage()">🌐 עברית (HE)</button>
                 <button type="button" class="btn btn-export" id="btnSaveAnalysis" onclick="saveCurrentAnalysis()" data-i18n="saveToMyAnalyses">💾 Save to My Analyses</button>
@@ -410,13 +450,33 @@
                             </div>
                         </div>
 
-                        <div>
+                        <div class="mb-2">
                             <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
                                 <span data-i18n="stabilityScore">🏛️ Long-Term Stability</span>
                                 <span class="text-white">{{ synastry.stability_score }}%</span>
                             </div>
                             <div class="metric-bar-wrap">
                                 <div class="metric-bar-fill" style="width: {{ synastry.stability_score }}%; background: #10b981;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="powerScore">⚡ Executive Power &amp; Drive</span>
+                                <span class="text-white" id="powerScoreVal">{{ synastry.power_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" id="powerScoreBar" style="width: {{ synastry.power_score }}%; background: #f59e0b;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="wealthScore">💎 Wealth &amp; Resource Flow</span>
+                                <span class="text-white" id="wealthScoreVal">{{ synastry.wealth_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" id="wealthScoreBar" style="width: {{ synastry.wealth_score }}%; background: #a855f7;"></div>
                             </div>
                         </div>
                     </div>
@@ -432,7 +492,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <h3 class="h5 cinzel mb-0" style="color: var(--p1-color);">{{ p1.name }}</h3>
+                                        <h3 class="h5 cinzel mb-0 entity-name-label" data-entity="p1" data-real-name="{{ p1.name }}" style="color: var(--p1-color);">{{ p1.name }}</h3>
                                         <span id="p1_result_saved_badge"></span>
                                     </div>
                                     <small class="text-muted">{{ p1.city }} ({{ p1.date }} {{ p1.time }})</small>
@@ -440,7 +500,7 @@
                                 <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--p1-color); border: 1px solid rgba(56, 189, 248, 0.3);" data-i18n="innerWheel">Inner Wheel</span>
                             </div>
 
-                            <div class="d-flex flex-column gap-2 mt-3">
+                            <div class="d-flex flex-column gap-2 mt-2">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Sun" data-sign="{{ p1.planets_dict['Sun'].sign }}" data-symbol="{{ p1.planets_dict['Sun'].symbol }}" data-deg="{{ p1.planets_dict['Sun'].sign_deg }}" data-min="{{ p1.planets_dict['Sun'].sign_min }}" data-formatted="{{ p1.planets_dict['Sun'].formatted }}">{{ p1.planets_dict['Sun'].formatted }}</span>
@@ -449,9 +509,17 @@
                                     <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Moon" data-sign="{{ p1.planets_dict['Moon'].sign }}" data-symbol="{{ p1.planets_dict['Moon'].symbol }}" data-deg="{{ p1.planets_dict['Moon'].sign_deg }}" data-min="{{ p1.planets_dict['Moon'].sign_min }}" data-formatted="{{ p1.planets_dict['Moon'].formatted }}">{{ p1.planets_dict['Moon'].formatted }}</span>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;">🧭 <span data-i18n="ascSign">ASC Rising</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Ascendant" data-sign="{{ p1.asc_point.sign }}" data-symbol="{{ p1.asc_point.symbol }}" data-deg="{{ p1.asc_point.sign_deg }}" data-min="{{ p1.asc_point.sign_min }}" data-formatted="{{ p1.asc_point.formatted }}">{{ p1.asc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #a78bfa;">🏛️ <span data-i18n="mcSign">Midheaven (MC)</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Midheaven" data-sign="{{ p1.mc_point.sign }}" data-symbol="{{ p1.mc_point.symbol }}" data-deg="{{ p1.mc_point.sign_deg }}" data-min="{{ p1.mc_point.sign_min }}" data-formatted="{{ p1.mc_point.formatted }}">{{ p1.mc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #c084fc;">☊ <span data-i18n="northNodeSign">North Node</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="North Node" data-sign="{{ p1.north_node.sign }}" data-symbol="{{ p1.north_node.symbol }}" data-deg="{{ p1.north_node.sign_deg }}" data-min="{{ p1.north_node.sign_min }}" data-formatted="{{ p1.north_node.formatted }}">{{ p1.north_node.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
@@ -482,7 +550,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <h3 class="h5 cinzel mb-0" style="color: var(--p2-color);">{{ p2.name }}</h3>
+                                        <h3 class="h5 cinzel mb-0 entity-name-label" data-entity="p2" data-real-name="{{ p2.name }}" style="color: var(--p2-color);">{{ p2.name }}</h3>
                                         <span id="p2_result_saved_badge"></span>
                                     </div>
                                     <small class="text-muted">{{ p2.city }} ({{ p2.date }} {{ p2.time }})</small>
@@ -495,7 +563,7 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex flex-column gap-2 mt-3">
+                            <div class="d-flex flex-column gap-2 mt-2">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Sun" data-sign="{{ p2.planets_dict['Sun'].sign }}" data-symbol="{{ p2.planets_dict['Sun'].symbol }}" data-deg="{{ p2.planets_dict['Sun'].sign_deg }}" data-min="{{ p2.planets_dict['Sun'].sign_min }}" data-formatted="{{ p2.planets_dict['Sun'].formatted }}">{{ p2.planets_dict['Sun'].formatted }}</span>
@@ -504,9 +572,17 @@
                                     <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Moon" data-sign="{{ p2.planets_dict['Moon'].sign }}" data-symbol="{{ p2.planets_dict['Moon'].symbol }}" data-deg="{{ p2.planets_dict['Moon'].sign_deg }}" data-min="{{ p2.planets_dict['Moon'].sign_min }}" data-formatted="{{ p2.planets_dict['Moon'].formatted }}">{{ p2.planets_dict['Moon'].formatted }}</span>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
-                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #ec4899;">🧭 <span data-i18n="ascSign">ASC Rising</span>:</strong></span>
                                     <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Ascendant" data-sign="{{ p2.asc_point.sign }}" data-symbol="{{ p2.asc_point.symbol }}" data-deg="{{ p2.asc_point.sign_deg }}" data-min="{{ p2.asc_point.sign_min }}" data-formatted="{{ p2.asc_point.formatted }}">{{ p2.asc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #a78bfa;">🏛️ <span data-i18n="mcSign">Midheaven (MC)</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Midheaven" data-sign="{{ p2.mc_point.sign }}" data-symbol="{{ p2.mc_point.symbol }}" data-deg="{{ p2.mc_point.sign_deg }}" data-min="{{ p2.mc_point.sign_min }}" data-formatted="{{ p2.mc_point.formatted }}">{{ p2.mc_point.formatted }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <span class="text-secondary text-nowrap"><strong style="color: #c084fc;">☊ <span data-i18n="northNodeSign">North Node</span>:</strong></span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="North Node" data-sign="{{ p2.north_node.sign }}" data-symbol="{{ p2.north_node.symbol }}" data-deg="{{ p2.north_node.sign_deg }}" data-min="{{ p2.north_node.sign_min }}" data-formatted="{{ p2.north_node.formatted }}">{{ p2.north_node.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
@@ -538,20 +614,30 @@
         <!-- Interactive Map & Aspects Centerpiece -->
         <div class="glass-card p-4 mb-5">
             <!-- Tabs Navigation -->
-            <ul class="nav nav-tabs mb-4 justify-content-center" id="mapTabs">
+            <ul class="nav nav-tabs mb-4 justify-content-center flex-wrap gap-1" id="mapTabs">
                 <li class="nav-item">
-                    <button class="nav-link active" onclick="switchMapMode('synastry')" data-i18n="tabBiWheel">
+                    <button class="nav-link active" id="tab-btn-synastry" onclick="switchMapMode('synastry')" data-i18n="tabBiWheel">
                         🔮 Synastry Bi-Wheel
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link tab-natal-btn" data-partner="p1" data-name="{{ p1.name }}" onclick="switchMapMode('natal1')">
+                    <button class="nav-link tab-natal-btn" id="tab-btn-natal1" data-partner="p1" data-name="{{ p1.name }}" onclick="switchMapMode('natal1')">
                         🪐 {{ p1.name }}'s Natal Map
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link tab-natal-btn" data-partner="p2" data-name="{{ p2.name }}" onclick="switchMapMode('natal2')">
+                    <button class="nav-link tab-natal-btn" id="tab-btn-natal2" data-partner="p2" data-name="{{ p2.name }}" onclick="switchMapMode('natal2')">
                         🌙 {{ p2.name }}'s Natal Map
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-btn-transits1" onclick="switchMapMode('transits1')" data-i18n="tabTransitsP1">
+                        🌍 Current Transits - Entity A
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-btn-transits2" onclick="switchMapMode('transits2')" data-i18n="tabTransitsP2">
+                        🌍 Current Transits - Entity B
                     </button>
                 </li>
                 <li class="nav-item">
@@ -647,6 +733,55 @@
             </div>
         </div>
 
+        <!-- Multi-Dimensional Expert Astrologist Dossier Hub -->
+        <div class="glass-card p-4 mb-5" id="expertDossierSection" style="border-top: 3px solid var(--gold);">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25 gap-2">
+                <div>
+                    <h3 class="cinzel h4 text-warning mb-1" data-i18n="expertHubTitle">🧙‍♂️ Multi-Dimensional Expert Astrologist Dossier</h3>
+                    <p class="text-secondary small mb-0" data-i18n="expertHubSubtitle">
+                        Deep analysis of Ascendant &amp; Chart Ruler, Midheaven, Blind Portrait, Elemental Balance, All Natal Aspects, Current Date Transits &amp; 2-Entity House Overlays
+                    </p>
+                </div>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <span id="blindModeBannerBadge" class="badge bg-warning text-dark px-3 py-2 d-none" data-i18n="blindModeActive">
+                        🕵️ Blind Mode Active — Deduced Purely from Chart Math!
+                    </span>
+                </div>
+            </div>
+
+            <!-- Expert Dossier Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4 flex-wrap gap-1" id="expertDossierTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="exp-tab-p1" onclick="switchExpertTab('p1')">
+                        🌟 <span data-i18n="expertTabNatalP1">Deep Natal &amp; Blind Portrait - A</span> (<span class="entity-name-label" data-entity="p1" data-real-name="{{ p1.name }}">{{ p1.name }}</span>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="exp-tab-p2" onclick="switchExpertTab('p2')">
+                        🌟 <span data-i18n="expertTabNatalP2">Deep Natal &amp; Blind Portrait - B</span> (<span class="entity-name-label" data-entity="p2" data-real-name="{{ p2.name }}">{{ p2.name }}</span>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="exp-tab-transits" onclick="switchExpertTab('transits')">
+                        <span data-i18n="expertTabTransits">🌍 Current Date Transits &amp; Forecast</span> ({{ transits.date }})
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="exp-tab-interaction" onclick="switchExpertTab('interaction')" data-i18n="expertTabInteraction">
+                        🤝 2-Entity Interaction &amp; House Overlays
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link border-warning text-warning" id="exp-tab-elon" onclick="switchExpertTab('elon')" data-i18n="expertTabElonVerify">
+                        🧪 Blind Verification: Elon Musk (Chart vs Reality)
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Dynamic Expert Dossier Content Container -->
+            <div id="expertDossierContent"></div>
+        </div>
+
         <!-- Detailed Aspect Matrix & Interpretations -->
         <div class="glass-card p-4" id="aspectsCatalogSection">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
@@ -733,9 +868,25 @@
 
     <script>
         const astroData = JSON.parse(document.getElementById('astroData').textContent);
-        const { chart1, chart2, synastry, zodiac_data } = astroData;
+        const { chart1, chart2, synastry, transits, elon_case_study, zodiac_data } = astroData;
 
         let currentCoordSystem = 'tropical'; // 'tropical' | 'j2000'
+        let currentExpertTab = 'p1'; // 'p1' | 'p2' | 'transits' | 'interaction' | 'elon'
+        let isBlindMode = false;
+
+        function getEntityDisplayName(tag) {
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            if (isBlindMode) {
+                if (tag === 'p1') return isHe ? `נבדק עיוור א׳ (${chart1.date})` : `Blind Subject A (${chart1.date})`;
+                if (tag === 'p2') return isHe ? `נבדק עיוור ב׳ (${chart2.date})` : `Blind Subject B (${chart2.date})`;
+            }
+            return tag === 'p1' ? chart1.name : chart2.name;
+        }
+
+        function formatMdBold(str) {
+            if (!str) return '';
+            return str.replace(/\*\*(.+?)\*\*/g, '<strong class="text-warning">$1</strong>');
+        }
 
         function getActiveChart(baseChart) {
             if (!baseChart) return null;
@@ -759,7 +910,20 @@
             return synastry;
         }
 
-        let currentMode = 'synastry'; // 'synastry' | 'natal1' | 'natal2'
+        function getActiveTransits() {
+            if (!transits) return null;
+            const sysRep = (transits.systems && transits.systems[currentCoordSystem]) ? transits.systems[currentCoordSystem] : { p1: transits.p1, p2: transits.p2 };
+            const tChart = getActiveChart(transits.transit_chart);
+            return {
+                date: transits.date,
+                time: transits.time,
+                transit_chart: tChart,
+                p1: sysRep.p1,
+                p2: sysRep.p2
+            };
+        }
+
+        let currentMode = 'synastry'; // 'synastry' | 'natal1' | 'natal2' | 'transits1' | 'transits2'
         let activeAspectFilter = 'all';
 
         const CX = 450;
@@ -962,11 +1126,12 @@
 
             const c1 = getActiveChart(chart1);
             const c2 = getActiveChart(chart2);
-            const ascDeg = c1.asc;
+            const tr = getActiveTransits();
 
             if (mode === 'synastry') {
+                const ascDeg = c1.asc;
                 // Partner B: Outer Planet Track (r = 338)
-                drawPlanetTrack(c2.planets, ascDeg, 338, 'p2', c2.name, '#f472b6', layer);
+                drawPlanetTrack(c2.planets, ascDeg, 338, 'p2', getEntityDisplayName('p2'), '#f472b6', layer);
 
                 // Separator circle between track 1 and 2
                 const sep = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -979,12 +1144,34 @@
                 layer.appendChild(sep);
 
                 // Partner A: Inner Planet Track (r = 285)
-                drawPlanetTrack(c1.planets, ascDeg, 285, 'p1', c1.name, '#38bdf8', layer);
+                drawPlanetTrack(c1.planets, ascDeg, 285, 'p1', getEntityDisplayName('p1'), '#38bdf8', layer);
 
+            } else if (mode === 'transits1' || mode === 'transits2') {
+                const baseChart = mode === 'transits1' ? c1 : c2;
+                const baseName = mode === 'transits1' ? getEntityDisplayName('p1') : getEntityDisplayName('p2');
+                const baseColor = mode === 'transits1' ? '#38bdf8' : '#f472b6';
+                const ascDeg = baseChart.asc;
+
+                // Outer Track: Current Sky Transits (r = 338, gold/emerald)
+                if (tr && tr.transit_chart) {
+                    drawPlanetTrack(tr.transit_chart.planets, ascDeg, 338, 'transit', `Transits (${tr.date})`, '#fbbf24', layer);
+                }
+                const sep = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                sep.setAttribute('cx', CX);
+                sep.setAttribute('cy', CY);
+                sep.setAttribute('r', 312);
+                sep.setAttribute('fill', 'none');
+                sep.setAttribute('stroke', 'rgba(251,191,36,0.2)');
+                sep.setAttribute('stroke-dasharray', '2,4');
+                layer.appendChild(sep);
+
+                // Inner Track: Natal Chart (r = 285)
+                drawPlanetTrack(baseChart.planets, ascDeg, 285, 'natal', baseName, baseColor, layer);
             } else {
                 const chart = mode === 'natal1' ? c1 : c2;
+                const dispName = mode === 'natal1' ? getEntityDisplayName('p1') : getEntityDisplayName('p2');
                 const trackColor = mode === 'natal1' ? '#38bdf8' : '#f472b6';
-                drawPlanetTrack(chart.planets, chart.asc, 310, 'natal', chart.name, trackColor, layer);
+                drawPlanetTrack(chart.planets, chart.asc, 310, 'natal', dispName, trackColor, layer);
             }
         }
 
@@ -1091,8 +1278,9 @@
             const c1 = getActiveChart(chart1);
             const c2 = getActiveChart(chart2);
             const syn = getActiveSynastry();
+            const tr = getActiveTransits();
 
-            const ascDeg = mode === 'synastry' ? c1.asc : (mode === 'natal1' ? c1.asc : c2.asc);
+            const ascDeg = (mode === 'natal2' || mode === 'transits2') ? c2.asc : c1.asc;
 
             if (mode === 'synastry') {
                 const aspects = syn.aspects;
@@ -1126,9 +1314,11 @@
                         const p1Name = window.tPlanet ? window.tPlanet(asp.p1_planet) : asp.p1_planet;
                         const p2Name = window.tPlanet ? window.tPlanet(asp.p2_planet) : asp.p2_planet;
                         const meaningText = window.tAspectMeaning ? window.tAspectMeaning(asp) : asp.meaning;
+                        const n1 = getEntityDisplayName('p1');
+                        const n2 = getEntityDisplayName('p2');
                         const pairLabel = isHe
-                            ? `<strong style="color: var(--p1-color)">${p1Name} של ${c1.name}</strong> ↔ <strong style="color: var(--p2-color)">${p2Name} של ${c2.name}</strong>`
-                            : `<strong style="color: var(--p1-color)">${c1.name}'s ${p1Name}</strong> ↔ <strong style="color: var(--p2-color)">${c2.name}'s ${p2Name}</strong>`;
+                            ? `<strong style="color: var(--p1-color)">${p1Name} של ${n1}</strong> ↔ <strong style="color: var(--p2-color)">${p2Name} של ${n2}</strong>`
+                            : `<strong style="color: var(--p1-color)">${n1}'s ${p1Name}</strong> ↔ <strong style="color: var(--p2-color)">${n2}'s ${p2Name}</strong>`;
                         const orbBadge = isHe ? `סטייה (Orb): ${asp.orb}°` : `Orb ${asp.orb}°`;
 
                         showTooltip(e, `
@@ -1145,6 +1335,48 @@
 
                     line.addEventListener('mouseleave', hideTooltip);
 
+                    layer.appendChild(line);
+                });
+            } else if (mode === 'transits1' || mode === 'transits2') {
+                const baseChart = mode === 'transits1' ? c1 : c2;
+                const trRep = mode === 'transits1' ? tr.p1 : tr.p2;
+                const tChart = tr.transit_chart;
+                const natalLookup = { ...baseChart.planets_dict, 'Ascendant': baseChart.asc_point, 'Midheaven': baseChart.mc_point };
+                if (baseChart.north_node) natalLookup['North Node'] = baseChart.north_node;
+                const transitLookup = { ...tChart.planets_dict };
+                if (tChart.north_node) transitLookup['North Node'] = tChart.north_node;
+
+                (trRep.transit_aspects || []).forEach(asp => {
+                    if (activeAspectFilter !== 'all' && asp.aspect !== activeAspectFilter) return;
+                    const tPt = transitLookup[asp.transit_planet];
+                    const nPt = natalLookup[asp.natal_planet];
+                    if (!tPt || !nPt) return;
+
+                    const angle1 = lonToSvgAngle(tPt.lon, ascDeg);
+                    const angle2 = lonToSvgAngle(nPt.lon, ascDeg);
+                    const p1 = polarToCartesian(CX, CY, 240, angle1);
+                    const p2 = polarToCartesian(CX, CY, 240, angle2);
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', p1.x);
+                    line.setAttribute('y1', p1.y);
+                    line.setAttribute('x2', p2.x);
+                    line.setAttribute('y2', p2.y);
+                    line.setAttribute('stroke', asp.color);
+                    line.setAttribute('stroke-width', '1.8');
+                    line.setAttribute('stroke-opacity', '0.75');
+                    line.setAttribute('class', `aspect-chord aspect-${asp.aspect.toLowerCase()}`);
+                    line.setAttribute('data-p1', asp.transit_planet);
+                    line.setAttribute('data-p2', asp.natal_planet);
+
+                    line.addEventListener('mouseenter', (e) => {
+                        const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                        showTooltip(e, `
+                            <div class="fw-bold" style="color: ${asp.color}">🌍 Transit ${asp.aspect} (Orb ${asp.orb}°)</div>
+                            <div class="small text-light">${formatMdBold(isHe ? asp.he : asp.en)}</div>
+                        `);
+                    });
+                    line.addEventListener('mouseleave', hideTooltip);
                     layer.appendChild(line);
                 });
             } else {
@@ -1228,12 +1460,16 @@
             if (mode === 'synastry') {
                 title.textContent = isHe ? `${syn.overall_score}% ${window.t ? window.t('matchLabel') : 'התאמה'}` : `${syn.overall_score}% MATCH`;
                 subtitle.textContent = isHe ? (window.t ? window.t('synastryLabel') : 'סינסטריה') : 'SYNASTRY';
+            } else if (mode === 'transits1' || mode === 'transits2') {
+                const tr = getActiveTransits();
+                title.textContent = isHe ? 'מעברים' : 'TRANSITS';
+                subtitle.textContent = tr ? tr.date : '';
             } else if (mode === 'natal1') {
-                title.textContent = c1.name.toUpperCase();
+                title.textContent = getEntityDisplayName('p1').slice(0, 12).toUpperCase();
                 const signTranslated = window.tZodiac ? window.tZodiac(c1.sun_sign) : c1.sun_sign;
                 subtitle.textContent = `☉ ${signTranslated}`;
             } else {
-                title.textContent = c2.name.toUpperCase();
+                title.textContent = getEntityDisplayName('p2').slice(0, 12).toUpperCase();
                 const signTranslated = window.tZodiac ? window.tZodiac(c2.sun_sign) : c2.sun_sign;
                 subtitle.textContent = `☉ ${signTranslated}`;
             }
@@ -1246,9 +1482,10 @@
         function redrawWheel() {
             const c1 = getActiveChart(chart1);
             const c2 = getActiveChart(chart2);
-            const activeAsc = currentMode === 'synastry' ? c1.asc : (currentMode === 'natal1' ? c1.asc : c2.asc);
+            const isP2Base = (currentMode === 'natal2' || currentMode === 'transits2');
+            const activeAsc = isP2Base ? c2.asc : c1.asc;
             renderZodiacRing(activeAsc);
-            renderHouseCusps(currentMode === 'natal2' ? c2 : c1);
+            renderHouseCusps(isP2Base ? c2 : c1);
             renderAspects(currentMode);
             renderPlanets(currentMode);
             renderCenterInfo(currentMode);
@@ -1282,45 +1519,89 @@
             };
             
             // 1. Planetary Data Table
-            const chart = mode === 'synastry' ? null : (mode === 'natal1' ? c1 : c2);
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const chart = (mode === 'natal1' || mode === 'transits1') ? c1 : ((mode === 'natal2' || mode === 'transits2') ? c2 : null);
             let htmlTable = '';
             
-            if (chart) {
+            const formatRxAndDignity = (p) => {
+                if (!p) return '';
+                let badges = '';
+                if (p.retrograde && p.name !== 'North Node') {
+                    badges += ` <span class="rx-badge" title="${isHe ? 'נסיגה אסטרונומית' : 'Apparent Retrograde Motion'}">Rx</span>`;
+                }
+                if (p.dignity && p.dignity.status && p.dignity.status !== 'peregrine') {
+                    const digLabel = isHe ? p.dignity.label_he : p.dignity.label_en;
+                    badges += ` <span class="dignity-badge" style="color:${p.dignity.color}; border:1px solid ${p.dignity.color}55;">${digLabel}</span>`;
+                }
+                return badges;
+            };
+
+            if (chart && (mode === 'natal1' || mode === 'natal2')) {
                 // Natal Data Table
                 htmlTable = `<table class="data-table">
                     <thead>
                         <tr>
-                            <th>Body</th>
-                            <th>Longitude</th>
-                            <th>House</th>
+                            <th>${isHe ? 'גרם שמיים' : 'Body'}</th>
+                            <th>${isHe ? 'מיקום אקליפטי וכבוד' : 'Longitude & Dignity'}</th>
+                            <th>${isHe ? 'בית' : 'House'}</th>
                         </tr>
                     </thead>
                     <tbody>`;
-                const allPoints = [...chart.planets, chart.asc_point, chart.mc_point];
+                const allPoints = [...chart.planets, chart.north_node, chart.asc_point, chart.mc_point].filter(Boolean);
                 allPoints.forEach(p => {
-                    const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
                     const pName = window.tPlanet ? window.tPlanet(p.name) : p.name;
                     htmlTable += `<tr>
                         <td><strong style="color: ${p.color || '#fff'}">${p.symbol}</strong> ${pName}</td>
-                        <td>${formatPos(p)}</td>
+                        <td>${formatPos(p)}${formatRxAndDignity(p)}</td>
                         <td>${p.house || '-'}</td>
                     </tr>`;
                 });
                 htmlTable += `</tbody></table>`;
-            } else {
-                // Synastry Data Table
+            } else if (mode === 'transits1' || mode === 'transits2') {
+                const tr = getActiveTransits();
+                const tChart = tr ? tr.transit_chart : c2;
+                const dispBase = mode === 'transits1' ? getEntityDisplayName('p1') : getEntityDisplayName('p2');
                 htmlTable = `<table class="data-table" style="font-size: 0.8rem;">
                     <thead>
                         <tr>
-                            <th>Body</th>
-                            <th style="color: var(--p1-color)">${c1.name}</th>
-                            <th style="color: var(--p2-color)">${c2.name}</th>
+                            <th>${isHe ? 'גרם שמיים' : 'Body'}</th>
+                            <th style="color: var(--p1-color)">${dispBase} (${isHe ? 'לידה' : 'Natal'})</th>
+                            <th style="color: #fbbf24">🌍 ${isHe ? 'מעברים' : 'Transits'} (${tr ? tr.date : ''})</th>
                         </tr>
                     </thead>
                     <tbody>`;
-                const names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Ascendant', 'Midheaven'];
-                const p1Dict = {...c1.planets_dict, 'Ascendant': c1.asc_point, 'Midheaven': c1.mc_point};
-                const p2Dict = {...c2.planets_dict, 'Ascendant': c2.asc_point, 'Midheaven': c2.mc_point};
+                const names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'North Node', 'Ascendant', 'Midheaven'];
+                const p1Dict = {...chart.planets_dict, 'North Node': chart.north_node, 'Ascendant': chart.asc_point, 'Midheaven': chart.mc_point};
+                const p2Dict = {...tChart.planets_dict, 'North Node': tChart.north_node, 'Ascendant': tChart.asc_point, 'Midheaven': tChart.mc_point};
+                names.forEach(n => {
+                    const p1 = p1Dict[n];
+                    const p2 = p2Dict[n];
+                    if (p1 && p2) {
+                        const pName = window.tPlanet ? window.tPlanet(n) : n;
+                        htmlTable += `<tr>
+                            <td><strong style="color: ${p1.color}">${p1.symbol}</strong> ${pName}</td>
+                            <td>${formatPos(p1)} (H${p1.house || '-'})</td>
+                            <td>${formatPos(p2)}${p2.retrograde && n !== 'North Node' ? ' <span class="rx-badge">Rx</span>' : ''}</td>
+                        </tr>`;
+                    }
+                });
+                htmlTable += `</tbody></table>`;
+            } else {
+                // Synastry Data Table
+                const n1 = getEntityDisplayName('p1');
+                const n2 = getEntityDisplayName('p2');
+                htmlTable = `<table class="data-table" style="font-size: 0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>${isHe ? 'גרם שמיים' : 'Body'}</th>
+                            <th style="color: var(--p1-color)">${n1}</th>
+                            <th style="color: var(--p2-color)">${n2}</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                const names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'North Node', 'Ascendant', 'Midheaven'];
+                const p1Dict = {...c1.planets_dict, 'North Node': c1.north_node, 'Ascendant': c1.asc_point, 'Midheaven': c1.mc_point};
+                const p2Dict = {...c2.planets_dict, 'North Node': c2.north_node, 'Ascendant': c2.asc_point, 'Midheaven': c2.mc_point};
                 
                 names.forEach(n => {
                     const p1 = p1Dict[n];
@@ -1329,8 +1610,8 @@
                         const pName = window.tPlanet ? window.tPlanet(n) : n;
                         htmlTable += `<tr>
                             <td><strong style="color: ${p1.color}">${p1.symbol}</strong> ${pName}</td>
-                            <td>${formatPos(p1)}</td>
-                            <td>${formatPos(p2)}</td>
+                            <td>${formatPos(p1)}${p1.retrograde && n !== 'North Node' ? ' <span class="rx-badge">Rx</span>' : ''}</td>
+                            <td>${formatPos(p2)}${p2.retrograde && n !== 'North Node' ? ' <span class="rx-badge">Rx</span>' : ''}</td>
                         </tr>`;
                     }
                 });
@@ -1466,8 +1747,9 @@
             // 5. Re-render the Aspect Cards list
             renderAspectCardsList(getActiveSynastry().aspects);
 
-            // 6. Redraw Wheel, Data Table, and Aspect Grid
+            // 6. Redraw Wheel, Data Table, Aspect Grid, and Expert Dossier
             redrawWheel();
+            renderExpertDossier();
         }
         window.setCoordinateSystem = setCoordinateSystem;
 
@@ -1476,11 +1758,15 @@
             const c2 = getActiveChart(chart2);
 
             const updateCard = (partnerId, chartObj) => {
-                const bodies = ['Sun', 'Moon', 'Ascendant', 'Venus', 'Mars'];
+                const bodies = ['Sun', 'Moon', 'Ascendant', 'Midheaven', 'North Node', 'Venus', 'Mars'];
                 bodies.forEach(b => {
                     const el = document.querySelector(`.planet-pos[data-partner="${partnerId}"][data-body="${b}"]`);
                     if (!el) return;
-                    const pt = (b === 'Ascendant') ? chartObj.asc_point : chartObj.planets_dict[b];
+                    let pt = chartObj.planets_dict[b];
+                    if (b === 'Ascendant') pt = chartObj.asc_point;
+                    else if (b === 'Midheaven') pt = chartObj.mc_point;
+                    else if (b === 'North Node') pt = chartObj.north_node;
+
                     if (pt) {
                         el.setAttribute('data-sign', pt.sign);
                         el.setAttribute('data-symbol', pt.symbol || pt.sign_symbol);
@@ -1534,6 +1820,8 @@
                 { selector: '.metric-bar-fill[style*="#818cf8"]', score: syn.emotional_score },
                 { selector: '.metric-bar-fill[style*="#38bdf8"]', score: syn.intellectual_score },
                 { selector: '.metric-bar-fill[style*="#10b981"]', score: syn.stability_score },
+                { selector: '#powerScoreBar', score: syn.power_score || 75 },
+                { selector: '#wealthScoreBar', score: syn.wealth_score || 75 },
             ];
             bars.forEach(b => {
                 const el = document.querySelector(b.selector);
@@ -1542,6 +1830,10 @@
                 const textEl = container ? container.querySelector('.text-white') : null;
                 if (textEl) textEl.textContent = `${b.score}%`;
             });
+            const pVal = document.getElementById('powerScoreVal');
+            if (pVal && syn.power_score !== undefined) pVal.textContent = `${syn.power_score}%`;
+            const wVal = document.getElementById('wealthScoreVal');
+            if (wVal && syn.wealth_score !== undefined) wVal.textContent = `${syn.wealth_score}%`;
 
             // Verdict
             const verdictEl = document.getElementById('synastryVerdictText');
@@ -1625,25 +1917,475 @@
 
             const label = document.getElementById('currentModeLabel');
             const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const n1 = getEntityDisplayName('p1');
+            const n2 = getEntityDisplayName('p2');
+            const tr = getActiveTransits();
 
             if (mode === 'synastry') {
-                tabs[0].classList.add('active');
+                const btn = document.getElementById('tab-btn-synastry');
+                if (btn) btn.classList.add('active');
                 label.textContent = isHe
-                    ? `גלגל סינסטריה כפול (פנימי: ${chart1.name} / חיצוני: ${chart2.name})`
-                    : `Synastry Bi-Wheel (Inner: ${chart1.name} / Outer: ${chart2.name})`;
+                    ? `גלגל סינסטריה כפול (פנימי: ${n1} / חיצוני: ${n2})`
+                    : `Synastry Bi-Wheel (Inner: ${n1} / Outer: ${n2})`;
             } else if (mode === 'natal1') {
-                tabs[1].classList.add('active');
+                const btn = document.getElementById('tab-btn-natal1');
+                if (btn) btn.classList.add('active');
                 label.textContent = isHe
-                    ? `מפת לידה: ${chart1.name}`
-                    : `${chart1.name} - Natal Chart Map`;
+                    ? `מפת לידה: ${n1}`
+                    : `${n1} - Natal Chart Map`;
             } else if (mode === 'natal2') {
-                tabs[2].classList.add('active');
+                const btn = document.getElementById('tab-btn-natal2');
+                if (btn) btn.classList.add('active');
                 label.textContent = isHe
-                    ? `מפת לידה: ${chart2.name}`
-                    : `${chart2.name} - Natal Chart Map`;
+                    ? `מפת לידה: ${n2}`
+                    : `${n2} - Natal Chart Map`;
+            } else if (mode === 'transits1') {
+                const btn = document.getElementById('tab-btn-transits1');
+                if (btn) btn.classList.add('active');
+                label.textContent = isHe
+                    ? `מפת מעברים (${tr ? tr.date : ''}) על מפת הלידה של ${n1}`
+                    : `Current Sky Transits (${tr ? tr.date : ''}) on ${n1}'s Natal Chart`;
+            } else if (mode === 'transits2') {
+                const btn = document.getElementById('tab-btn-transits2');
+                if (btn) btn.classList.add('active');
+                label.textContent = isHe
+                    ? `מפת מעברים (${tr ? tr.date : ''}) על מפת הלידה של ${n2}`
+                    : `Current Sky Transits (${tr ? tr.date : ''}) on ${n2}'s Natal Chart`;
             }
 
             redrawWheel();
+        }
+
+        // Blind Mode Toggle ("Deduce Who They Are Without Knowing Their Name")
+        function toggleBlindMode() {
+            isBlindMode = !isBlindMode;
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const btn = document.getElementById('blindModeBtn');
+            const badge = document.getElementById('blindModeBannerBadge');
+
+            if (btn) {
+                if (isBlindMode) {
+                    btn.className = 'btn btn-warning text-dark fw-bold rounded-pill px-3 py-1';
+                    btn.textContent = isHe ? '🕵️ מצב עיוור פעיל (לחץ לחשיפת השמות)' : '🕵️ Blind Mode ON (Click to Reveal Real Names)';
+                } else {
+                    btn.className = 'btn btn-export border-warning text-warning';
+                    btn.textContent = window.t ? window.t('blindModeToggle') : '🕵️ Blind Mode (Hide Names & Deduce Purely from Chart)';
+                }
+            }
+            if (badge) {
+                if (isBlindMode) badge.classList.remove('d-none');
+                else badge.classList.add('d-none');
+            }
+
+            // Update all entity name labels
+            document.querySelectorAll('.entity-name-label').forEach(el => {
+                const tag = el.getAttribute('data-entity');
+                el.textContent = getEntityDisplayName(tag);
+            });
+
+            renderAspectCardsList(getActiveSynastry().aspects);
+            redrawWheel();
+            renderExpertDossier();
+
+            if (isBlindMode) {
+                document.getElementById('expertDossierSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        window.toggleBlindMode = toggleBlindMode;
+
+        // Expert Dossier Tab Switching & Rendering
+        function switchExpertTab(tab) {
+            currentExpertTab = tab;
+            ['p1', 'p2', 'transits', 'interaction', 'elon'].forEach(k => {
+                const btn = document.getElementById(`exp-tab-${k}`);
+                if (btn) {
+                    if (k === tab) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+            renderExpertDossier();
+        }
+        window.switchExpertTab = switchExpertTab;
+
+        function renderNatalExpertTab(entityTag) {
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const chart = getActiveChart(entityTag === 'p1' ? chart1 : chart2);
+            const dispName = getEntityDisplayName(entityTag);
+            const d = chart.expert_dossier;
+            if (!d) return '';
+
+            const bp = d.blind_portrait;
+            const ascSec = d.ascendant_section;
+            const mcSec = d.mc_section;
+            const big3Sec = d.big_three_section;
+            const bal = d.balance;
+            const patterns = d.patterns || [];
+            const planets = d.planets_interpreted || [];
+            const aspects = d.natal_aspects_interpreted || [];
+
+            const bpParagraphs = (isHe ? bp.paragraphs_he : bp.paragraphs_en) || [];
+
+            let html = `
+                <!-- 1. Blind Portrait Box -->
+                <div class="blind-portrait-box mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                        <div>
+                            <span class="badge bg-warning text-dark mb-1">${isHe ? '🕵️ דיוקן אסטרולוגי עיוור (ללא ידיעת השם)' : '🕵️ Blind Astrological Deduction (Zero Name Knowledge)'}</span>
+                            <h4 class="cinzel text-white mb-0">${escapeHtml(isHe ? bp.archetype_title_he : bp.archetype_title_en)}</h4>
+                        </div>
+                        <span class="badge bg-dark border border-warning text-warning font-monospace">${escapeHtml(dispName)} · ${chart.date} ${chart.time}</span>
+                    </div>
+                    <p class="text-secondary small mb-3">${isHe ? 'סינתזה זו מחושבת מתמטית מתוך מעלת האופק, שליט המפה, רום השמיים, הבתים וההיבטים בלבד:' : 'Synthesized algorithmically from Ascendant degree, Chart Ruler, Midheaven, House placements, and Aspect geometry alone:'}</p>
+                    <div class="d-flex flex-column gap-2">
+                        ${bpParagraphs.map(p => `<div class="p-2 rounded" style="background: rgba(255,255,255,0.03); font-size: 0.92rem; line-height: 1.6;">${formatMdBold(p)}</div>`).join('')}
+                    </div>
+                </div>
+
+                <!-- 2. Ascendant & Chart Ruler + Midheaven & MC Ruler -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('ascAndMcHeader') : '🧭 Cardinal Axes: Ascendant, Chart Ruler & Midheaven (MC)'}</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100" style="border-top: 3px solid #ec4899;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold" style="color: #ec4899;">🧭 ${isHe ? 'אופק עולה (Ascendant) ושליט המפה' : 'Ascendant (Rising Sign) & Chart Ruler'}</span>
+                                <span class="badge bg-dark border border-secondary text-light">${ascSec.formatted}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25">
+                                    ${isHe ? `שליט המפה: ${ascSec.chart_ruler_he} במזל ${ascSec.chart_ruler_sign_he} (בית ${ascSec.chart_ruler_house})` : `Chart Ruler: ${ascSec.chart_ruler} in ${ascSec.chart_ruler_sign} (House ${ascSec.chart_ruler_house})`}
+                                </span>
+                            </div>
+                            <p class="mb-0 text-light text-opacity-90" style="font-size: 0.9rem; line-height: 1.6;">${formatMdBold(isHe ? ascSec.he : ascSec.en)}</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100" style="border-top: 3px solid #8b5cf6;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold" style="color: #a78bfa;">🏛️ ${isHe ? 'רום שמיים (MC - בית 10) ושליט הקריירה' : 'Midheaven (MC - 10th House) & Career Ruler'}</span>
+                                <span class="badge bg-dark border border-secondary text-light">${mcSec.formatted}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                                    ${isHe ? `שליט רום השמיים: ${mcSec.mc_ruler_he} בבית ${mcSec.mc_ruler_house}` : `MC Ruler: ${mcSec.mc_ruler} in ${mcSec.mc_ruler_sign} (House ${mcSec.mc_ruler_house})`}
+                                </span>
+                            </div>
+                            <p class="mb-0 text-light text-opacity-90" style="font-size: 0.9rem; line-height: 1.6;">${formatMdBold(isHe ? mcSec.he : mcSec.en)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Big Three Synthesis & Elemental / Modal / Hemisphere Balance -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('bigThreeAndBalanceHeader') : '⚖️ Big Three Synthesis, Elemental, Modal & Hemisphere Balance'}</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100">
+                            <p class="mb-3 text-light" style="font-size: 0.9rem; line-height: 1.6;">${formatMdBold(isHe ? big3Sec.he : big3Sec.en)}</p>
+                            <div class="p-2 rounded" style="background: rgba(255,255,255,0.04); font-size: 0.85rem;">
+                                ${formatMdBold(isHe ? bal.summary_he : bal.summary_en)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100 d-flex flex-column justify-content-center gap-2">
+                            <div class="row g-2 text-center">
+                                <div class="col-3">
+                                    <div class="p-2 rounded" style="background: rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3);">
+                                        <div class="small text-secondary">🔥 ${isHe ? 'אש' : 'Fire'}</div>
+                                        <div class="fw-bold text-white">${bal.elements_pct.Fire}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="p-2 rounded" style="background: rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">
+                                        <div class="small text-secondary">🌍 ${isHe ? 'אדמה' : 'Earth'}</div>
+                                        <div class="fw-bold text-white">${bal.elements_pct.Earth}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="p-2 rounded" style="background: rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3);">
+                                        <div class="small text-secondary">💨 ${isHe ? 'אוויר' : 'Air'}</div>
+                                        <div class="fw-bold text-white">${bal.elements_pct.Air}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="p-2 rounded" style="background: rgba(129,140,248,0.12); border:1px solid rgba(129,140,248,0.3);">
+                                        <div class="small text-secondary">🌊 ${isHe ? 'מים' : 'Water'}</div>
+                                        <div class="fw-bold text-white">${bal.elements_pct.Water}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-2 text-center mt-1">
+                                <div class="col-4">
+                                    <div class="p-2 rounded" style="background: rgba(255,255,255,0.03);">
+                                        <div class="small text-secondary">${isHe ? 'קרדינלי (יוזם)' : 'Cardinal'}</div>
+                                        <div class="fw-bold text-warning">${bal.modalities_pct.Cardinal}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 rounded" style="background: rgba(255,255,255,0.03);">
+                                        <div class="small text-secondary">${isHe ? 'קבוע (יציב)' : 'Fixed'}</div>
+                                        <div class="fw-bold text-info">${bal.modalities_pct.Fixed}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 rounded" style="background: rgba(255,255,255,0.03);">
+                                        <div class="small text-secondary">${isHe ? 'משתנה (גמיש)' : 'Mutable'}</div>
+                                        <div class="fw-bold text-success">${bal.modalities_pct.Mutable}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Detected Geometric Patterns -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('patternsHeader') : '✨ Geometric Patterns, Angular Planets & Mutual Receptions'} (${patterns.length})</h5>
+                <div class="row g-3 mb-4">
+                    ${patterns.map(pat => `
+                        <div class="col-lg-6">
+                            <div class="expert-sub-card h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-warning">${escapeHtml(isHe ? pat.title_he : pat.title_en)}</span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning">${escapeHtml(pat.badge)}</span>
+                                </div>
+                                <p class="mb-0 text-light text-opacity-90" style="font-size: 0.88rem; line-height: 1.55;">${formatMdBold(isHe ? pat.he : pat.en)}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- 5. All Planets in Sign & House -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('allPlanetsHeader') : '🪐 Expert Planet-by-Planet in Sign & House'}</h5>
+                <div class="row g-3 mb-4">
+                    ${planets.map(p => {
+                        const dig = p.dignity || {};
+                        const digLabel = isHe ? dig.label_he : dig.label_en;
+                        const rxHtml = (p.retrograde && p.name !== 'North Node')
+                            ? `<span class="rx-badge">${isHe ? 'נסיגה Rx' : 'Retrograde Rx'}</span>`
+                            : '';
+                        return `
+                        <div class="col-lg-6">
+                            <div class="expert-sub-card h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="h5 mb-0" style="color:${p.color}">${p.symbol}</span>
+                                        <strong class="text-white">${escapeHtml(isHe ? p.name_he : p.name)}</strong>
+                                        <span class="badge bg-dark border border-secondary">${p.formatted}</span>
+                                        <span class="badge bg-secondary bg-opacity-25 text-info">${isHe ? `בית ${p.house}` : `House ${p.house}`}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        ${rxHtml}
+                                        <span class="dignity-badge" style="color:${dig.color || '#94a3b8'}; border:1px solid ${(dig.color || '#94a3b8')}55;">${escapeHtml(digLabel || '')}</span>
+                                    </div>
+                                </div>
+                                <p class="mb-0 text-light text-opacity-90" style="font-size: 0.86rem; line-height: 1.55;">${formatMdBold(isHe ? p.he : p.en)}</p>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+
+                <!-- 6. All Natal Aspects -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('allNatalAspectsHeader') : '📐 Complete Natal Aspects Catalog'} (${aspects.length})</h5>
+                <div class="row g-3">
+                    ${aspects.map(a => `
+                        <div class="col-lg-6">
+                            <div class="expert-sub-card h-100" style="border-left: 3px solid ${a.color};">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-white">${a.p1_symbol} ${escapeHtml(window.tPlanet ? window.tPlanet(a.p1) : a.p1)} ↔ ${a.p2_symbol} ${escapeHtml(window.tPlanet ? window.tPlanet(a.p2) : a.p2)}</span>
+                                    <span class="badge" style="background:rgba(255,255,255,0.08); color:${a.color}; border:1px solid ${a.color}66;">${escapeHtml(window.tAspect ? window.tAspect(a.aspect) : a.aspect)} (${a.orb}°)</span>
+                                </div>
+                                <p class="mb-0 text-secondary" style="font-size: 0.85rem; line-height: 1.5;">${formatMdBold(isHe ? a.he : a.en)}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            return html;
+        }
+
+        function renderTransitsExpertTab() {
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const tr = getActiveTransits();
+            if (!tr) return '';
+            const n1 = getEntityDisplayName('p1');
+            const n2 = getEntityDisplayName('p2');
+            const rep1 = tr.p1;
+            const rep2 = tr.p2;
+
+            return `
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 p-3 rounded" style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3);">
+                    <div>
+                        <h5 class="cinzel text-warning mb-1">🌍 ${window.t ? window.t('transitsForecastHeader') : 'Executive Transit Forecast for'} ${tr.date} (${tr.time})</h5>
+                        <div class="small text-secondary">${isHe ? 'השמיים בזמן אמת מול מפות הלידה של שתי הישויות' : 'Real-time planetary sky positions mapped onto both entities’ natal houses and planets'}</div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2 mt-md-0">
+                        <button class="btn btn-sm btn-outline-warning rounded-pill" onclick="switchMapMode('transits1'); document.getElementById('chartSvgContainer').scrollIntoView({behavior:'smooth'});">
+                            🎡 ${isHe ? `הצג בגלגל: מעברים על ${n1}` : `View Wheel: Transits on ${n1}`}
+                        </button>
+                        <button class="btn btn-sm btn-outline-info rounded-pill" onclick="openEditCompareModal()">
+                            📅 ${isHe ? 'שנה תאריך מעברים' : 'Change Transit Date'}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Executive Forecast Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100" style="border-top: 3px solid var(--p1-color);">
+                            <h6 class="cinzel mb-2" style="color: var(--p1-color);">${escapeHtml(n1)} — ${isHe ? 'תחזית מעברים' : 'Transit Forecast'}</h6>
+                            <p class="mb-0 text-light" style="font-size: 0.9rem; line-height: 1.6;">${formatMdBold(isHe ? rep1.forecast_he : rep1.forecast_en)}</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="expert-sub-card h-100" style="border-top: 3px solid var(--p2-color);">
+                            <h6 class="cinzel mb-2" style="color: var(--p2-color);">${escapeHtml(n2)} — ${isHe ? 'תחזית מעברים' : 'Transit Forecast'}</h6>
+                            <p class="mb-0 text-light" style="font-size: 0.9rem; line-height: 1.6;">${formatMdBold(isHe ? rep2.forecast_he : rep2.forecast_en)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sky Planets in Natal Houses -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('transitsHousesHeader') : '🏠 Current Sky Planets Transiting Natal Houses (1–12)'} (${ escapeHtml(n1) })</h5>
+                <div class="row g-3 mb-4">
+                    ${(rep1.house_transits || []).map(ht => `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="expert-sub-card h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold" style="color:${ht.color}">${ht.symbol} ${escapeHtml(isHe ? ht.planet_he : ht.planet)}</span>
+                                    <span class="badge bg-warning bg-opacity-15 text-warning">${isHe ? `בית לידה ${ht.natal_house}` : `Natal House ${ht.natal_house}`}</span>
+                                </div>
+                                <div class="small text-info mb-1">${ht.formatted} ${ht.retrograde ? '<span class="rx-badge">Rx</span>' : ''}</div>
+                                <p class="mb-0 text-secondary" style="font-size: 0.83rem; line-height: 1.5;">${formatMdBold(isHe ? ht.he : ht.en)}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Active Transit-to-Natal Aspects -->
+                <h5 class="cinzel text-warning mb-3">${window.t ? window.t('transitsAspectsHeader') : '⚡ Active Transit-to-Natal Aspects'} (${ escapeHtml(n1) }: ${rep1.transit_aspects.length})</h5>
+                <div class="row g-3">
+                    ${(rep1.transit_aspects || []).slice(0, 14).map(ta => `
+                        <div class="col-lg-6">
+                            <div class="expert-sub-card h-100" style="border-left: 3px solid ${ta.color};">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-white">🌍 ${ta.transit_symbol} ${escapeHtml(window.tPlanet ? window.tPlanet(ta.transit_planet) : ta.transit_planet)} ↔ ${ta.natal_symbol} ${escapeHtml(window.tPlanet ? window.tPlanet(ta.natal_planet) : ta.natal_planet)}</span>
+                                    <span class="badge" style="background:rgba(255,255,255,0.08); color:${ta.color}; border:1px solid ${ta.color}66;">${escapeHtml(window.tAspect ? window.tAspect(ta.aspect) : ta.aspect)} (${ta.orb}°)</span>
+                                </div>
+                                <p class="mb-0 text-secondary" style="font-size: 0.85rem;">${formatMdBold(isHe ? ta.he : ta.en)}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderInteractionExpertTab() {
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const syn = getActiveSynastry();
+            const inter = syn ? syn.interaction : null;
+            if (!inter) return '';
+            const n1 = getEntityDisplayName('p1');
+            const n2 = getEntityDisplayName('p2');
+
+            return `
+                <div class="blind-portrait-box mb-4">
+                    <h5 class="cinzel text-warning mb-2">${window.t ? window.t('interactionSynthesisHeader') : '🤝 2-Entity Interaction Synthesis'}</h5>
+                    <p class="mb-0 text-light" style="font-size: 0.94rem; line-height: 1.65;">${formatMdBold(isHe ? inter.synthesis_he : inter.synthesis_en)}</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <h6 class="cinzel mb-3" style="color: var(--p2-color);">${isHe ? `🏠 כוכבי ${escapeHtml(n2)} בתוך בתי החיים של ${escapeHtml(n1)}` : `🏠 ${escapeHtml(n2)}'s Planets Inside ${escapeHtml(n1)}'s Natal Houses`}</h6>
+                        <div class="d-flex flex-column gap-2">
+                            ${(inter.overlays_2_in_1 || []).map(ov => `
+                                <div class="expert-sub-card py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold" style="color:${ov.color}">${ov.symbol} ${escapeHtml(isHe ? ov.planet_he : ov.planet)} (${ov.formatted})</span>
+                                        <span class="badge bg-info bg-opacity-15 text-info">${isHe ? `בבית ${ov.target_house} של ${escapeHtml(n1)}` : `in ${escapeHtml(n1)}'s House ${ov.target_house}`}</span>
+                                    </div>
+                                    <div class="text-secondary" style="font-size: 0.84rem;">${formatMdBold(isHe ? ov.he : ov.en)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <h6 class="cinzel mb-3" style="color: var(--p1-color);">${isHe ? `🏠 כוכבי ${escapeHtml(n1)} בתוך בתי החיים של ${escapeHtml(n2)}` : `🏠 ${escapeHtml(n1)}'s Planets Inside ${escapeHtml(n2)}'s Natal Houses`}</h6>
+                        <div class="d-flex flex-column gap-2">
+                            ${(inter.overlays_1_in_2 || []).map(ov => `
+                                <div class="expert-sub-card py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold" style="color:${ov.color}">${ov.symbol} ${escapeHtml(isHe ? ov.planet_he : ov.planet)} (${ov.formatted})</span>
+                                        <span class="badge bg-warning bg-opacity-15 text-warning">${isHe ? `בבית ${ov.target_house} של ${escapeHtml(n2)}` : `in ${escapeHtml(n2)}'s House ${ov.target_house}`}</span>
+                                    </div>
+                                    <div class="text-secondary" style="font-size: 0.84rem;">${formatMdBold(isHe ? ov.he : ov.en)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderElonCaseStudyTab() {
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const cs = elon_case_study;
+            if (!cs) return '';
+
+            return `
+                <div class="blind-portrait-box mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                        <div>
+                            <span class="badge bg-warning text-dark mb-1">${isHe ? '🧪 מבחן אימות אלגוריתמי (Blind Test vs. Reality)' : '🧪 Algorithmic Blind Verification Benchmark'}</span>
+                            <h5 class="cinzel text-white mb-0">${escapeHtml(isHe ? cs.subject_blind_label_he : cs.subject_blind_label_en)}</h5>
+                        </div>
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2">
+                            ✓ ${escapeHtml(isHe ? cs.real_identity_he : cs.real_identity_en)}
+                        </span>
+                    </div>
+                    <p class="mb-0 text-secondary small">
+                        ${isHe
+                            ? 'השוואה ישירה בין מה שמנוע האסטרולוג המומחה גוזר מתמטית מהתאריך 28.06.1971 בשעה 07:30 בפרטוריה (ללא ידיעת שם האדם) לבין קורות החיים והאישיות המתועדים של אילון מאסק:'
+                            : 'Side-by-side comparison between what the Expert Astrologist Engine deduces purely from 1971-06-28 07:30 SAST Pretoria (without knowing the person’s name) vs. Elon Musk’s documented biography and enterprises:'}
+                    </p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" style="font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: rgba(251, 191, 36, 0.1);">
+                                <th style="width: 24%;" class="text-warning">${window.t ? window.t('elonColFactor') : 'Astrological Chart Signature'}</th>
+                                <th style="width: 38%;" class="text-info">${window.t ? window.t('elonColBlind') : 'Blind Expert Deduction (Zero Knowledge of Identity)'}</th>
+                                <th style="width: 38%;" class="text-success">${window.t ? window.t('elonColReality') : 'Documented Real-World Reality (Elon Musk)'}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(cs.comparisons || []).map(row => `
+                                <tr>
+                                    <td class="fw-bold text-warning align-top">${escapeHtml(isHe ? row.factor_he : row.factor_en)}</td>
+                                    <td class="text-light align-top" style="line-height: 1.55;">${escapeHtml(isHe ? row.blind_deduction_he : row.blind_deduction_en)}</td>
+                                    <td class="text-light align-top" style="line-height: 1.55; background: rgba(16, 185, 129, 0.05);">${escapeHtml(isHe ? row.reality_match_he : row.reality_match_en)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderExpertDossier() {
+            const container = document.getElementById('expertDossierContent');
+            if (!container) return;
+            if (currentExpertTab === 'p1') {
+                container.innerHTML = renderNatalExpertTab('p1');
+            } else if (currentExpertTab === 'p2') {
+                container.innerHTML = renderNatalExpertTab('p2');
+            } else if (currentExpertTab === 'transits') {
+                container.innerHTML = renderTransitsExpertTab();
+            } else if (currentExpertTab === 'interaction') {
+                container.innerHTML = renderInteractionExpertTab();
+            } else if (currentExpertTab === 'elon') {
+                container.innerHTML = renderElonCaseStudyTab();
+            }
         }
 
         // Tooltip handlers
@@ -1844,6 +2586,7 @@
             updatePartnerCards(currentCoordSystem);
             updateScores(currentCoordSystem);
             redrawWheel();
+            renderExpertDossier();
         });
     </script>
 
@@ -1943,6 +2686,21 @@
                                     <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">
                                         ℹ️ <span data-i18n="tzStandardNotice">Enter standard time / GMT offset for your location without daylight saving (DST)</span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transit Date & Time inside Modal -->
+                        <div class="p-3 rounded mb-2" style="background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.25);">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <span class="fw-bold text-warning small" data-i18n="transitBarTitle">🌍 Current / Transit Reference Date &amp; Time</span>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <input type="date" id="modal_transit_date" name="transit_date" class="form-control form-control-sm" value="{{ transits.date }}">
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <input type="time" id="modal_transit_time" name="transit_time" class="form-control form-control-sm" value="{{ transits.time }}">
                                 </div>
                             </div>
                         </div>
@@ -2092,9 +2850,11 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Initialize Wheel & People on Load
+        // Initialize Wheel, Expert Dossier & People on Load
         document.addEventListener('DOMContentLoaded', () => {
+            updatePartnerCards(currentCoordSystem);
             redrawWheel();
+            renderExpertDossier();
             fetchSavedPeopleForResult();
         });
     </script>

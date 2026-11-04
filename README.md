@@ -1,14 +1,24 @@
-# AstroMatch Pro (v2.4.1)
+# AstroMatch Pro (v2.5.0)
 
-Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
+Professional-grade Astrological Compatibility (Synastry), Expert Natal & Transit Dossier, and Interactive Celestial Maps web application.
 
-AstroMatch Pro calculates the precise astronomical positions of planets for two individuals based on their exact birth date, time, timezone offset, and city. It computes celestial angles, 12 house cusps, geometric aspect chords between charts, and visualizes them on interactive Astrological Maps (Synastry Bi-Wheel and Natal Charts).
+AstroMatch Pro calculates the precise astronomical positions of planets, lunar nodes, and cardinal angles for any two entities (people, companies, organizations, or historical events) as well as real-time **Current Date Transits**. It computes unequal Porphyry house cusps, Essential Dignities, Retrograde motion (`Rx`), Mutual Receptions, House Overlays, and Blind Astrological Portraits, visualizing them on interactive SVG Astrological Maps (Synastry Bi-Wheel, Natal Charts, and Current Transits Bi-Wheels).
 
 ---
 
 ## Key Features
 
-- **Dual Coordinate Systems with Interactive Toggle (New in v2.4.1)**:
+- **Expert Astrologist Engine & Blind Portrait Synthesis (New in v2.5.0)**:
+  - **אופק (Ascendant / Rising Sign) & Chart Ruler (שליט המפה)**: Deep analysis of the Rising Sign degree, its planetary ruler, and the house/sign where the Chart Ruler steers the life trajectory.
+  - **Midheaven (רום שמיים - MC) & MC Ruler + Lunar North Node (ראש הדרקון ☊)**: Complete vocational and karmic destiny analysis.
+  - **Retrograde (`Rx`), Daily Speed & Essential Dignities**: Full evaluation of apparent retrograde motion and planetary dignity (`Domicile`, `Exaltation`, `Detriment`, `Fall`, `Peregrine`).
+  - **Geometric Patterns & Mutual Receptions**: Automatic detection of angular planets conjunct `ASC`/`MC`, Mutual Receptions (`קבלה הדדית`), Stelliums, Focal Squares, and Channeled Oppositions (Wedges).
+  - **🕵️ Blind Portrait & Blind Mode Toggle**: Deduces who a person or entity is strictly from their chart geometry without using their name, with a 1-click **Blind Mode** toggle on the report page.
+  - **🌍 Current Date Transits & Transits Bi-Wheel**: Computes planetary positions for today (or any chosen date), maps them onto each entity's 12 natal houses and natal planets, and renders an interactive **Transits Bi-Wheel** on the SVG map.
+  - **🤝 2-Entity Interaction (People, Companies, Events) & House Overlays**: Analyzes Person + Person, Founder + Company, or Company + Company with full **House Overlays (`השלכות בתים`)** and **6-Dimensional Synergy Scores** (adding `Executive Power & Drive` and `Wealth & Resource Flow`).
+  - **🧪 Elon Musk Blind Verification Case Study**: Built-in 1-click benchmark (`1971-06-28 07:30 Pretoria` + `SpaceX` / `Tesla`) comparing blind astrological deductions against documented reality.
+
+- **Dual Coordinate Systems with Interactive Toggle (v2.4.1)**:
   - **Tropical (Date / Astro.com)**: Western astrology standard based on the apparent ecliptic of date, accounting for equinox precession, nutation, and light-time corrections. Matches Astro.com and Swiss Ephemeris calculations to the exact arcminute.
   - **J2000 (Astrometric)**: Modern astrophysical coordinate system fixed to the standard epoch J2000.0 without date precession.
   - **Instant UI Switch Button**: Toggle seamlessly between `🌐 Tropical (Astro.com)` and `🔭 J2000 (Astrometric)` on the chart toolbar and data tables without page reloads.

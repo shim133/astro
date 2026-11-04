@@ -157,6 +157,10 @@
   {"name": "Auckland", "country": "New Zealand", "display": "Auckland, New Zealand", "lat": -36.8485, "lon": 174.7633, "tz": "+12:00"},
   {"name": "Cape Town", "country": "South Africa", "display": "Cape Town, South Africa", "lat": -33.9249, "lon": 18.4241, "tz": "+02:00"},
   {"name": "Johannesburg", "country": "South Africa", "display": "Johannesburg, South Africa", "lat": -26.2041, "lon": 28.0473, "tz": "+02:00"},
+  {"name": "Pretoria", "country": "South Africa", "display": "Pretoria, South Africa", "lat": -25.7479, "lon": 28.2293, "tz": "+02:00"},
+  {"name": "Hawthorne", "country": "United States", "display": "Hawthorne, USA", "lat": 33.9164, "lon": -118.3526, "tz": "-08:00"},
+  {"name": "Palo Alto", "country": "United States", "display": "Palo Alto, USA", "lat": 37.4419, "lon": -122.1430, "tz": "-08:00"},
+  {"name": "Cupertino", "country": "United States", "display": "Cupertino, USA", "lat": 37.3230, "lon": -122.0322, "tz": "-08:00"},
   {"name": "Nairobi", "country": "Kenya", "display": "Nairobi, Kenya", "lat": -1.2921, "lon": 36.8219, "tz": "+03:00"},
   {"name": "Casablanca", "country": "Morocco", "display": "Casablanca, Morocco", "lat": 33.5731, "lon": -7.5898, "tz": "+01:00"}
 ]

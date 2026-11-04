@@ -8,10 +8,17 @@ import json
 
 import os
 import uuid
+from astro_expert import (
+    get_dignity,
+    build_expert_natal_dossier,
+    compute_transits_report,
+    build_interaction_dossier,
+    ELON_MUSK_CASE_STUDY,
+)
 
 app = Flask(__name__)
 
-APP_VERSION = "2.4.1"
+APP_VERSION = "2.5.0"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -312,8 +319,8 @@ def get_house_for_lon(lon_deg, cusps_list):
                 return i + 1
     return 1
 
-def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
-    """Compute angles, houses, planets, and natal aspects for a specific coordinate system."""
+def _calculate_chart_system(t, lat, lon, coord_system='tropical', t_next=None):
+    """Compute angles, houses, planets, lunar nodes, dignities, retrogrades, and expert dossier."""
     angles = calculate_angles_and_houses(t, lat, lon, coord_system=coord_system)
     asc_deg = angles["asc"]
     cusps_deg_list = [h["cusp"] for h in angles["houses"]]
@@ -326,13 +333,26 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
         if coord_system == 'tropical':
             apparent = earth.at(t).observe(p_obj).apparent()
             _, lon_ecl, _ = apparent.ecliptic_latlon('date')
+            if t_next is not None:
+                _, lon_ecl_next, _ = earth.at(t_next).observe(p_obj).apparent().ecliptic_latlon('date')
+            else:
+                lon_ecl_next = lon_ecl
         else: # 'j2000'
             astrometric = earth.at(t).observe(p_obj)
             _, lon_ecl, _ = astrometric.ecliptic_latlon()
+            if t_next is not None:
+                _, lon_ecl_next, _ = earth.at(t_next).observe(p_obj).ecliptic_latlon()
+            else:
+                lon_ecl_next = lon_ecl
             
         deg = float(lon_ecl.degrees % 360)
+        deg_next = float(lon_ecl_next.degrees % 360)
+        daily_speed = ((deg_next - deg + 180.0) % 360.0 - 180.0) / 0.1 if t_next is not None else 1.0
+        is_retrograde = bool(daily_speed < 0 and p_name not in ('Sun', 'Moon'))
+
         zodiac = format_zodiac(deg)
         house_num = get_house_for_lon(deg, cusps_deg_list)
+        dignity = get_dignity(p_name, zodiac["sign"])
         
         planet_entry = {
             "name": p_name,
@@ -342,16 +362,50 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
             "lon": round(deg, 2),
             "sign": zodiac["sign"],
             "sign_symbol": zodiac["symbol"],
+            "sign_element": zodiac["element"],
             "sign_deg": zodiac["deg"],
             "sign_min": zodiac["min"],
             "deg": zodiac["deg"],
             "min": zodiac["min"],
             "sign_color": zodiac["color"],
             "formatted": zodiac["formatted"],
-            "house": house_num
+            "house": house_num,
+            "retrograde": is_retrograde,
+            "speed": round(float(daily_speed), 3),
+            "dignity": dignity
         }
         planets_list.append(planet_entry)
         planets_dict[p_name] = planet_entry
+
+    # Compute Lunar North Node (Mean Ascending Node)
+    T_cent = (t.tt - 2451545.0) / 36525.0
+    nn_trop = (125.04452 - 1934.136261 * T_cent + 0.0020708 * (T_cent ** 2) + (T_cent ** 3) / 450000.0) % 360.0
+    if coord_system == 'j2000':
+        prec_deg = (1.396971 * T_cent) % 360.0
+        nn_deg = (nn_trop - prec_deg) % 360.0
+    else:
+        nn_deg = float(nn_trop)
+    nn_zodiac = format_zodiac(nn_deg)
+    north_node_entry = {
+        "name": "North Node",
+        "symbol": "☊",
+        "color": "#c084fc",
+        "category": "node",
+        "lon": round(nn_deg, 2),
+        "sign": nn_zodiac["sign"],
+        "sign_symbol": nn_zodiac["symbol"],
+        "sign_element": nn_zodiac["element"],
+        "sign_deg": nn_zodiac["deg"],
+        "sign_min": nn_zodiac["min"],
+        "deg": nn_zodiac["deg"],
+        "min": nn_zodiac["min"],
+        "sign_color": nn_zodiac["color"],
+        "formatted": nn_zodiac["formatted"],
+        "house": get_house_for_lon(nn_deg, cusps_deg_list),
+        "retrograde": True,
+        "speed": -0.053,
+        "dignity": {"status": "peregrine", "label_en": "Karmic Node", "label_he": "ראש הדרקון", "color": "#c084fc"}
+    }
 
     # Add Ascendant and MC as special points
     asc_zodiac = format_zodiac(asc_deg)
@@ -363,6 +417,7 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
         "lon": round(asc_deg, 2),
         "sign": asc_zodiac["sign"],
         "sign_symbol": asc_zodiac["symbol"],
+        "sign_element": asc_zodiac["element"],
         "sign_deg": asc_zodiac["deg"],
         "sign_min": asc_zodiac["min"],
         "deg": asc_zodiac["deg"],
@@ -381,22 +436,26 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
         "lon": round(angles["mc"], 2),
         "sign": mc_zodiac["sign"],
         "sign_symbol": mc_zodiac["symbol"],
+        "sign_element": mc_zodiac["element"],
         "sign_deg": mc_zodiac["deg"],
         "sign_min": mc_zodiac["min"],
         "deg": mc_zodiac["deg"],
         "min": mc_zodiac["min"],
         "sign_color": mc_zodiac["color"],
         "formatted": mc_zodiac["formatted"],
-        "house": get_house_for_lon(angles["mc"], cusps_deg_list)
+        "house": 10
     }
 
-    # Natal aspects for this individual
-    all_points = planets_list + [asc_entry]
+    # Natal aspects for this individual (including ASC, MC, and North Node)
+    all_points = planets_list + [asc_entry, mc_entry, north_node_entry]
     natal_aspects = []
     for i in range(len(all_points)):
         for j in range(i + 1, len(all_points)):
             pt1 = all_points[i]
             pt2 = all_points[j]
+            # Skip ASC-MC aspect since they are structural axes
+            if {pt1["name"], pt2["name"]} == {"Ascendant", "Midheaven"}:
+                continue
             diff = abs(pt1["lon"] - pt2["lon"])
             diff = min(diff, 360.0 - diff)
             
@@ -418,7 +477,7 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
                     })
                     break
 
-    return {
+    sys_result = {
         "system": coord_system,
         "asc": round(asc_deg, 2),
         "mc": round(angles["mc"], 2),
@@ -429,15 +488,19 @@ def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
         "planets_dict": planets_dict,
         "asc_point": asc_entry,
         "mc_point": mc_entry,
+        "north_node": north_node_entry,
         "natal_aspects": natal_aspects,
         # Big Three shorthand
         "sun_sign": planets_dict["Sun"]["sign"],
         "moon_sign": planets_dict["Moon"]["sign"],
         "asc_sign": asc_zodiac["sign"],
+        "mc_sign": mc_zodiac["sign"],
     }
+    sys_result["expert_dossier"] = build_expert_natal_dossier(sys_result)
+    return sys_result
 
 def compute_chart(name, date_str, time_str, tz_str, city_str):
-    """Calculates all planetary coordinates, angles, houses, and natal aspects."""
+    """Calculates all planetary coordinates, angles, houses, natal aspects, and expert synthesis."""
     # Resolve City Coordinates (Curated DB first, then live OpenStreetMap/Nominatim fallback)
     matched_city = find_city_in_db(city_str)
     if matched_city:
@@ -473,10 +536,11 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         
     ts = load.timescale()
     t = ts.utc(dt.year, dt.month, dt.day, dt.hour - total_offset, dt.minute)
+    t_next = ts.tt_jd(t.tt + 0.1)
     
     # Compute both Tropical (Date / Astro.com) and J2000 (Astrometric) systems
-    trop_data = _calculate_chart_system(t, lat, lon, coord_system='tropical')
-    j2000_data = _calculate_chart_system(t, lat, lon, coord_system='j2000')
+    trop_data = _calculate_chart_system(t, lat, lon, coord_system='tropical', t_next=t_next)
+    j2000_data = _calculate_chart_system(t, lat, lon, coord_system='j2000', t_next=t_next)
 
     return {
         "name": name,
@@ -496,13 +560,17 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         **trop_data
     }
 
-def _calculate_synastry_single(c1_sys, c2_sys):
-    """Calculates inter-chart aspects, compatibility score breakdown, and interpretations for one system."""
+def _calculate_synastry_single(c1_sys, c2_sys, name1="Entity A", name2="Entity B"):
+    """Calculates inter-chart aspects, compatibility score breakdown, house overlays, and interpretations."""
     aspects = []
     
-    # Points to compare
-    pts1 = c1_sys["planets"] + [c1_sys["asc_point"]]
-    pts2 = c2_sys["planets"] + [c2_sys["asc_point"]]
+    # Points to compare (including ASC, MC, and North Node)
+    pts1 = c1_sys["planets"] + [c1_sys["asc_point"], c1_sys["mc_point"]]
+    if c1_sys.get("north_node"):
+        pts1.append(c1_sys["north_node"])
+    pts2 = c2_sys["planets"] + [c2_sys["asc_point"], c2_sys["mc_point"]]
+    if c2_sys.get("north_node"):
+        pts2.append(c2_sys["north_node"])
     
     raw_score = 0.0
     category_scores = {
@@ -537,8 +605,8 @@ def _calculate_synastry_single(c1_sys, c2_sys):
                         meaning = f"Dynamic planetary link: {p1['name']} {asp_name} {p2['name']} creates active energy exchange between {p1['name']}'s drive and {p2['name']}'s essence."
                     
                     # Point calculation
-                    weight = PLANETS_CONFIG.get(p1['name'], {}).get('weight', 1.0) * \
-                             PLANETS_CONFIG.get(p2['name'], {}).get('weight', 1.0)
+                    weight = PLANETS_CONFIG.get(p1['name'], {}).get('weight', 0.9) * \
+                             PLANETS_CONFIG.get(p2['name'], {}).get('weight', 0.9)
                     pt = asp_cfg["base_points"] * tightness * weight
                     raw_score += pt
                     
@@ -550,7 +618,7 @@ def _calculate_synastry_single(c1_sys, c2_sys):
                         category_scores["emotional"] += pt * 1.3
                     if pair_names & {'Mercury', 'Uranus'}:
                         category_scores["intellectual"] += pt * 1.4
-                    if pair_names & {'Saturn', 'Jupiter', 'Ascendant'}:
+                    if pair_names & {'Saturn', 'Jupiter', 'Ascendant', 'Midheaven', 'North Node'}:
                         category_scores["stability"] += pt * 1.3
                     
                     aspects.append({
@@ -601,7 +669,7 @@ def _calculate_synastry_single(c1_sys, c2_sys):
         verdict_key = "verdict_0"
         verdict = "Karmic Growth Catalyst: Intense friction and distinct temperaments; great personal transformation if communication is nurtured."
 
-    return {
+    syn_dict = {
         "aspects": aspects,
         "overall_score": overall_pct,
         "chemistry_score": chemistry_pct,
@@ -612,16 +680,23 @@ def _calculate_synastry_single(c1_sys, c2_sys):
         "verdict_key": verdict_key,
         "raw_points": round(raw_score, 1)
     }
+    interaction = build_interaction_dossier(c1_sys, c2_sys, syn_dict, name1, name2, get_house_for_lon)
+    syn_dict["interaction"] = interaction
+    syn_dict["power_score"] = interaction["power_score"]
+    syn_dict["wealth_score"] = interaction["wealth_score"]
+    return syn_dict
 
 def calculate_synastry(c1, c2):
-    """Calculates all inter-chart aspects and scores for both Tropical and J2000 systems."""
+    """Calculates all inter-chart aspects, house overlays, and scores for both Tropical and J2000 systems."""
+    name1 = c1.get("name", "Entity A")
+    name2 = c2.get("name", "Entity B")
     c1_trop = c1.get("systems", {}).get("tropical", c1)
     c2_trop = c2.get("systems", {}).get("tropical", c2)
     c1_j2000 = c1.get("systems", {}).get("j2000", c1)
     c2_j2000 = c2.get("systems", {}).get("j2000", c2)
 
-    syn_tropical = _calculate_synastry_single(c1_trop, c2_trop)
-    syn_j2000 = _calculate_synastry_single(c1_j2000, c2_j2000)
+    syn_tropical = _calculate_synastry_single(c1_trop, c2_trop, name1=name1, name2=name2)
+    syn_j2000 = _calculate_synastry_single(c1_j2000, c2_j2000, name1=name1, name2=name2)
 
     return {
         "systems": {
@@ -632,14 +707,53 @@ def calculate_synastry(c1, c2):
         **syn_tropical
     }
 
+def calculate_transits(chart1, chart2, transit_date_str=None, transit_time_str=None):
+    """Calculate Current Sky / Transit positions and Transit-to-Natal reports for both entities."""
+    now = datetime.now()
+    t_date = (transit_date_str or "").strip() or now.strftime("%Y-%m-%d")
+    t_time = (transit_time_str or "").strip() or now.strftime("%H:%M")
+    t_city = chart1.get("city", "Tel Aviv, Israel")
+    t_tz = chart1.get("tz", "+02:00")
+
+    transit_chart = compute_chart(f"Current Sky ({t_date})", t_date, t_time, t_tz, t_city)
+
+    trop_t = transit_chart["systems"]["tropical"]
+    j2000_t = transit_chart["systems"]["j2000"]
+
+    rep_p1_trop = compute_transits_report(chart1["systems"]["tropical"], trop_t, f"{t_date} {t_time}", get_house_for_lon)
+    rep_p2_trop = compute_transits_report(chart2["systems"]["tropical"], trop_t, f"{t_date} {t_time}", get_house_for_lon)
+
+    rep_p1_j2000 = compute_transits_report(chart1["systems"]["j2000"], j2000_t, f"{t_date} {t_time}", get_house_for_lon)
+    rep_p2_j2000 = compute_transits_report(chart2["systems"]["j2000"], j2000_t, f"{t_date} {t_time}", get_house_for_lon)
+
+    return {
+        "date": t_date,
+        "time": t_time,
+        "transit_chart": transit_chart,
+        "systems": {
+            "tropical": {"p1": rep_p1_trop, "p2": rep_p2_trop},
+            "j2000": {"p1": rep_p1_j2000, "p2": rep_p2_j2000},
+        },
+        "p1": rep_p1_trop,
+        "p2": rep_p2_trop,
+    }
+
 # --- ROUTES ---
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html', app_version=APP_VERSION)
+    now_date = datetime.now().strftime("%Y-%m-%d")
+    now_time = datetime.now().strftime("%H:%M")
+    return render_template('index.html', app_version=APP_VERSION, now_date=now_date, now_time=now_time)
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
+        now_date = datetime.now().strftime("%Y-%m-%d")
+        now_time = datetime.now().strftime("%H:%M")
+
+        transit_date = request.form.get('transit_date', now_date).strip() or now_date
+        transit_time = request.form.get('transit_time', now_time).strip() or now_time
+
         p1_inputs = {
             'name': request.form['p1_name'].strip(),
             'date_str': request.form['p1_date'],
@@ -647,26 +761,44 @@ def analyze():
             'city_str': request.form['p1_city'].strip(),
             'tz_str': request.form['p1_tz'].strip()
         }
-        p2_inputs = {
-            'name': request.form['p2_name'].strip(),
-            'date_str': request.form['p2_date'],
-            'time_str': request.form['p2_time'],
-            'city_str': request.form['p2_city'].strip(),
-            'tz_str': request.form['p2_tz'].strip()
-        }
+
+        # Allow single-entity analysis by falling back to Current Sky if Partner B is left blank
+        p2_name_raw = request.form.get('p2_name', '').strip()
+        p2_date_raw = request.form.get('p2_date', '').strip()
+        if p2_name_raw and p2_date_raw:
+            p2_inputs = {
+                'name': p2_name_raw,
+                'date_str': p2_date_raw,
+                'time_str': request.form.get('p2_time', '12:00').strip() or '12:00',
+                'city_str': request.form.get('p2_city', p1_inputs['city_str']).strip() or p1_inputs['city_str'],
+                'tz_str': request.form.get('p2_tz', p1_inputs['tz_str']).strip() or p1_inputs['tz_str']
+            }
+        else:
+            p2_inputs = {
+                'name': f"Current Sky ({transit_date})",
+                'date_str': transit_date,
+                'time_str': transit_time,
+                'city_str': p1_inputs['city_str'],
+                'tz_str': p1_inputs['tz_str']
+            }
         
         # Calculate individual charts
         chart1 = compute_chart(**p1_inputs)
         chart2 = compute_chart(**p2_inputs)
         
-        # Calculate Synastry
+        # Calculate Synastry / Entity Interaction
         synastry = calculate_synastry(chart1, chart2)
+
+        # Calculate Current Date Transits
+        transits = calculate_transits(chart1, chart2, transit_date, transit_time)
         
         # Bundle everything for frontend visualization
         payload = {
             "chart1": chart1,
             "chart2": chart2,
             "synastry": synastry,
+            "transits": transits,
+            "elon_case_study": ELON_MUSK_CASE_STUDY,
             "zodiac_data": ZODIAC_DATA
         }
         
@@ -675,6 +807,8 @@ def analyze():
             p1=chart1,
             p2=chart2,
             synastry=synastry,
+            transits=transits,
+            elon_case_study=ELON_MUSK_CASE_STUDY,
             payload_json=json.dumps(payload),
             app_version=APP_VERSION
         )
@@ -684,7 +818,9 @@ def analyze():
         return render_template(
             'index.html',
             error=f"Error calculating charts: {str(e)}",
-            app_version=APP_VERSION
+            app_version=APP_VERSION,
+            now_date=datetime.now().strftime("%Y-%m-%d"),
+            now_time=datetime.now().strftime("%H:%M")
         )
 
 # --- API ROUTES ---
