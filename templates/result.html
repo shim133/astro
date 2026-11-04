@@ -443,23 +443,23 @@
                             <div class="d-flex flex-column gap-2 mt-3">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Sun'].sign }}" data-symbol="{{ p1.planets_dict['Sun'].symbol }}" data-deg="{{ p1.planets_dict['Sun'].sign_deg }}" data-min="{{ p1.planets_dict['Sun'].sign_min }}" data-formatted="{{ p1.planets_dict['Sun'].formatted }}">{{ p1.planets_dict['Sun'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Sun" data-sign="{{ p1.planets_dict['Sun'].sign }}" data-symbol="{{ p1.planets_dict['Sun'].symbol }}" data-deg="{{ p1.planets_dict['Sun'].sign_deg }}" data-min="{{ p1.planets_dict['Sun'].sign_min }}" data-formatted="{{ p1.planets_dict['Sun'].formatted }}">{{ p1.planets_dict['Sun'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Moon'].sign }}" data-symbol="{{ p1.planets_dict['Moon'].symbol }}" data-deg="{{ p1.planets_dict['Moon'].sign_deg }}" data-min="{{ p1.planets_dict['Moon'].sign_min }}" data-formatted="{{ p1.planets_dict['Moon'].formatted }}">{{ p1.planets_dict['Moon'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Moon" data-sign="{{ p1.planets_dict['Moon'].sign }}" data-symbol="{{ p1.planets_dict['Moon'].symbol }}" data-deg="{{ p1.planets_dict['Moon'].sign_deg }}" data-min="{{ p1.planets_dict['Moon'].sign_min }}" data-formatted="{{ p1.planets_dict['Moon'].formatted }}">{{ p1.planets_dict['Moon'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.asc_point.sign }}" data-symbol="{{ p1.asc_point.symbol }}" data-deg="{{ p1.asc_point.sign_deg }}" data-min="{{ p1.asc_point.sign_min }}" data-formatted="{{ p1.asc_point.formatted }}">{{ p1.asc_point.formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Ascendant" data-sign="{{ p1.asc_point.sign }}" data-symbol="{{ p1.asc_point.symbol }}" data-deg="{{ p1.asc_point.sign_deg }}" data-min="{{ p1.asc_point.sign_min }}" data-formatted="{{ p1.asc_point.formatted }}">{{ p1.asc_point.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Venus'].sign }}" data-symbol="{{ p1.planets_dict['Venus'].symbol }}" data-deg="{{ p1.planets_dict['Venus'].sign_deg }}" data-min="{{ p1.planets_dict['Venus'].sign_min }}" data-formatted="{{ p1.planets_dict['Venus'].formatted }}">{{ p1.planets_dict['Venus'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Venus" data-sign="{{ p1.planets_dict['Venus'].sign }}" data-symbol="{{ p1.planets_dict['Venus'].symbol }}" data-deg="{{ p1.planets_dict['Venus'].sign_deg }}" data-min="{{ p1.planets_dict['Venus'].sign_min }}" data-formatted="{{ p1.planets_dict['Venus'].formatted }}">{{ p1.planets_dict['Venus'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #ef4444;">♂ <span data-i18n="planetMars">Mars</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p1.planets_dict['Mars'].sign }}" data-symbol="{{ p1.planets_dict['Mars'].symbol }}" data-deg="{{ p1.planets_dict['Mars'].sign_deg }}" data-min="{{ p1.planets_dict['Mars'].sign_min }}" data-formatted="{{ p1.planets_dict['Mars'].formatted }}">{{ p1.planets_dict['Mars'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p1" data-body="Mars" data-sign="{{ p1.planets_dict['Mars'].sign }}" data-symbol="{{ p1.planets_dict['Mars'].symbol }}" data-deg="{{ p1.planets_dict['Mars'].sign_deg }}" data-min="{{ p1.planets_dict['Mars'].sign_min }}" data-formatted="{{ p1.planets_dict['Mars'].formatted }}">{{ p1.planets_dict['Mars'].formatted }}</span>
                                 </div>
                             </div>
 
@@ -498,23 +498,23 @@
                             <div class="d-flex flex-column gap-2 mt-3">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong class="text-warning">☉ <span data-i18n="sunSign">Sun</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Sun'].sign }}" data-symbol="{{ p2.planets_dict['Sun'].symbol }}" data-deg="{{ p2.planets_dict['Sun'].sign_deg }}" data-min="{{ p2.planets_dict['Sun'].sign_min }}" data-formatted="{{ p2.planets_dict['Sun'].formatted }}">{{ p2.planets_dict['Sun'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Sun" data-sign="{{ p2.planets_dict['Sun'].sign }}" data-symbol="{{ p2.planets_dict['Sun'].symbol }}" data-deg="{{ p2.planets_dict['Sun'].sign_deg }}" data-min="{{ p2.planets_dict['Sun'].sign_min }}" data-formatted="{{ p2.planets_dict['Sun'].formatted }}">{{ p2.planets_dict['Sun'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #cbd5e1;">☽ <span data-i18n="moonSign">Moon</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Moon'].sign }}" data-symbol="{{ p2.planets_dict['Moon'].symbol }}" data-deg="{{ p2.planets_dict['Moon'].sign_deg }}" data-min="{{ p2.planets_dict['Moon'].sign_min }}" data-formatted="{{ p2.planets_dict['Moon'].formatted }}">{{ p2.planets_dict['Moon'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Moon" data-sign="{{ p2.planets_dict['Moon'].sign }}" data-symbol="{{ p2.planets_dict['Moon'].symbol }}" data-deg="{{ p2.planets_dict['Moon'].sign_deg }}" data-min="{{ p2.planets_dict['Moon'].sign_min }}" data-formatted="{{ p2.planets_dict['Moon'].formatted }}">{{ p2.planets_dict['Moon'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #ec4899;"><span data-i18n="ascSign">ASC Rising</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.asc_point.sign }}" data-symbol="{{ p2.asc_point.symbol }}" data-deg="{{ p2.asc_point.sign_deg }}" data-min="{{ p2.asc_point.sign_min }}" data-formatted="{{ p2.asc_point.formatted }}">{{ p2.asc_point.formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Ascendant" data-sign="{{ p2.asc_point.sign }}" data-symbol="{{ p2.asc_point.symbol }}" data-deg="{{ p2.asc_point.sign_deg }}" data-min="{{ p2.asc_point.sign_min }}" data-formatted="{{ p2.asc_point.formatted }}">{{ p2.asc_point.formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #f472b6;">♀ <span data-i18n="planetVenus">Venus</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Venus'].sign }}" data-symbol="{{ p2.planets_dict['Venus'].symbol }}" data-deg="{{ p2.planets_dict['Venus'].sign_deg }}" data-min="{{ p2.planets_dict['Venus'].sign_min }}" data-formatted="{{ p2.planets_dict['Venus'].formatted }}">{{ p2.planets_dict['Venus'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Venus" data-sign="{{ p2.planets_dict['Venus'].sign }}" data-symbol="{{ p2.planets_dict['Venus'].symbol }}" data-deg="{{ p2.planets_dict['Venus'].sign_deg }}" data-min="{{ p2.planets_dict['Venus'].sign_min }}" data-formatted="{{ p2.planets_dict['Venus'].formatted }}">{{ p2.planets_dict['Venus'].formatted }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
                                     <span class="text-secondary text-nowrap"><strong style="color: #ef4444;">♂ <span data-i18n="planetMars">Mars</span>:</strong></span>
-                                    <span class="fw-semibold planet-pos text-nowrap" data-sign="{{ p2.planets_dict['Mars'].sign }}" data-symbol="{{ p2.planets_dict['Mars'].symbol }}" data-deg="{{ p2.planets_dict['Mars'].sign_deg }}" data-min="{{ p2.planets_dict['Mars'].sign_min }}" data-formatted="{{ p2.planets_dict['Mars'].formatted }}">{{ p2.planets_dict['Mars'].formatted }}</span>
+                                    <span class="fw-semibold planet-pos text-nowrap" data-partner="p2" data-body="Mars" data-sign="{{ p2.planets_dict['Mars'].sign }}" data-symbol="{{ p2.planets_dict['Mars'].symbol }}" data-deg="{{ p2.planets_dict['Mars'].sign_deg }}" data-min="{{ p2.planets_dict['Mars'].sign_min }}" data-formatted="{{ p2.planets_dict['Mars'].formatted }}">{{ p2.planets_dict['Mars'].formatted }}</span>
                                 </div>
                             </div>
 
@@ -563,9 +563,24 @@
 
             <!-- Map Controls & Filter Legend -->
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 px-3">
-                <div class="d-flex align-items-center gap-3">
-                    <span class="text-secondary small" data-i18n="wheelControls">Wheel Mode:</span>
-                    <span id="currentModeLabel" class="badge bg-secondary bg-opacity-25 text-warning font-monospace">Synastry Bi-Wheel</span>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-secondary small" data-i18n="wheelControls">Wheel Mode:</span>
+                        <span id="currentModeLabel" class="badge bg-secondary bg-opacity-25 text-warning font-monospace">Synastry Bi-Wheel</span>
+                    </div>
+
+                    <!-- Coordinate System Selector -->
+                    <div class="d-flex align-items-center gap-2 border-start border-secondary border-opacity-25 ps-3" id="coordSwitchContainer">
+                        <span class="text-secondary small" data-i18n="coordSystem">Coordinates:</span>
+                        <div class="btn-group btn-group-sm" role="group" id="coordToggleGroup">
+                            <button type="button" class="btn btn-sm btn-warning fw-semibold px-2 py-1" id="btn-coord-tropical" onclick="setCoordinateSystem('tropical')" title="Standard Western Astrology · Apparent Ecliptic of Date · Matches Astro.com">
+                                🌐 <span data-i18n="coordTropical">Tropical (Astro.com)</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning px-2 py-1" id="btn-coord-j2000" onclick="setCoordinateSystem('j2000')" title="IAU Standard Epoch J2000.0 · Astrometric Coordinates">
+                                🔭 <span data-i18n="coordJ2000">J2000 (Astrometric)</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -621,7 +636,12 @@
             </div>
             <div class="col-lg-5">
                 <div class="glass-card p-4 h-100" style="overflow-x: auto;">
-                    <h3 class="cinzel h5 text-white mb-3" data-i18n="planetTableTitle">Planetary Data</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="cinzel h5 text-white mb-0" data-i18n="planetTableTitle">Planetary Data</h3>
+                        <span id="activeCoordBadge" class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 small" data-i18n="coordTropical" title="Standard Western Astrology (Apparent Ecliptic of Date) · Matches Astro.com">
+                            Tropical (Astro.com)
+                        </span>
+                    </div>
                     <div id="planetTableContainer"></div>
                 </div>
             </div>
@@ -714,6 +734,30 @@
     <script>
         const astroData = JSON.parse(document.getElementById('astroData').textContent);
         const { chart1, chart2, synastry, zodiac_data } = astroData;
+
+        let currentCoordSystem = 'tropical'; // 'tropical' | 'j2000'
+
+        function getActiveChart(baseChart) {
+            if (!baseChart) return null;
+            if (baseChart.systems && baseChart.systems[currentCoordSystem]) {
+                return {
+                    ...baseChart,
+                    ...baseChart.systems[currentCoordSystem]
+                };
+            }
+            return baseChart;
+        }
+
+        function getActiveSynastry() {
+            if (!synastry) return null;
+            if (synastry.systems && synastry.systems[currentCoordSystem]) {
+                return {
+                    ...synastry,
+                    ...synastry.systems[currentCoordSystem]
+                };
+            }
+            return synastry;
+        }
 
         let currentMode = 'synastry'; // 'synastry' | 'natal1' | 'natal2'
         let activeAspectFilter = 'all';
@@ -916,11 +960,13 @@
             const layer = document.getElementById('planetsLayer');
             layer.innerHTML = '';
 
-            const ascDeg = chart1.asc;
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const ascDeg = c1.asc;
 
             if (mode === 'synastry') {
                 // Partner B: Outer Planet Track (r = 338)
-                drawPlanetTrack(chart2.planets, ascDeg, 338, 'p2', chart2.name, '#f472b6', layer);
+                drawPlanetTrack(c2.planets, ascDeg, 338, 'p2', c2.name, '#f472b6', layer);
 
                 // Separator circle between track 1 and 2
                 const sep = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -933,10 +979,10 @@
                 layer.appendChild(sep);
 
                 // Partner A: Inner Planet Track (r = 285)
-                drawPlanetTrack(chart1.planets, ascDeg, 285, 'p1', chart1.name, '#38bdf8', layer);
+                drawPlanetTrack(c1.planets, ascDeg, 285, 'p1', c1.name, '#38bdf8', layer);
 
             } else {
-                const chart = mode === 'natal1' ? chart1 : chart2;
+                const chart = mode === 'natal1' ? c1 : c2;
                 const trackColor = mode === 'natal1' ? '#38bdf8' : '#f472b6';
                 drawPlanetTrack(chart.planets, chart.asc, 310, 'natal', chart.name, trackColor, layer);
             }
@@ -1042,10 +1088,14 @@
             const layer = document.getElementById('aspectsLayer');
             layer.innerHTML = '';
 
-            const ascDeg = mode === 'synastry' ? chart1.asc : (mode === 'natal1' ? chart1.asc : chart2.asc);
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const syn = getActiveSynastry();
+
+            const ascDeg = mode === 'synastry' ? c1.asc : (mode === 'natal1' ? c1.asc : c2.asc);
 
             if (mode === 'synastry') {
-                const aspects = synastry.aspects;
+                const aspects = syn.aspects;
                 aspects.forEach((asp, idx) => {
                     if (activeAspectFilter !== 'all' && asp.aspect !== activeAspectFilter) {
                         return;
@@ -1077,8 +1127,8 @@
                         const p2Name = window.tPlanet ? window.tPlanet(asp.p2_planet) : asp.p2_planet;
                         const meaningText = window.tAspectMeaning ? window.tAspectMeaning(asp) : asp.meaning;
                         const pairLabel = isHe
-                            ? `<strong style="color: var(--p1-color)">${p1Name} של ${chart1.name}</strong> ↔ <strong style="color: var(--p2-color)">${p2Name} של ${chart2.name}</strong>`
-                            : `<strong style="color: var(--p1-color)">${chart1.name}'s ${p1Name}</strong> ↔ <strong style="color: var(--p2-color)">${chart2.name}'s ${p2Name}</strong>`;
+                            ? `<strong style="color: var(--p1-color)">${p1Name} של ${c1.name}</strong> ↔ <strong style="color: var(--p2-color)">${p2Name} של ${c2.name}</strong>`
+                            : `<strong style="color: var(--p1-color)">${c1.name}'s ${p1Name}</strong> ↔ <strong style="color: var(--p2-color)">${c2.name}'s ${p2Name}</strong>`;
                         const orbBadge = isHe ? `סטייה (Orb): ${asp.orb}°` : `Orb ${asp.orb}°`;
 
                         showTooltip(e, `
@@ -1098,7 +1148,7 @@
                     layer.appendChild(line);
                 });
             } else {
-                const chart = mode === 'natal1' ? chart1 : chart2;
+                const chart = mode === 'natal1' ? c1 : c2;
                 chart.natal_aspects.forEach((asp) => {
                     if (activeAspectFilter !== 'all' && asp.aspect !== activeAspectFilter) {
                         return;
@@ -1171,17 +1221,20 @@
             subtitle.setAttribute('text-anchor', 'middle');
 
             const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const syn = getActiveSynastry();
 
             if (mode === 'synastry') {
-                title.textContent = isHe ? `${synastry.overall_score}% ${window.t ? window.t('matchLabel') : 'התאמה'}` : `${synastry.overall_score}% MATCH`;
+                title.textContent = isHe ? `${syn.overall_score}% ${window.t ? window.t('matchLabel') : 'התאמה'}` : `${syn.overall_score}% MATCH`;
                 subtitle.textContent = isHe ? (window.t ? window.t('synastryLabel') : 'סינסטריה') : 'SYNASTRY';
             } else if (mode === 'natal1') {
-                title.textContent = chart1.name.toUpperCase();
-                const signTranslated = window.tZodiac ? window.tZodiac(chart1.sun_sign) : chart1.sun_sign;
+                title.textContent = c1.name.toUpperCase();
+                const signTranslated = window.tZodiac ? window.tZodiac(c1.sun_sign) : c1.sun_sign;
                 subtitle.textContent = `☉ ${signTranslated}`;
             } else {
-                title.textContent = chart2.name.toUpperCase();
-                const signTranslated = window.tZodiac ? window.tZodiac(chart2.sun_sign) : chart2.sun_sign;
+                title.textContent = c2.name.toUpperCase();
+                const signTranslated = window.tZodiac ? window.tZodiac(c2.sun_sign) : c2.sun_sign;
                 subtitle.textContent = `☉ ${signTranslated}`;
             }
 
@@ -1191,9 +1244,11 @@
 
         // Refresh entire Wheel
         function redrawWheel() {
-            const activeAsc = currentMode === 'synastry' ? chart1.asc : (currentMode === 'natal1' ? chart1.asc : chart2.asc);
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const activeAsc = currentMode === 'synastry' ? c1.asc : (currentMode === 'natal1' ? c1.asc : c2.asc);
             renderZodiacRing(activeAsc);
-            renderHouseCusps(currentMode === 'natal2' ? chart2 : chart1);
+            renderHouseCusps(currentMode === 'natal2' ? c2 : c1);
             renderAspects(currentMode);
             renderPlanets(currentMode);
             renderCenterInfo(currentMode);
@@ -1204,6 +1259,9 @@
         function renderDataTables(mode) {
             const gridContainer = document.getElementById('aspectGridContainer');
             const tableContainer = document.getElementById('planetTableContainer');
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const syn = getActiveSynastry();
             
             const formatPos = (p) => {
                 if (!p || !p.formatted) return '-';
@@ -1224,7 +1282,7 @@
             };
             
             // 1. Planetary Data Table
-            const chart = mode === 'synastry' ? null : (mode === 'natal1' ? chart1 : chart2);
+            const chart = mode === 'synastry' ? null : (mode === 'natal1' ? c1 : c2);
             let htmlTable = '';
             
             if (chart) {
@@ -1255,14 +1313,14 @@
                     <thead>
                         <tr>
                             <th>Body</th>
-                            <th style="color: var(--p1-color)">${chart1.name}</th>
-                            <th style="color: var(--p2-color)">${chart2.name}</th>
+                            <th style="color: var(--p1-color)">${c1.name}</th>
+                            <th style="color: var(--p2-color)">${c2.name}</th>
                         </tr>
                     </thead>
                     <tbody>`;
                 const names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Ascendant', 'Midheaven'];
-                const p1Dict = {...chart1.planets_dict, 'Ascendant': chart1.asc_point, 'Midheaven': chart1.mc_point};
-                const p2Dict = {...chart2.planets_dict, 'Ascendant': chart2.asc_point, 'Midheaven': chart2.mc_point};
+                const p1Dict = {...c1.planets_dict, 'Ascendant': c1.asc_point, 'Midheaven': c1.mc_point};
+                const p2Dict = {...c2.planets_dict, 'Ascendant': c2.asc_point, 'Midheaven': c2.mc_point};
                 
                 names.forEach(n => {
                     const p1 = p1Dict[n];
@@ -1298,21 +1356,21 @@
 
             if (mode === 'synastry') {
                 // Synastry Grid: P1 on Y-axis, P2 on X-axis
-                const pts1 = [...chart1.planets, chart1.asc_point].map(p => p.name);
-                const pts2 = [...chart2.planets, chart2.asc_point].map(p => p.name);
+                const pts1 = [...c1.planets, c1.asc_point].map(p => p.name);
+                const pts2 = [...c2.planets, c2.asc_point].map(p => p.name);
                 
-                synastry.aspects.forEach(asp => {
+                syn.aspects.forEach(asp => {
                     aspectLookup[`${asp.p1_planet}-${asp.p2_planet}`] = asp;
                 });
                 
                 htmlGrid += '<thead><tr><th></th>';
                 pts2.forEach(p2 => {
-                    htmlGrid += `<th style="color: var(--p2-color)">${getSym(chart2, p2)}</th>`;
+                    htmlGrid += `<th style="color: var(--p2-color)">${getSym(c2, p2)}</th>`;
                 });
                 htmlGrid += '</tr></thead><tbody>';
                 
                 pts1.forEach(p1 => {
-                    htmlGrid += `<tr><th style="color: var(--p1-color)">${getSym(chart1, p1)}</th>`;
+                    htmlGrid += `<tr><th style="color: var(--p1-color)">${getSym(c1, p1)}</th>`;
                     pts2.forEach(p2 => {
                         const key = `${p1}-${p2}`;
                         const asp = aspectLookup[key];
@@ -1330,7 +1388,7 @@
                 
             } else {
                 // Natal Grid (Triangular)
-                const c = mode === 'natal1' ? chart1 : chart2;
+                const c = mode === 'natal1' ? c1 : c2;
                 const pts = [...c.planets, c.asc_point].map(p => p.name);
                 
                 c.natal_aspects.forEach(asp => {
@@ -1366,6 +1424,197 @@
             }
             
             gridContainer.innerHTML = htmlGrid;
+        }
+
+        // Coordinate Switcher Handler
+        function setCoordinateSystem(sys) {
+            if (sys !== 'tropical' && sys !== 'j2000') return;
+            currentCoordSystem = sys;
+
+            // 1. Update toggle buttons UI
+            const btnTrop = document.getElementById('btn-coord-tropical');
+            const btnJ2000 = document.getElementById('btn-coord-j2000');
+            if (btnTrop && btnJ2000) {
+                if (sys === 'tropical') {
+                    btnTrop.className = 'btn btn-sm btn-warning fw-semibold px-2 py-1';
+                    btnJ2000.className = 'btn btn-sm btn-outline-warning px-2 py-1';
+                } else {
+                    btnTrop.className = 'btn btn-sm btn-outline-warning px-2 py-1';
+                    btnJ2000.className = 'btn btn-sm btn-warning fw-semibold px-2 py-1';
+                }
+            }
+
+            // 2. Update badge on Planetary Data table
+            const badge = document.getElementById('activeCoordBadge');
+            if (badge) {
+                const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                if (sys === 'tropical') {
+                    badge.textContent = isHe ? 'טרופי (Astro.com)' : 'Tropical (Astro.com)';
+                    badge.title = isHe ? 'אסטרולוגיה מערבית סטנדרטית (נקודת שוויון לתאריך)' : 'Standard Western Astrology (Apparent Ecliptic of Date)';
+                } else {
+                    badge.textContent = isHe ? 'J2000 (אסטרומטרי)' : 'J2000 (Astrometric)';
+                    badge.title = isHe ? 'נקודת ייחוס אסטרונומית קבועה J2000.0' : 'IAU Standard Epoch J2000.0';
+                }
+            }
+
+            // 3. Update Partner Big Three Cards at the top
+            updatePartnerCards(sys);
+
+            // 4. Update Synastry Score Circle, Rating, and Bars
+            updateScores(sys);
+
+            // 5. Re-render the Aspect Cards list
+            renderAspectCardsList(getActiveSynastry().aspects);
+
+            // 6. Redraw Wheel, Data Table, and Aspect Grid
+            redrawWheel();
+        }
+        window.setCoordinateSystem = setCoordinateSystem;
+
+        function updatePartnerCards(sys) {
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+
+            const updateCard = (partnerId, chartObj) => {
+                const bodies = ['Sun', 'Moon', 'Ascendant', 'Venus', 'Mars'];
+                bodies.forEach(b => {
+                    const el = document.querySelector(`.planet-pos[data-partner="${partnerId}"][data-body="${b}"]`);
+                    if (!el) return;
+                    const pt = (b === 'Ascendant') ? chartObj.asc_point : chartObj.planets_dict[b];
+                    if (pt) {
+                        el.setAttribute('data-sign', pt.sign);
+                        el.setAttribute('data-symbol', pt.symbol || pt.sign_symbol);
+                        el.setAttribute('data-deg', pt.deg !== undefined ? pt.deg : pt.sign_deg);
+                        el.setAttribute('data-min', pt.min !== undefined ? pt.min : pt.sign_min);
+                        el.setAttribute('data-formatted', pt.formatted);
+                        
+                        const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                        const translatedSign = window.tZodiac ? window.tZodiac(pt.sign) : pt.sign;
+                        const deg = pt.deg !== undefined ? pt.deg : pt.sign_deg;
+                        const min = pt.min !== undefined ? pt.min : pt.sign_min;
+                        const sym = pt.sign_symbol || pt.symbol;
+                        
+                        if (isHe) {
+                            el.innerHTML = `${translatedSign} <span style="color: ${pt.sign_color || '#fff'}">${sym}</span> <span dir="ltr" style="display:inline-block;">${deg}° ${min.toString().padStart(2, '0')}'</span>`;
+                        } else {
+                            el.innerHTML = `<span dir="ltr" style="display:inline-block;">${deg}° ${min.toString().padStart(2, '0')}'</span> <span style="color: ${pt.sign_color || '#fff'}">${sym}</span> ${translatedSign}`;
+                        }
+                    }
+                });
+            };
+
+            updateCard('p1', c1);
+            updateCard('p2', c2);
+        }
+
+        function updateScores(sys) {
+            const syn = getActiveSynastry();
+            if (!syn) return;
+            
+            // Score circle
+            const scoreCircle = document.querySelector('.score-circle');
+            if (scoreCircle) {
+                scoreCircle.style.setProperty('--score-pct', syn.overall_score);
+            }
+            const scoreNum = document.querySelector('.score-circle-inner .cinzel.h2');
+            if (scoreNum) {
+                scoreNum.textContent = syn.overall_score;
+            }
+
+            // Aspect count badge
+            const aspectCountBadge = document.querySelector('.cinzel.text-uppercase + .badge');
+            if (aspectCountBadge) {
+                const countText = `${syn.aspects.length} ${window.t ? window.t('aspectsCount') : 'Aspects'}`;
+                aspectCountBadge.textContent = countText;
+            }
+
+            // Metric bars
+            const bars = [
+                { selector: '.metric-bar-fill[style*="#f43f5e"]', score: syn.chemistry_score },
+                { selector: '.metric-bar-fill[style*="#818cf8"]', score: syn.emotional_score },
+                { selector: '.metric-bar-fill[style*="#38bdf8"]', score: syn.intellectual_score },
+                { selector: '.metric-bar-fill[style*="#10b981"]', score: syn.stability_score },
+            ];
+            bars.forEach(b => {
+                const el = document.querySelector(b.selector);
+                if (el) el.style.width = `${b.score}%`;
+                const container = el ? el.closest('.mb-2, div') : null;
+                const textEl = container ? container.querySelector('.text-white') : null;
+                if (textEl) textEl.textContent = `${b.score}%`;
+            });
+
+            // Verdict
+            const verdictEl = document.getElementById('synastryVerdictText');
+            if (verdictEl) {
+                verdictEl.setAttribute('data-verdict-key', syn.verdict_key);
+                verdictEl.setAttribute('data-default-verdict', syn.verdict);
+                const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+                if (isHe && window.tVerdict) {
+                    verdictEl.textContent = window.tVerdict(syn.verdict_key) || syn.verdict;
+                } else {
+                    verdictEl.textContent = syn.verdict;
+                }
+            }
+        }
+
+        function renderAspectCardsList(aspects) {
+            const container = document.getElementById('aspectCardsContainer');
+            if (!container || !aspects) return;
+            const c1 = getActiveChart(chart1);
+            const c2 = getActiveChart(chart2);
+            const isHe = (window.getCurrentLang && window.getCurrentLang() === 'he');
+
+            let html = '';
+            aspects.forEach(item => {
+                const p1Planet = window.tPlanet ? window.tPlanet(item.p1_planet) : item.p1_planet;
+                const p2Planet = window.tPlanet ? window.tPlanet(item.p2_planet) : item.p2_planet;
+                const aspName = window.tAspect ? window.tAspect(item.aspect) : item.aspect;
+                const meaning = window.tAspectMeaning ? window.tAspectMeaning(item) : item.meaning;
+                const natureText = item.nature === 'harmonious' 
+                    ? (isHe ? '● זרימה הרמונית' : '● Harmonious Flow')
+                    : (isHe ? '● זרז דינמי' : '● Dynamic Catalyst');
+                const natureClass = item.nature === 'harmonious' ? 'text-success' : 'text-danger';
+
+                html += `
+                <div class="col-lg-6 aspect-card-col" data-nature="${item.nature}" data-aspect="${item.aspect}">
+                    <div class="aspect-item-card ${item.aspect} h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2 aspect-pair-header" 
+                                     data-p1-name="${c1.name}" data-p1-planet="${item.p1_planet}" data-p1-sym="${item.p1_symbol}"
+                                     data-p2-name="${c2.name}" data-p2-planet="${item.p2_planet}" data-p2-sym="${item.p2_symbol}">
+                                    <span class="fw-bold" style="color: var(--p1-color)">${c1.name} ${item.p1_symbol} ${p1Planet}</span>
+                                    <span class="text-secondary">✕</span>
+                                    <span class="fw-bold" style="color: var(--p2-color)">${c2.name} ${item.p2_symbol} ${p2Planet}</span>
+                                </div>
+                                <span class="badge aspect-badge-name" data-aspect="${item.aspect}" data-angle="${item.angle}" style="background: rgba(255,255,255,0.08); color: ${item.color}; border: 1px solid ${item.color}66;">
+                                    ${aspName} (${item.angle}°)
+                                </span>
+                            </div>
+
+                            <p class="text-light text-opacity-90 mb-2 aspect-meaning-text" 
+                               data-aspect-key="${item.aspect_key}" 
+                               data-p1-planet="${item.p1_planet}" 
+                               data-p2-planet="${item.p2_planet}" 
+                               data-aspect="${item.aspect}" 
+                               data-default-meaning="${item.meaning}" 
+                               style="font-size: 0.88rem; line-height: 1.5;">
+                                ${meaning}
+                            </p>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-10 text-muted" style="font-size: 0.75rem;">
+                            <span class="aspect-orb-text" data-orb="${item.orb}" data-tightness="${Math.round(item.tightness * 100)}">
+                                ${isHe ? 'סטייה' : 'Orb'}: <strong class="text-white">${item.orb}°</strong> (${isHe ? 'דיוק' : 'Tightness'}: ${Math.round(item.tightness * 100)}%)
+                            </span>
+                            <span class="aspect-nature-tag" data-nature="${item.nature}">
+                                <span class="${natureClass}">${natureText}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
         }
 
         // Mode Switching
@@ -1539,7 +1788,7 @@
                     city: chart2.city,
                     tz: chart2.tz
                 },
-                notes: `Compatibility Score: ${synastry.overall_score}% (${synastry.aspects.length} aspects)`
+                notes: `Compatibility Score: ${getActiveSynastry().overall_score}% (${getActiveSynastry().aspects.length} aspects) [${currentCoordSystem}]`
             };
 
             try {
@@ -1566,9 +1815,9 @@
         // Redraw wheel and refresh mode label when language toggles
         window.addEventListener('languageChanged', (e) => {
             const lang = e.detail && e.detail.lang ? e.detail.lang : (window.getCurrentLang ? window.getCurrentLang() : 'en');
+            const isHe = lang === 'he';
             const label = document.getElementById('currentModeLabel');
             if (label) {
-                const isHe = lang === 'he';
                 if (currentMode === 'synastry') {
                     label.textContent = isHe
                         ? `גלגל סינסטריה כפול (פנימי: ${chart1.name} / חיצוני: ${chart2.name})`
@@ -1579,6 +1828,21 @@
                     label.textContent = isHe ? `מפת לידה: ${chart2.name}` : `${chart2.name} - Natal Chart Map`;
                 }
             }
+
+            // Update coordinate badge translation
+            const badge = document.getElementById('activeCoordBadge');
+            if (badge) {
+                if (currentCoordSystem === 'tropical') {
+                    badge.textContent = isHe ? 'טרופי (Astro.com)' : 'Tropical (Astro.com)';
+                    badge.title = isHe ? 'אסטרולוגיה מערבית סטנדרטית (נקודת שוויון לתאריך)' : 'Standard Western Astrology (Apparent Ecliptic of Date)';
+                } else {
+                    badge.textContent = isHe ? 'J2000 (אסטרומטרי)' : 'J2000 (Astrometric)';
+                    badge.title = isHe ? 'נקודת ייחוס אסטרונומית קבועה J2000.0' : 'IAU Standard Epoch J2000.0';
+                }
+            }
+
+            updatePartnerCards(currentCoordSystem);
+            updateScores(currentCoordSystem);
             redrawWheel();
         });
     </script>
@@ -1632,6 +1896,9 @@
                                 <div>
                                     <label class="form-label small" data-i18n="tzLabel">UTC Timezone</label>
                                     <input type="text" id="modal_p1_tz" name="p1_tz" class="form-control form-control-sm" value="{{ p1.tz }}" required>
+                                    <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">
+                                        ℹ️ <span data-i18n="tzStandardNotice">Enter standard time / GMT offset for your location without daylight saving (DST)</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1673,6 +1940,9 @@
                                 <div>
                                     <label class="form-label small" data-i18n="tzLabel">UTC Timezone</label>
                                     <input type="text" id="modal_p2_tz" name="p2_tz" class="form-control form-control-sm" value="{{ p2.tz }}" required>
+                                    <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">
+                                        ℹ️ <span data-i18n="tzStandardNotice">Enter standard time / GMT offset for your location without daylight saving (DST)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

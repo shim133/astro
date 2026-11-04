@@ -11,7 +11,7 @@ import uuid
 
 app = Flask(__name__)
 
-APP_VERSION = "2.4.0"
+APP_VERSION = "2.4.1"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -225,12 +225,12 @@ def format_zodiac(lon_deg):
         "raw": float(norm_deg)
     }
 
-def calculate_angles_and_houses(t, lat, lon):
+def calculate_angles_and_houses(t, lat, lon, coord_system='tropical'):
     """
     Calculate Ascendant, Midheaven (MC), Descendant, Imum Coeli (IC),
-    and 12 Equal House Cusps.
+    and 12 Equal House Cusps. Supports 'tropical' (GAST) and 'j2000' (GMST).
     """
-    gast_hours = t.gast
+    gast_hours = t.gast if coord_system == 'tropical' else t.gmst
     lst_hours = (gast_hours + lon / 15.0) % 24
     ramc_deg = (lst_hours * 15.0) % 360
     eps_rad = np.radians(23.4392911) # Obliquity of Ecliptic
@@ -312,59 +312,25 @@ def get_house_for_lon(lon_deg, cusps_list):
                 return i + 1
     return 1
 
-def compute_chart(name, date_str, time_str, tz_str, city_str):
-    """Calculates all planetary coordinates, angles, houses, and natal aspects."""
-    # Resolve City Coordinates (Curated DB first, then live OpenStreetMap/Nominatim fallback)
-    matched_city = find_city_in_db(city_str)
-    if matched_city:
-        lat, lon = matched_city['lat'], matched_city['lon']
-        address = matched_city['display']
-        source = "Curated Database"
-    else:
-        location = geolocator.geocode(city_str)
-        if not location:
-            raise ValueError(f"Could not locate '{city_str}' on OpenStreetMap or local database. Please check spelling or specify country (e.g., 'Kiryat Gat, Israel').")
-        lat, lon = location.latitude, location.longitude
-        address = location.address
-        source = "OpenStreetMap"
-    
-    # Parse date and time
-    dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-    
-    # Parse timezone offset e.g. +02:00, -05:00, +2, -5
-    try:
-        tz_clean = tz_str.strip()
-        sign = 1 if tz_clean[0] != '-' else -1
-        core = tz_clean.lstrip('+-')
-        if ':' in core:
-            parts = core.split(':')
-            h = int(parts[0])
-            m = int(parts[1])
-        else:
-            h = int(core)
-            m = 0
-        total_offset = sign * (h + m / 60.0)
-    except Exception:
-        total_offset = 0.0
-        
-    ts = load.timescale()
-    t = ts.utc(dt.year, dt.month, dt.day, dt.hour - total_offset, dt.minute)
-    
-    # Calculate celestial angles & houses
-    angles = calculate_angles_and_houses(t, lat, lon)
+def _calculate_chart_system(t, lat, lon, coord_system='tropical'):
+    """Compute angles, houses, planets, and natal aspects for a specific coordinate system."""
+    angles = calculate_angles_and_houses(t, lat, lon, coord_system=coord_system)
     asc_deg = angles["asc"]
     cusps_deg_list = [h["cusp"] for h in angles["houses"]]
     
-    # Calculate all planets
     planets_list = []
     planets_dict = {}
     
     for p_name, p_info in PLANETS_CONFIG.items():
         p_obj = eph[p_info['target']]
-        apparent = earth.at(t).observe(p_obj).apparent()
-        _, lon_ecl, _ = apparent.ecliptic_latlon('date')
+        if coord_system == 'tropical':
+            apparent = earth.at(t).observe(p_obj).apparent()
+            _, lon_ecl, _ = apparent.ecliptic_latlon('date')
+        else: # 'j2000'
+            astrometric = earth.at(t).observe(p_obj)
+            _, lon_ecl, _ = astrometric.ecliptic_latlon()
+            
         deg = float(lon_ecl.degrees % 360)
-        
         zodiac = format_zodiac(deg)
         house_num = get_house_for_lon(deg, cusps_deg_list)
         
@@ -453,15 +419,7 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
                     break
 
     return {
-        "name": name,
-        "date": date_str,
-        "time": time_str,
-        "tz": tz_str,
-        "city": city_str,
-        "location_address": address,
-        "location_source": source,
-        "lat": round(lat, 4),
-        "lon": round(lon, 4),
+        "system": coord_system,
         "asc": round(asc_deg, 2),
         "mc": round(angles["mc"], 2),
         "dsc": round(angles["dsc"], 2),
@@ -478,13 +436,73 @@ def compute_chart(name, date_str, time_str, tz_str, city_str):
         "asc_sign": asc_zodiac["sign"],
     }
 
-def calculate_synastry(c1, c2):
-    """Calculates all inter-chart aspects, compatibility score breakdown, and interpretations."""
+def compute_chart(name, date_str, time_str, tz_str, city_str):
+    """Calculates all planetary coordinates, angles, houses, and natal aspects."""
+    # Resolve City Coordinates (Curated DB first, then live OpenStreetMap/Nominatim fallback)
+    matched_city = find_city_in_db(city_str)
+    if matched_city:
+        lat, lon = matched_city['lat'], matched_city['lon']
+        address = matched_city['display']
+        source = "Curated Database"
+    else:
+        location = geolocator.geocode(city_str)
+        if not location:
+            raise ValueError(f"Could not locate '{city_str}' on OpenStreetMap or local database. Please check spelling or specify country (e.g., 'Kiryat Gat, Israel').")
+        lat, lon = location.latitude, location.longitude
+        address = location.address
+        source = "OpenStreetMap"
+    
+    # Parse date and time
+    dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+    
+    # Parse timezone offset e.g. +02:00, -05:00, +2, -5
+    try:
+        tz_clean = tz_str.strip()
+        sign = 1 if tz_clean[0] != '-' else -1
+        core = tz_clean.lstrip('+-')
+        if ':' in core:
+            parts = core.split(':')
+            h = int(parts[0])
+            m = int(parts[1])
+        else:
+            h = int(core)
+            m = 0
+        total_offset = sign * (h + m / 60.0)
+    except Exception:
+        total_offset = 0.0
+        
+    ts = load.timescale()
+    t = ts.utc(dt.year, dt.month, dt.day, dt.hour - total_offset, dt.minute)
+    
+    # Compute both Tropical (Date / Astro.com) and J2000 (Astrometric) systems
+    trop_data = _calculate_chart_system(t, lat, lon, coord_system='tropical')
+    j2000_data = _calculate_chart_system(t, lat, lon, coord_system='j2000')
+
+    return {
+        "name": name,
+        "date": date_str,
+        "time": time_str,
+        "tz": tz_str,
+        "city": city_str,
+        "location_address": address,
+        "location_source": source,
+        "lat": round(lat, 4),
+        "lon": round(lon, 4),
+        "systems": {
+            "tropical": trop_data,
+            "j2000": j2000_data
+        },
+        # Default top-level properties to tropical for backwards compatibility
+        **trop_data
+    }
+
+def _calculate_synastry_single(c1_sys, c2_sys):
+    """Calculates inter-chart aspects, compatibility score breakdown, and interpretations for one system."""
     aspects = []
     
     # Points to compare
-    pts1 = c1["planets"] + [c1["asc_point"]]
-    pts2 = c2["planets"] + [c2["asc_point"]]
+    pts1 = c1_sys["planets"] + [c1_sys["asc_point"]]
+    pts2 = c2_sys["planets"] + [c2_sys["asc_point"]]
     
     raw_score = 0.0
     category_scores = {
@@ -595,6 +613,25 @@ def calculate_synastry(c1, c2):
         "raw_points": round(raw_score, 1)
     }
 
+def calculate_synastry(c1, c2):
+    """Calculates all inter-chart aspects and scores for both Tropical and J2000 systems."""
+    c1_trop = c1.get("systems", {}).get("tropical", c1)
+    c2_trop = c2.get("systems", {}).get("tropical", c2)
+    c1_j2000 = c1.get("systems", {}).get("j2000", c1)
+    c2_j2000 = c2.get("systems", {}).get("j2000", c2)
+
+    syn_tropical = _calculate_synastry_single(c1_trop, c2_trop)
+    syn_j2000 = _calculate_synastry_single(c1_j2000, c2_j2000)
+
+    return {
+        "systems": {
+            "tropical": syn_tropical,
+            "j2000": syn_j2000
+        },
+        # Default top-level fields to tropical for backwards compatibility
+        **syn_tropical
+    }
+
 # --- ROUTES ---
 @app.route('/', methods=['GET'])
 def index():
@@ -683,13 +720,10 @@ def api_geocode():
             lat = round(loc.latitude, 4)
             lon = round(loc.longitude, 4)
             
-            # Smart timezone estimation
-            if "ישראל" in addr or "Israel" in addr or (29.5 <= lat <= 33.5 and 34.0 <= lon <= 36.0):
-                tz_est = "+03:00"
-            else:
-                raw_offset = round(lon / 15.0)
-                sign = "+" if raw_offset >= 0 else "-"
-                tz_est = f"{sign}{abs(int(raw_offset)):02d}:00"
+            # Geographic standard GMT offset without daylight saving (15 degrees per timezone hour)
+            raw_offset = round(lon / 15.0)
+            sign = "+" if raw_offset >= 0 else "-"
+            tz_est = f"{sign}{abs(int(raw_offset)):02d}:00"
                 
             return jsonify({
                 "found": True,

@@ -5,6 +5,21 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2026-09-06
+
+### Added
+- **Dual Coordinate Systems Support (Tropical & J2000)**:
+  - Added support for both **Tropical (Apparent Ecliptic of Date / Astro.com)** and **J2000 (Astrometric / Epoch J2000.0)** coordinate frameworks.
+  - Interactive UI toggle button (`🌐 Tropical (Astro.com)` / `🔭 J2000 (Astrometric)`) in chart controls and data table header.
+  - Dynamic client-side switching that instantly updates the SVG chart wheel, planetary degree glyphs, unequal house cusps, angular axes, aspect chords, data tables, aspect grid, compatibility score circle, and aspect interpretation cards.
+  - Tropical coordinates use true ecliptic of date accounting for equinox precession, nutation, and light-time corrections, matching Astro.com and professional Swiss Ephemeris calculations to the exact arcminute.
+  - Bilingual localization support (Hebrew & English) for coordinate system labels, descriptions, and tooltips.
+- **Universal Standard Time (Non-DST) Notice & Consistency**:
+  - Clarified and standardized time input across forms: times are entered in the location's standard astronomical GMT offset without daylight saving time (DST).
+  - Added bilingual guidance notices (`tzStandardNotice`) on all timezone input fields and profile edit modals in both Hebrew and English.
+  - Normalized all reference cities worldwide to standard non-DST offsets (e.g., standard GMT+2 for 30°-45°E, GMT-5 for NYC, GMT+0 for LON, GMT+1 for PAR).
+  - Universal longitude-based geographic GMT offset estimation (`round(lon / 15.0)`) without any country-specific hardcoding.
+
 ## [2.4.0] - 2026-09-06
 
 ### Added

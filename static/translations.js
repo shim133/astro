@@ -31,6 +31,7 @@ export const TRANSLATIONS = {
     cityHelp: 'הזן עיר, יישוב או מושב בארץ ובעולם. נבדק בזמן אמת מול OpenStreetMap ומאגר המקומות המקומי.',
     tzLabel: 'אזור זמן (UTC)',
     tzAuto: 'מתעדכן אוטומטית לפי העיר',
+    tzStandardNotice: 'יש להזין שעה באזור הזמן הסטנדרטי (GMT) ללא שעון קיץ (למשל: שעון חורף סטנדרטי)',
 
     // Actions & Buttons
     calcBtn: '🔮 חשב סינסטריה וצייר מפות אסטרולוגיות',
@@ -138,6 +139,13 @@ export const TRANSLATIONS = {
 
     // Chart Controls & Filters
     wheelControls: 'מצב גלגל:',
+    coordSystem: 'מערכת קואורדינטות:',
+    coordTropical: 'טרופי (Astro.com)',
+    coordJ2000: 'J2000 (אסטרומטרי)',
+    coordDescTropical: 'אסטרולוגיה מערבית סטנדרטית (נקודת שוויון לתאריך) · תואם Astro.com',
+    coordDescJ2000: 'נקודת ייחוס אסטרונומית קבועה J2000.0 (אקליפטיקה אסטרומטרית)',
+    planetTableTitle: 'נתוני כוכבים ומעלות',
+    aspectGridTitle: 'לוח היבטים (Matrix)',
     aspectFilters: 'סינון היבטים:',
     showAspectLines: 'הצג קווי היבטים',
     equalHouses: 'בתים שווים',
@@ -300,6 +308,7 @@ export const TRANSLATIONS = {
     cityHelp: 'Enter any city, town, or village worldwide. Checked live against OpenStreetMap and curated coordinates.',
     tzLabel: 'UTC Timezone Offset',
     tzAuto: 'Auto-set from city',
+    tzStandardNotice: 'Enter standard time / GMT offset for your location without daylight saving (DST)',
 
     // Actions & Buttons
     calcBtn: '🔮 Calculate Synastry & Draw Astrological Maps',
@@ -407,6 +416,13 @@ export const TRANSLATIONS = {
 
     // Chart Controls & Filters
     wheelControls: 'Wheel Mode:',
+    coordSystem: 'Coordinates:',
+    coordTropical: 'Tropical (Astro.com)',
+    coordJ2000: 'J2000 (Astrometric)',
+    coordDescTropical: 'Standard Western Astrology (Apparent Ecliptic of Date) · Matches Astro.com',
+    coordDescJ2000: 'IAU Standard Epoch J2000.0 (Astrometric Ecliptic)',
+    planetTableTitle: 'Planetary Data',
+    aspectGridTitle: 'Aspect Grid',
     aspectFilters: 'Aspect Filters:',
     showAspectLines: 'Show Aspect Lines',
     equalHouses: 'Equal Houses',

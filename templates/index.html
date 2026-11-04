@@ -396,13 +396,16 @@
                                 <span data-i18n="tzLabel">UTC Timezone Offset</span>
                                 <span class="text-muted" style="font-size: 0.75rem;" data-i18n="tzAuto">Auto-set from city</span>
                             </label>
-                            <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+03:00" required oninput="checkPersonSavedState('p1')">
+                            <input type="text" id="p1_tz" name="p1_tz" class="form-control" placeholder="+02:00" required oninput="checkPersonSavedState('p1')">
                             <div class="tz-pills mt-1">
-                                <button type="button" onclick="setTZ('p1_tz', '+03:00'); checkPersonSavedState('p1');">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p1_tz', '+02:00'); checkPersonSavedState('p1');">TLV (+2)</button>
                                 <button type="button" onclick="setTZ('p1_tz', '-05:00'); checkPersonSavedState('p1');">NYC (-5)</button>
                                 <button type="button" onclick="setTZ('p1_tz', '+00:00'); checkPersonSavedState('p1');">LON (+0)</button>
                                 <button type="button" onclick="setTZ('p1_tz', '+01:00'); checkPersonSavedState('p1');">PAR (+1)</button>
                                 <button type="button" onclick="setTZ('p1_tz', '-08:00'); checkPersonSavedState('p1');">LAX (-8)</button>
+                            </div>
+                            <div class="small text-white-50 mt-1" style="font-size: 0.74rem;">
+                                ℹ️ <span data-i18n="tzStandardNotice">Enter standard time / GMT offset for your location without daylight saving (DST)</span>
                             </div>
                         </div>
                     </div>
@@ -469,11 +472,14 @@
                             </label>
                             <input type="text" id="p2_tz" name="p2_tz" class="form-control" placeholder="-05:00" required oninput="checkPersonSavedState('p2')">
                             <div class="tz-pills mt-1">
-                                <button type="button" onclick="setTZ('p2_tz', '+03:00'); checkPersonSavedState('p2');">TLV (+3)</button>
+                                <button type="button" onclick="setTZ('p2_tz', '+02:00'); checkPersonSavedState('p2');">TLV (+2)</button>
                                 <button type="button" onclick="setTZ('p2_tz', '-05:00'); checkPersonSavedState('p2');">NYC (-5)</button>
                                 <button type="button" onclick="setTZ('p2_tz', '+00:00'); checkPersonSavedState('p2');">LON (+0)</button>
                                 <button type="button" onclick="setTZ('p2_tz', '+01:00'); checkPersonSavedState('p2');">PAR (+1)</button>
                                 <button type="button" onclick="setTZ('p2_tz', '-08:00'); checkPersonSavedState('p2');">LAX (-8)</button>
+                            </div>
+                            <div class="small text-white-50 mt-1" style="font-size: 0.74rem;">
+                                ℹ️ <span data-i18n="tzStandardNotice">Enter standard time / GMT offset for your location without daylight saving (DST)</span>
                             </div>
                         </div>
                     </div>

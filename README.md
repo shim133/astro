@@ -1,4 +1,4 @@
-# AstroMatch Pro (v2.4.0)
+# AstroMatch Pro (v2.4.1)
 
 Professional-grade Astrological Compatibility (Synastry) & Interactive Celestial Maps web application.
 
@@ -8,7 +8,13 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
 
 ## Key Features
 
-- **Professional Astrological Charts (New in v2.4.0)**:
+- **Dual Coordinate Systems with Interactive Toggle (New in v2.4.1)**:
+  - **Tropical (Date / Astro.com)**: Western astrology standard based on the apparent ecliptic of date, accounting for equinox precession, nutation, and light-time corrections. Matches Astro.com and Swiss Ephemeris calculations to the exact arcminute.
+  - **J2000 (Astrometric)**: Modern astrophysical coordinate system fixed to the standard epoch J2000.0 without date precession.
+  - **Instant UI Switch Button**: Toggle seamlessly between `🌐 Tropical (Astro.com)` and `🔭 J2000 (Astrometric)` on the chart toolbar and data tables without page reloads.
+  - All visual elements (SVG chart wheel, planetary degree glyphs, house cusps, aspect grid, compatibility scores, and aspect catalog) dynamically update in real time.
+
+- **Professional Astrological Charts (v2.4.0)**:
   - **Porphyry Unequal Houses**: Transitioned from equal houses to precise Porphyry unequal houses with dynamic visual SVG sectors and centered Roman numerals.
   - **Exact Degrees on Wheel**: Explicitly rendered degree values (0-29°) next to each planetary glyph on the chart.
   - **Distinct Angular Axes**: Distinctly labeled ASC, IC, DSC, and MC with their exact calculated degrees on the SVG wheel.
@@ -31,8 +37,8 @@ AstroMatch Pro calculates the precise astronomical positions of planets for two 
   - User preference persisted across visits in `localStorage`.
 
 - **Version Tracking & Metadata Display**:
-  - Global `APP_VERSION = "2.4.0"` in `app.py`.
-  - All saved analyses and people profiles are stamped with the version number used (`"version": "2.4.0"`).
+  - Global `APP_VERSION = "2.4.1"` in `app.py`.
+  - All saved analyses and people profiles are stamped with the version number used (`"version": "2.4.1"`).
   - Saved cards display a version badge (e.g. `v2.3.0`).
   - Persistent application footer displayed below the program on all screens.
 
