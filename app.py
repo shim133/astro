@@ -19,7 +19,7 @@ from astro_expert import (
 
 app = Flask(__name__)
 
-APP_VERSION = "2.5.1"
+APP_VERSION = "2.5.2"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

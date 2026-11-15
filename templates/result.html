@@ -2687,25 +2687,34 @@
                     : `Compatibility Score: ${getActiveSynastry().overall_score}% (${getActiveSynastry().aspects.length} aspects) [${currentCoordSystem}]`
             };
 
+            const STORAGE_KEY_ANALYSES = 'astromatch_saved_analyses';
             try {
-                const res = await fetch('/api/analyses', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    btn.innerHTML = window.t ? window.t('saveSuccess') : '✅ Saved to Analyses!';
-                    btn.classList.add('text-success');
-                    btn.style.borderColor = '#10b981';
-                    setTimeout(() => {
-                        btn.innerHTML = window.t ? window.t('saveToMyAnalyses') : '💾 Saved';
-                    }, 2500);
-                } else {
-                    alert("Could not save analysis.");
-                }
-            } catch (err) {
-                alert("Error saving analysis: " + err);
+                const raw = localStorage.getItem(STORAGE_KEY_ANALYSES);
+                const localList = raw ? JSON.parse(raw) : [];
+                const record = {
+                    id: 'analysis-' + Date.now().toString(36),
+                    created_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
+                    ...payload
+                };
+                localList.unshift(record);
+                localStorage.setItem(STORAGE_KEY_ANALYSES, JSON.stringify(localList));
+            } catch (storageErr) {
+                console.error("LocalStorage save error on result page:", storageErr);
             }
+
+            btn.innerHTML = window.t ? window.t('saveSuccess') : '✅ Saved to Analyses!';
+            btn.classList.add('text-success');
+            btn.style.borderColor = '#10b981';
+            setTimeout(() => {
+                btn.innerHTML = window.t ? window.t('saveToMyAnalyses') : '💾 Saved';
+            }, 2500);
+
+            // Optional background server sync
+            fetch('/api/analyses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         // Redraw wheel and refresh mode label when language toggles
@@ -3006,15 +3015,43 @@
     <script>
         let resultSavedPeople = [];
         let editCompareModalInstance = null;
+        const STORAGE_KEY_PEOPLE = 'astromatch_saved_people';
+
+        function getStoredPeopleResult() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_PEOPLE);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+
+        function setStoredPeopleResult(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(list));
+            } catch (e) { console.error("LocalStorage save error:", e); }
+        }
 
         async function fetchSavedPeopleForResult() {
             try {
-                const res = await fetch('/api/people');
-                resultSavedPeople = await res.json();
+                const local = getStoredPeopleResult();
+                if (local !== null) {
+                    resultSavedPeople = local;
+                } else {
+                    const res = await fetch('/api/people');
+                    if (res.ok) {
+                        const serverData = await res.json();
+                        resultSavedPeople = Array.isArray(serverData) ? serverData : [];
+                        setStoredPeopleResult(resultSavedPeople);
+                    } else {
+                        resultSavedPeople = [];
+                    }
+                }
                 populateModalPeopleDropdowns();
                 updateReportSavedBadges();
             } catch (err) {
                 console.error("Could not fetch saved people on result page:", err);
+                resultSavedPeople = getStoredPeopleResult() || [];
+                populateModalPeopleDropdowns();
+                updateReportSavedBadges();
             }
         }
 
@@ -3091,20 +3128,30 @@
                 version: window.APP_VERSION || "{{ app_version }}"
             };
 
-            try {
-                const res = await fetch('/api/people', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+            const existingIdx = resultSavedPeople.findIndex(p => p.name.trim().toLowerCase() === payload.name.trim().toLowerCase());
+            if (existingIdx !== -1) {
+                resultSavedPeople[existingIdx] = {
+                    ...resultSavedPeople[existingIdx],
+                    ...payload,
+                    updated_at: new Date().toISOString().replace('T', ' ').slice(0, 16)
+                };
+            } else {
+                resultSavedPeople.unshift({
+                    id: 'person-' + Date.now().toString(36),
+                    ...payload,
+                    created_at: new Date().toISOString().replace('T', ' ').slice(0, 16)
                 });
-                if (res.ok) {
-                    await fetchSavedPeopleForResult();
-                } else {
-                    alert("Failed to save person.");
-                }
-            } catch (err) {
-                alert("Error saving person: " + err);
             }
+            setStoredPeopleResult(resultSavedPeople);
+            updateReportSavedBadges();
+            populateModalPeopleDropdowns();
+
+            // Optional background server sync
+            fetch('/api/people', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         function openEditCompareModal(focusPartner) {

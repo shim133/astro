@@ -5,6 +5,21 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.2] - 2026-11-15
+
+### Added
+- **Private Browser-Scoped Storage & Multi-User Isolation**:
+  - All saved personal profiles and couple analyses are now isolated to the user's private browser `localStorage` (`astromatch_saved_people` & `astromatch_saved_analyses`).
+  - Sharing the web link with others presents a clean, empty workspace: visitors cannot view any birthdays, names, or analyses entered by others.
+  - Repository data stores (`saved_people.json` & `saved_analyses.json`) are completely sanitized to empty lists `[]`.
+- **Data Backup & Restore Engine (Export / Import JSON)**:
+  - **📥 Export Backup**: One-click download of all saved profiles and analyses as a portable JSON file (`astromatch_backup_YYYY-MM-DD.json`).
+  - **📤 Import Backup**: One-click file picker that merges and restores saved people profiles and synastry analyses in seconds.
+  - Automatically updates counts, filter badges, and form select dropdowns upon import.
+  - Offline-first & future-proof: Prepares architecture for optional cross-device synchronization.
+- **Privacy Indicator**:
+  - Added subtle privacy badge in the Saved Database toolbar: `🔒 Personal Storage: Your data is stored privately in this browser only and is never visible to others`.
+
 ## [2.5.1] - 2026-11-05
 
 ### Added

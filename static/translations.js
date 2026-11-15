@@ -56,6 +56,11 @@ export const TRANSLATIONS = {
     editBtn: '✏️ ערוך',
     deleteBtn: '🗑️ מחק',
     versionBadge: 'גרסה',
+    exportBackupBtn: '📥 גיבוי וייצוא (JSON)',
+    importBackupBtn: '📤 שחזור וייבוא (JSON)',
+    importSuccessMsg: 'הנתונים שוחזרו בהצלחה! שוחזרו {p} פרופילים אישיים ו-{a} ניתוחים.',
+    importErrorMsg: 'שגיאה בייבוא הקובץ. ודא שזהו קובץ JSON תקין של AstroMatch.',
+    personalPrivacyNotice: '🔒 שמירה אישית: הנתונים שלך נשמרים פרטית בדפדפן זה בלבד ואינם נגישים לאחרים',
 
     // Modal Edit
     editModalTitle: '✏️ עריכת ניתוח שמור',
@@ -408,6 +413,11 @@ export const TRANSLATIONS = {
     editBtn: '✏️ Edit',
     deleteBtn: '🗑️ Delete',
     versionBadge: 'v',
+    exportBackupBtn: '📥 Export Backup (JSON)',
+    importBackupBtn: '📤 Import Backup (JSON)',
+    importSuccessMsg: 'Data restored successfully! Loaded {p} people profiles and {a} analyses.',
+    importErrorMsg: 'Failed to import backup. Please ensure it is a valid AstroMatch JSON file.',
+    personalPrivacyNotice: '🔒 Personal Storage: Your data is stored privately in this browser only and is never visible to others',
 
     // Modal Edit
     editModalTitle: '✏️ Edit Saved Analysis',

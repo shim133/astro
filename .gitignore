@@ -62,5 +62,9 @@ ehthumbs.db
 # Chat exports (html)
 chat_*.html
 
+# Personal backups and data dumps
+*backup*.json
+personal_*.json
+
 # Large ephemeris files (uncomment if you prefer Skyfield to auto-download rather than track in git)
 # de421.bsp

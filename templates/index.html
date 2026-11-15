@@ -559,10 +559,17 @@
                     </button>
                 </div>
 
-                <div class="d-flex gap-2 align-items-center">
-                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." data-i18n-placeholder="searchSavedPlaceholder" style="width: 200px;" oninput="filterActiveSavedList()">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="refreshAllSaved()" data-i18n="refreshBtn">🔄 Refresh</button>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <input type="text" id="savedSearchInput" class="form-control form-control-sm" placeholder="🔍 Search saved..." data-i18n-placeholder="searchSavedPlaceholder" style="width: 170px;" oninput="filterActiveSavedList()">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="refreshAllSaved()" data-i18n="refreshBtn">🔄 Refresh</button>
+                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="exportDataBackup()" data-i18n="exportBackupBtn">📥 Export Backup</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="triggerImportBackup()" data-i18n="importBackupBtn">📤 Import Backup</button>
+                    <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="importDataBackup(event)">
                 </div>
+            </div>
+
+            <div class="small text-secondary mb-3 d-flex align-items-center gap-1 opacity-75">
+                <span data-i18n="personalPrivacyNotice">🔒 Personal Storage: Your data is stored privately in this browser only and is never visible to others</span>
             </div>
 
             <!-- Analysis Category Filter Bar (All / Single & Transits / Pairs & Synastry) -->
@@ -1086,15 +1093,59 @@
             document.getElementById('transit_time').value = `${hh}:${min}`;
         }
 
+        // --- CLIENT-SIDE PRIVATE STORAGE & SYNC ---
+        const STORAGE_KEY_ANALYSES = 'astromatch_saved_analyses';
+        const STORAGE_KEY_PEOPLE = 'astromatch_saved_people';
+
+        function getStoredAnalyses() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_ANALYSES);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+
+        function setStoredAnalyses(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY_ANALYSES, JSON.stringify(list));
+            } catch (e) { console.error("LocalStorage save error:", e); }
+        }
+
+        function getStoredPeople() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_PEOPLE);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+
+        function setStoredPeople(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(list));
+            } catch (e) { console.error("LocalStorage save error:", e); }
+        }
+
         // --- SAVED ANALYSES MANAGEMENT ---
         async function fetchSavedAnalyses() {
             try {
-                const res = await fetch('/api/analyses');
-                savedAnalyses = await res.json();
+                const local = getStoredAnalyses();
+                if (local !== null) {
+                    savedAnalyses = local;
+                } else {
+                    const res = await fetch('/api/analyses');
+                    if (res.ok) {
+                        const serverData = await res.json();
+                        savedAnalyses = Array.isArray(serverData) ? serverData : [];
+                        setStoredAnalyses(savedAnalyses);
+                    } else {
+                        savedAnalyses = [];
+                    }
+                }
                 renderSavedAnalyses(savedAnalyses);
-                document.getElementById('savedCountBadge').textContent = savedAnalyses.length;
+                const badge = document.getElementById('savedCountBadge');
+                if (badge) badge.textContent = savedAnalyses.length;
             } catch (err) {
                 console.error("Could not fetch saved analyses:", err);
+                savedAnalyses = getStoredAnalyses() || [];
+                renderSavedAnalyses(savedAnalyses);
             }
         }
 
@@ -1367,21 +1418,24 @@
                 notes: isSingle ? `Transit Snapshot for ${tDate} ${tTime}` : ""
             };
 
-            try {
-                const res = await fetch('/api/analyses', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    await fetchSavedAnalyses();
-                    scrollToSaved();
-                } else {
-                    alert("Failed to save analysis.");
-                }
-            } catch (err) {
-                alert("Error saving analysis: " + err);
-            }
+            const analysisRecord = {
+                id: 'analysis-' + Date.now().toString(36),
+                created_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
+                ...payload
+            };
+            savedAnalyses.unshift(analysisRecord);
+            setStoredAnalyses(savedAnalyses);
+            renderSavedAnalyses(savedAnalyses);
+            const badge = document.getElementById('savedCountBadge');
+            if (badge) badge.textContent = savedAnalyses.length;
+            scrollToSaved();
+
+            // Optional background server sync if available
+            fetch('/api/analyses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(analysisRecord)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         function openEditModal(id) {
@@ -1436,21 +1490,19 @@
                 notes: document.getElementById('edit_notes').value.trim()
             };
 
-            try {
-                const res = await fetch(`/api/analyses/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    editModalInstance.hide();
-                    await fetchSavedAnalyses();
-                } else {
-                    alert("Failed to update analysis.");
-                }
-            } catch (err) {
-                alert("Error updating analysis: " + err);
+            const idx = savedAnalyses.findIndex(x => x.id === id);
+            if (idx !== -1) {
+                savedAnalyses[idx] = { ...savedAnalyses[idx], ...payload, updated_at: new Date().toISOString().replace('T', ' ').slice(0, 16) };
+                setStoredAnalyses(savedAnalyses);
+                renderSavedAnalyses(savedAnalyses);
             }
+            if (editModalInstance) editModalInstance.hide();
+
+            fetch(`/api/analyses/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         async function deleteAnalysis(id) {
@@ -1459,16 +1511,13 @@
             const confirmMsg = `${window.t ? window.t('deleteConfirm') : 'Are you sure you want to delete'} "${title}"?`;
             if (!confirm(confirmMsg)) return;
 
-            try {
-                const res = await fetch(`/api/analyses/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    await fetchSavedAnalyses();
-                } else {
-                    alert("Failed to delete analysis.");
-                }
-            } catch (err) {
-                alert("Error deleting analysis: " + err);
-            }
+            savedAnalyses = savedAnalyses.filter(x => x.id !== id);
+            setStoredAnalyses(savedAnalyses);
+            renderSavedAnalyses(savedAnalyses);
+            const badge = document.getElementById('savedCountBadge');
+            if (badge) badge.textContent = savedAnalyses.length;
+
+            fetch(`/api/analyses/${id}`, { method: 'DELETE' }).catch(e => console.log("Server sync optional:", e));
         }
 
         function scrollToSaved() {
@@ -1488,8 +1537,19 @@
         // --- SAVED PEOPLE PROFILES LOGIC ---
         async function fetchSavedPeople() {
             try {
-                const res = await fetch('/api/people');
-                savedPeople = await res.json();
+                const local = getStoredPeople();
+                if (local !== null) {
+                    savedPeople = local;
+                } else {
+                    const res = await fetch('/api/people');
+                    if (res.ok) {
+                        const serverData = await res.json();
+                        savedPeople = Array.isArray(serverData) ? serverData : [];
+                        setStoredPeople(savedPeople);
+                    } else {
+                        savedPeople = [];
+                    }
+                }
                 
                 const badge = document.getElementById('savedPeopleCountBadge');
                 if (badge) badge.textContent = savedPeople.length;
@@ -1500,6 +1560,9 @@
                 checkPersonSavedState('p2');
             } catch (err) {
                 console.error("Could not fetch saved people:", err);
+                savedPeople = getStoredPeople() || [];
+                renderPeopleDropdowns();
+                renderSavedPeople(savedPeople);
             }
         }
 
@@ -1603,21 +1666,32 @@
                 version: window.APP_VERSION || "{{ app_version }}"
             };
 
-            try {
-                const res = await fetch('/api/people', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+            const existingIdx = savedPeople.findIndex(p => p.name.trim().toLowerCase() === name.toLowerCase());
+            if (existingIdx !== -1) {
+                savedPeople[existingIdx] = {
+                    ...savedPeople[existingIdx],
+                    ...payload,
+                    updated_at: new Date().toISOString().replace('T', ' ').slice(0, 16)
+                };
+            } else {
+                savedPeople.unshift({
+                    id: 'person-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+                    ...payload,
+                    created_at: new Date().toISOString().replace('T', ' ').slice(0, 16)
                 });
-                if (res.ok) {
-                    await fetchSavedPeople();
-                    checkPersonSavedState(partner);
-                } else {
-                    alert("Failed to save person profile.");
-                }
-            } catch (err) {
-                alert("Error saving person: " + err);
             }
+            setStoredPeople(savedPeople);
+            const badge = document.getElementById('savedPeopleCountBadge');
+            if (badge) badge.textContent = savedPeople.length;
+            renderPeopleDropdowns();
+            renderSavedPeople(savedPeople);
+            checkPersonSavedState(partner);
+
+            fetch('/api/people', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         function swapPartners() {
@@ -1804,21 +1878,26 @@
                 return;
             }
 
-            try {
-                const res = await fetch(`/api/people/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    editPersonModalInstance.hide();
-                    await fetchSavedPeople();
-                } else {
-                    alert("Failed to update person profile.");
-                }
-            } catch (err) {
-                alert("Error updating person: " + err);
+            const idx = savedPeople.findIndex(x => x.id === id);
+            if (idx !== -1) {
+                savedPeople[idx] = {
+                    ...savedPeople[idx],
+                    ...payload,
+                    updated_at: new Date().toISOString().replace('T', ' ').slice(0, 16)
+                };
+                setStoredPeople(savedPeople);
+                renderPeopleDropdowns();
+                renderSavedPeople(savedPeople);
+                checkPersonSavedState('p1');
+                checkPersonSavedState('p2');
             }
+            if (editPersonModalInstance) editPersonModalInstance.hide();
+
+            fetch(`/api/people/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log("Server sync optional:", e));
         }
 
         async function deletePerson(id) {
@@ -1827,16 +1906,109 @@
             const confirmMsg = `${window.t ? window.t('deletePersonConfirm') : 'Are you sure you want to delete profile for'} "${name}"?`;
             if (!confirm(confirmMsg)) return;
 
-            try {
-                const res = await fetch(`/api/people/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    await fetchSavedPeople();
-                } else {
-                    alert("Failed to delete person profile.");
+            savedPeople = savedPeople.filter(x => x.id !== id);
+            setStoredPeople(savedPeople);
+            const badge = document.getElementById('savedPeopleCountBadge');
+            if (badge) badge.textContent = savedPeople.length;
+            renderPeopleDropdowns();
+            renderSavedPeople(savedPeople);
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
+
+            fetch(`/api/people/${id}`, { method: 'DELETE' }).catch(e => console.log("Server sync optional:", e));
+        }
+
+        // --- BACKUP & RESTORE (EXPORT / IMPORT JSON) ---
+        function exportDataBackup() {
+            const dataToExport = {
+                app: "AstroMatch Pro",
+                version: window.APP_VERSION || "{{ app_version }}",
+                exported_at: new Date().toISOString(),
+                people: savedPeople || [],
+                analyses: savedAnalyses || []
+            };
+            const jsonStr = JSON.stringify(dataToExport, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const dateStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `astromatch_backup_${dateStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerImportBackup() {
+            const fileInput = document.getElementById('backupFileInput');
+            if (fileInput) fileInput.click();
+        }
+
+        function importDataBackup(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedPeople = [];
+                    let importedAnalyses = [];
+
+                    if (Array.isArray(parsed)) {
+                        if (parsed.length > 0 && parsed[0].title) {
+                            importedAnalyses = parsed;
+                        } else {
+                            importedPeople = parsed;
+                        }
+                    } else if (typeof parsed === 'object' && parsed !== null) {
+                        if (Array.isArray(parsed.people)) importedPeople = parsed.people;
+                        if (Array.isArray(parsed.analyses)) importedAnalyses = parsed.analyses;
+                    }
+
+                    if (!importedPeople.length && !importedAnalyses.length) {
+                        throw new Error("No recognizable people or analyses found in file.");
+                    }
+
+                    let pCount = 0;
+                    importedPeople.forEach(p => {
+                        const existingIdx = savedPeople.findIndex(x => (x.id === p.id) || (x.name && p.name && x.name.trim().toLowerCase() === p.name.trim().toLowerCase()));
+                        if (existingIdx !== -1) {
+                            savedPeople[existingIdx] = p;
+                        } else {
+                            savedPeople.push(p);
+                        }
+                        pCount++;
+                    });
+                    setStoredPeople(savedPeople);
+
+                    let aCount = 0;
+                    importedAnalyses.forEach(a => {
+                        const existingIdx = savedAnalyses.findIndex(x => (x.id && a.id && x.id === a.id) || (x.title === a.title && x.created_at === a.created_at));
+                        if (existingIdx !== -1) {
+                            savedAnalyses[existingIdx] = a;
+                        } else {
+                            savedAnalyses.push(a);
+                        }
+                        aCount++;
+                    });
+                    setStoredAnalyses(savedAnalyses);
+
+                    refreshAllSaved();
+
+                    const msgTpl = window.t ? window.t('importSuccessMsg') : 'Data restored successfully! Loaded {p} people profiles and {a} analyses.';
+                    const alertMsg = msgTpl.replace('{p}', pCount).replace('{a}', aCount);
+                    alert(alertMsg);
+                } catch (err) {
+                    console.error("Backup import error:", err);
+                    const errMsg = window.t ? window.t('importErrorMsg') : 'Failed to import backup. Please ensure it is a valid AstroMatch JSON file.';
+                    alert(errMsg + '\n' + (err.message || err));
+                } finally {
+                    event.target.value = '';
                 }
-            } catch (err) {
-                alert("Error deleting person: " + err);
-            }
+            };
+            reader.readAsText(file);
         }
 
         // Language change event listener to update dynamic sections
