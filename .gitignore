@@ -59,5 +59,9 @@ ehthumbs.db
 !.vscode/tasks.json
 .idea/
 
+# Chat exports & generation scripts
+chat_*.html
+build_chat_html.py
+
 # Large ephemeris files (uncomment if you prefer Skyfield to auto-download rather than track in git)
 # de421.bsp
