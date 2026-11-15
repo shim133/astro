@@ -325,6 +325,9 @@
             </p>
 
             <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+                <button type="button" class="btn btn-action-pill border-info text-info" onclick="openHelpModal()" data-i18n="helpBtn">
+                    ❓ Help &amp; Astrological Guide
+                </button>
                 <button type="button" class="btn btn-action-pill border-warning text-warning" onclick="loadElonSpaceX()" data-i18n="loadElonBtn">
                     🧪 Load Blind Test: Elon Musk + SpaceX
                 </button>
@@ -562,6 +565,20 @@
                 </div>
             </div>
 
+            <!-- Analysis Category Filter Bar (All / Single & Transits / Pairs & Synastry) -->
+            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap" id="analysesFilterBar">
+                <span class="text-secondary small me-1">🔍 <span data-i18n="filterAspects">Filter:</span></span>
+                <button type="button" class="btn btn-xs btn-outline-warning rounded-pill px-3 active" id="filterBtnAll" onclick="setAnalysisTypeFilter('all')">
+                    <span data-i18n="filterAllAnalyses">All</span> (<span id="countFilterAll">0</span>)
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-3" id="filterBtnSingle" onclick="setAnalysisTypeFilter('single_transit')">
+                    <span data-i18n="filterSingleTransits">👤 Single &amp; Transits</span> (<span id="countFilterSingle">0</span>)
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-3" id="filterBtnPairs" onclick="setAnalysisTypeFilter('synastry')">
+                    <span data-i18n="filterCoupleSynastry">👥 Pairs &amp; Synastry</span> (<span id="countFilterPairs">0</span>)
+                </button>
+            </div>
+
             <!-- Couple Analyses Container -->
             <div id="savedAnalysesContainer" class="row g-3">
                 <div class="text-center py-4 text-secondary">
@@ -720,6 +737,132 @@
         </div>
     </div>
 
+    <!-- Help & Professional Astrological Guide Modal -->
+    <div class="modal fade" id="helpGuideModal" tabindex="-1" aria-labelledby="helpGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content glass-card border border-warning border-opacity-25 text-light" style="background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(18px);">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <h5 class="modal-title cinzel text-warning d-flex align-items-center gap-2" id="helpGuideModalLabel">
+                        📖 <span data-i18n="helpModalTitle">Professional User &amp; Astrological Guide (v2.5.1)</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" style="line-height: 1.75; font-size: 0.92rem;">
+                    <!-- Guide Navigation Tabs -->
+                    <ul class="nav nav-pills mb-3 border-bottom border-secondary border-opacity-25 pb-2 gap-1" id="guideTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active btn-sm rounded-pill" id="guide-tab-single-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-single" type="button">
+                                👤 Single &amp; Transits
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-synastry-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-synastry" type="button">
+                                👥 Synastry &amp; Pairs
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-concepts-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-concepts" type="button">
+                                🧭 Key Concepts (ASC, MC, Nodes)
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-blind-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-blind" type="button">
+                                🕵️ Blind Mode
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-snapshots-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-snapshots" type="button">
+                                💾 Snapshots &amp; Filters
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="guideTabContent">
+                        <!-- Tab 1: Single & Transits -->
+                        <div class="tab-pane fade show active" id="guide-tab-single">
+                            <h6 class="text-warning fw-bold mb-2">👤 מצב ניתוח אישי ומעברי שמיים / Single Entity &amp; Transits</h6>
+                            <p class="text-secondary mb-2">
+                                <strong>האם חייבים להזין בן/בת זוג ב׳?</strong><br>
+                                לא! אם משאירים את בן/בת זוג ב׳ ריק (או מזינים רק אדם יחיד כמו אילון מאסק, SA או YS), האפליקציה עוברת באופן אוטומטי ל<strong>מצב ניתוח אישי ומעברי שמיים (Single Entity &amp; Transit Alignment Mode)</strong>.
+                            </p>
+                            <div class="p-3 rounded mb-3" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b;">
+                                <strong class="text-warning">🔍 מדוע ראיתם קודם 98% מול תאריך המעברים (Current Sky)?</strong><br>
+                                <span class="text-secondary small">
+                                    בגרסה 2.5.0, כאשר הוזן אדם יחיד, המערכת בדקה את מפת השמיים כיום בתור "בן זוג" והריצה עליו חישוב התאמה זוגי רומנטי (ולכן נכתב "דירוג התאמה 98% / פוטנציאל לנפשות תאומות / כימיה רומנטית").<br>
+                                    <strong>בגרסה 2.5.1 זה תוקן לחלוטין:</strong> אדם יחיד מוצג עם <strong>מדד תהודת מעברים קוסמית (Cosmic Transit Resonance)</strong> עם מדדי מומנטום פעיל, מיקוד מנטלי, איזון רגשי, עמידות ביצועית ושפע — ללא מושגים זוגיים שאינם רלוונטיים!
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Synastry & Pairs -->
+                        <div class="tab-pane fade" id="guide-tab-synastry">
+                            <h6 class="text-warning fw-bold mb-2">👥 סינסטריה והתאמה זוגית ועסקית / Synastry &amp; Entity Interactions</h6>
+                            <p class="text-secondary mb-2">
+                                כאשר מזינים שני אנשים, או אדם וחברה (כמו במקרה הבוחן של אילון מאסק ו-SpaceX), המערכת מחשבת סינסטריה מלאה:
+                            </p>
+                            <ul class="text-secondary small mb-3">
+                                <li><strong>אלגוריתם ניקוד מאוזן (גרסה 2.5.1):</strong> משקלל את היחס האמיתי בין היבטים הרמוניים (טריין, סקסטיל, צמידות מטיבה) להיבטים מאתגרים (ריבוע, מולות).</li>
+                                <li><strong>עדיפות לכוכבים אישיים:</strong> שמש, ירח, ונוס, מארס ואופק מקבלים משקל כפול מול כוכבים דוריים חיצוניים (אורנוס, נפטון, פלוטו) כדי למנוע אינפלציית ציונים פיקטיבית.</li>
+                                <li><strong>מדדי שותפות עסקית (Power &amp; Wealth):</strong> נמדדים לפי היבטים לרום השמיים (MC), בתים 10, 2 ו-8 וחיבורי מאדים-פלוטו-יופיטר.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Tab 3: Key Concepts -->
+                        <div class="tab-pane fade" id="guide-tab-concepts">
+                            <h6 class="text-warning fw-bold mb-2">🧭 מושגי יסוד באסטרולוגיה מקצועית / Core Astrological Concepts</h6>
+                            <div class="row g-2 text-secondary small">
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-white">🧭 אופק עולה (Ascendant / ASC):</strong><br>
+                                    נקודת המפגש המזרחית ברגע הלידה המדויק. מייצג את "מערכת ההפעלה" הראשונית, חזות האדם והאופן שבו הוא יוזם ופוגש את המציאות.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-warning">👑 שליט המפה (Chart Ruler):</strong><br>
+                                    הכוכב השולט במזל האופק. זהו "הקברניט" המנווט את כל מפת הלידה, ומיקומו בבית ובמזל מגדיר את הזירה המרכזית של הגורל וההתפתחות.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-info">🏛️ רום שמיים (Midheaven / MC):</strong><br>
+                                    הנקודה הגבוהה ביותר בשמיים (פסגת בית 10). מציינת את שיא ההישגים, השאיפות המקצועיות, המוניטין והייעוד החברתי.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong style="color: #c084fc;">☊ ראש הדרקון (North Node):</strong><br>
+                                    המצפן האבולוציוני של הנשמה. מורה על כיוון הצמיחה העתידי והאתגרים שנועדו להוביל להתעלות אישית.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 4: Blind Mode -->
+                        <div class="tab-pane fade" id="guide-tab-blind">
+                            <h6 class="text-warning fw-bold mb-2">🕵️ מצב מבחן עיוור / Blind Mode Deduction</h6>
+                            <p class="text-secondary small mb-2">
+                                כפתור <strong>"מצב עיוור"</strong> מסתיר את השמות האמיתיים ומאפשר לראות את כוחה הטהור של האסטרולוגיה:
+                            </p>
+                            <p class="text-secondary small mb-0">
+                                כיצד אסטרולוג מומחה, ללא ידיעת שם האדם או הרקע שלו, מסוגל להסיק בדיוק מוחלט תכונות מנהיגות קיצוניות, דחף הנדסי וטכנולוגי, מוטת שליטה וחזון עולמי (כפי שמוצג במקרה הבוחן של אילון מאסק).
+                            </p>
+                        </div>
+
+                        <!-- Tab 5: Snapshots & Filters -->
+                        <div class="tab-pane fade" id="guide-tab-snapshots">
+                            <h6 class="text-warning fw-bold mb-2">💾 שמירת תמונות מצב ומניעת בלגן / Snapshots &amp; Filtered Database</h6>
+                            <p class="text-secondary small mb-2">
+                                כדי למנוע ערבוב ובלגן בין ניתוחי יחיד לניתוחי זוגות:
+                            </p>
+                            <ul class="text-secondary small mb-0">
+                                <li><strong>שמירת תמונת מצב לתאריך:</strong> בעת ניתוח אדם יחיד, לחיצה על "שמור לניתוחים שלי" שומרת תמונת מצב מדויקת עם תאריך ושעת המעברים.</li>
+                                <li><strong>סינון חכם במאגר:</strong> בעמוד הראשי נוספו כפתורי סינון — <code>הכל</code>, <code>👤 אישי ומעברים לתאריך</code> ו-<code>👥 זוגות ושותפויות</code> המאפשרים למצוא כל ניתוח ברגע.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" data-bs-dismiss="modal">
+                        סגור / Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS for modal -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -730,6 +873,14 @@
         let currentSavedTab = 'analyses';
         let editModalInstance = null;
         let editPersonModalInstance = null;
+        let helpModalInstance = null;
+
+        function openHelpModal() {
+            if (!helpModalInstance) {
+                helpModalInstance = new bootstrap.Modal(document.getElementById('helpGuideModal'));
+            }
+            helpModalInstance.show();
+        }
 
         // Fetch Curated Cities Database
         async function loadCities() {
@@ -947,11 +1098,71 @@
             }
         }
 
+        let currentAnalysisFilter = 'all';
+
+        function isItemSingleTransit(item) {
+            if (!item) return false;
+            if (item.type === 'single_transit') return true;
+            if (item.type === 'synastry') return false;
+            const p2 = item.p2 || {};
+            const p2Name = (p2.name || '').trim();
+            return (!p2Name || p2Name.includes('Current Sky'));
+        }
+
+        function setAnalysisTypeFilter(type) {
+            currentAnalysisFilter = type;
+            const btnAll = document.getElementById('filterBtnAll');
+            const btnSingle = document.getElementById('filterBtnSingle');
+            const btnPairs = document.getElementById('filterBtnPairs');
+
+            [btnAll, btnSingle, btnPairs].forEach(b => {
+                if (b) {
+                    b.classList.remove('btn-outline-warning', 'btn-outline-secondary', 'active');
+                    b.classList.add('btn-outline-secondary');
+                }
+            });
+
+            if (type === 'all' && btnAll) {
+                btnAll.classList.remove('btn-outline-secondary');
+                btnAll.classList.add('btn-outline-warning', 'active');
+            } else if (type === 'single_transit' && btnSingle) {
+                btnSingle.classList.remove('btn-outline-secondary');
+                btnSingle.classList.add('btn-outline-warning', 'active');
+            } else if (type === 'synastry' && btnPairs) {
+                btnPairs.classList.remove('btn-outline-secondary');
+                btnPairs.classList.add('btn-outline-warning', 'active');
+            }
+            filterActiveSavedList();
+        }
+
+        function updateAnalysisFilterCounts() {
+            if (!savedAnalyses) return;
+            const singleCount = savedAnalyses.filter(x => isItemSingleTransit(x)).length;
+            const pairsCount = savedAnalyses.filter(x => !isItemSingleTransit(x)).length;
+            
+            const elAll = document.getElementById('countFilterAll');
+            const elSingle = document.getElementById('countFilterSingle');
+            const elPairs = document.getElementById('countFilterPairs');
+            if (elAll) elAll.textContent = savedAnalyses.length;
+            if (elSingle) elSingle.textContent = singleCount;
+            if (elPairs) elPairs.textContent = pairsCount;
+        }
+
         function renderSavedAnalyses(list) {
+            updateAnalysisFilterCounts();
             const container = document.getElementById('savedAnalysesContainer');
-            if (!list || list.length === 0) {
-                const noSavedText = window.t ? window.t('noSavedYet') : 'No saved analyses yet.';
-                const noSavedSubText = window.t ? window.t('noSavedSub') : 'Fill in the form above and click "Save to My Analyses" to store couple profiles.';
+
+            // Apply category filter
+            let filteredList = list || [];
+            if (currentAnalysisFilter === 'single_transit') {
+                filteredList = filteredList.filter(x => isItemSingleTransit(x));
+            } else if (currentAnalysisFilter === 'synastry') {
+                filteredList = filteredList.filter(x => !isItemSingleTransit(x));
+            }
+
+            if (!filteredList || filteredList.length === 0) {
+                const noSavedText = window.t ? window.t('noSavedYet') : 'No saved analyses match this filter.';
+                const noSavedSubText = window.t ? window.t('noSavedSub') : 'Fill in the form above and click "Save to My Analyses" to store profiles or transit snapshots.';
                 container.innerHTML = `
                     <div class="col-12 text-center py-5 text-secondary">
                         <div style="font-size: 2rem;">📭</div>
@@ -963,42 +1174,60 @@
             }
 
             container.innerHTML = '';
-            list.forEach(item => {
+            filteredList.forEach(item => {
                 const col = document.createElement('div');
                 col.className = 'col-lg-6';
 
                 const p1 = item.p1 || {};
                 const p2 = item.p2 || {};
-                const versionNum = item.version || window.APP_VERSION || '2.2.0';
+                const isSingle = isItemSingleTransit(item);
+                const versionNum = item.version || window.APP_VERSION || '2.5.1';
                 const loadBtnText = window.t ? window.t('loadIntoForm') : '📥 Load into Form';
                 const editBtnText = window.t ? window.t('editBtn') : '✏️ Edit';
                 const deleteBtnText = window.t ? window.t('deleteBtn') : '🗑️ Delete';
                 const p1Label = p1.name || (window.t ? window.t('partnerA') : 'Partner A');
                 const p2Label = p2.name || (window.t ? window.t('partnerB') : 'Partner B');
 
+                const typeBadge = isSingle
+                    ? `<span class="badge bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25 small">👤 ${window.t ? window.t('snapshotBadgeSingle') : 'Single & Transits'}</span>`
+                    : `<span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25 small">👥 ${window.t ? window.t('snapshotBadgePair') : 'Couple Synastry'}</span>`;
+
+                const entityContent = isSingle ? `
+                    <div class="p-2 rounded mb-3 mt-1" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--p1-color); font-size: 0.85rem;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong style="color: var(--p1-color); font-size: 0.95rem;">${escapeHtml(p1Label)}</strong>
+                            <span class="badge bg-secondary bg-opacity-35 text-warning">🌍 ${escapeHtml(item.transit_date || '')} ${escapeHtml(item.transit_time || '')}</span>
+                        </div>
+                        <div class="text-secondary small">📅 ${p1.date || 'N/A'} ${p1.time || ''} · 📍 ${escapeHtml(p1.city || 'N/A')} (${p1.tz || ''})</div>
+                    </div>
+                ` : `
+                    <div class="row g-2 mb-3 mt-1" style="font-size: 0.85rem;">
+                        <div class="col-6 p-2 rounded" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--p1-color);">
+                            <strong style="color: var(--p1-color)">${escapeHtml(p1Label)}</strong>
+                            <div class="text-secondary small">📅 ${p1.date || 'N/A'} ${p1.time || ''}</div>
+                            <div class="text-secondary small text-truncate">📍 ${escapeHtml(p1.city || 'N/A')}</div>
+                        </div>
+                        <div class="col-6 p-2 rounded" style="background: rgba(244, 114, 182, 0.08); border-left: 3px solid var(--p2-color);">
+                            <strong style="color: var(--p2-color)">${escapeHtml(p2Label)}</strong>
+                            <div class="text-secondary small">📅 ${p2.date || 'N/A'} ${p2.time || ''}</div>
+                            <div class="text-secondary small text-truncate">📍 ${escapeHtml(p2.city || 'N/A')}</div>
+                        </div>
+                    </div>
+                `;
+
                 col.innerHTML = `
                     <div class="saved-analysis-card h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="cinzel text-warning mb-0" style="font-size: 1.15rem;">${escapeHtml(item.title)}</h5>
+                            <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-1">
+                                <h5 class="cinzel text-warning mb-0" style="font-size: 1.12rem;">${escapeHtml(item.title)}</h5>
                                 <div class="d-flex align-items-center gap-1">
+                                    ${typeBadge}
                                     <span class="badge bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25 font-monospace small" title="Program Version Used">v${versionNum}</span>
                                     <span class="badge bg-secondary bg-opacity-25 text-muted small">${item.created_at || ''}</span>
                                 </div>
                             </div>
 
-                            <div class="row g-2 mb-3 mt-1" style="font-size: 0.85rem;">
-                                <div class="col-6 p-2 rounded" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--p1-color);">
-                                    <strong style="color: var(--p1-color)">${escapeHtml(p1Label)}</strong>
-                                    <div class="text-secondary small">📅 ${p1.date || 'N/A'} ${p1.time || ''}</div>
-                                    <div class="text-secondary small text-truncate">📍 ${escapeHtml(p1.city || 'N/A')}</div>
-                                </div>
-                                <div class="col-6 p-2 rounded" style="background: rgba(244, 114, 182, 0.08); border-left: 3px solid var(--p2-color);">
-                                    <strong style="color: var(--p2-color)">${escapeHtml(p2Label)}</strong>
-                                    <div class="text-secondary small">📅 ${p2.date || 'N/A'} ${p2.time || ''}</div>
-                                    <div class="text-secondary small text-truncate">📍 ${escapeHtml(p2.city || 'N/A')}</div>
-                                </div>
-                            </div>
+                            ${entityContent}
 
                             ${item.notes ? `<p class="text-secondary small mb-3 italic"><em>"${escapeHtml(item.notes)}"</em></p>` : ''}
                         </div>
@@ -1046,6 +1275,7 @@
 
             const p1 = item.p1 || {};
             const p2 = item.p2 || {};
+            const isSingle = isItemSingleTransit(item);
 
             document.getElementById('p1_name').value = p1.name || '';
             document.getElementById('p1_date').value = p1.date || '';
@@ -1054,12 +1284,30 @@
             document.getElementById('p1_tz').value = p1.tz || '+03:00';
             onCitySelected('p1_city', 'p1_tz', 'p1_city_status');
 
-            document.getElementById('p2_name').value = p2.name || '';
-            document.getElementById('p2_date').value = p2.date || '';
-            document.getElementById('p2_time').value = p2.time || '12:00';
-            document.getElementById('p2_city').value = p2.city || '';
-            document.getElementById('p2_tz').value = p2.tz || '-05:00';
-            onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            if (isSingle) {
+                document.getElementById('p2_name').value = '';
+                document.getElementById('p2_date').value = '';
+                document.getElementById('p2_time').value = '12:00';
+                document.getElementById('p2_city').value = '';
+                document.getElementById('p2_tz').value = '+03:00';
+            } else {
+                document.getElementById('p2_name').value = p2.name || '';
+                document.getElementById('p2_date').value = p2.date || '';
+                document.getElementById('p2_time').value = p2.time || '12:00';
+                document.getElementById('p2_city').value = p2.city || '';
+                document.getElementById('p2_tz').value = p2.tz || '-05:00';
+                onCitySelected('p2_city', 'p2_tz', 'p2_city_status');
+            }
+
+            if (item.transit_date && document.getElementById('transit_date')) {
+                document.getElementById('transit_date').value = item.transit_date;
+            }
+            if (item.transit_time && document.getElementById('transit_time')) {
+                document.getElementById('transit_time').value = item.transit_time;
+            }
+
+            checkPersonSavedState('p1');
+            checkPersonSavedState('p2');
 
             // Smooth scroll up to form
             document.getElementById('astroForm').scrollIntoView({ behavior: 'smooth' });
@@ -1076,18 +1324,31 @@
             const p1_name = document.getElementById('p1_name').value.trim();
             const p2_name = document.getElementById('p2_name').value.trim();
 
-            if (!p1_name || !p2_name) {
-                alert(window.t ? window.t('fillNamesAlert') : "Please fill in at least Partner A and Partner B names before saving.");
+            if (!p1_name) {
+                alert(window.t ? window.t('enterNameAlert') || "Please enter at least Partner A's name before saving." : "Please enter at least Partner A's name before saving.");
                 return;
             }
 
-            const defaultTitle = `${p1_name} & ${p2_name}`;
-            const promptMsg = window.t ? window.t('promptTitle') : "Enter a title for this saved analysis:";
+            const tDate = document.getElementById('transit_date') ? document.getElementById('transit_date').value : '';
+            const tTime = document.getElementById('transit_time') ? document.getElementById('transit_time').value : '';
+            const isSingle = !p2_name;
+
+            let defaultTitle = `${p1_name} & ${p2_name}`;
+            if (isSingle) {
+                defaultTitle = `${p1_name} — Transit Snapshot (${tDate || 'Current Sky'})`;
+            }
+
+            const promptMsg = isSingle
+                ? (window.t ? window.t('saveTransitSnapshot') : "Enter title for this transit snapshot:")
+                : (window.t ? window.t('promptTitle') : "Enter a title for this saved analysis:");
             const title = prompt(promptMsg, defaultTitle);
             if (title === null) return; // user cancelled
 
             const payload = {
                 title: title.trim() || defaultTitle,
+                type: isSingle ? "single_transit" : "synastry",
+                transit_date: tDate,
+                transit_time: tTime,
                 version: window.APP_VERSION || "{{ app_version }}",
                 p1: {
                     name: p1_name,
@@ -1096,14 +1357,14 @@
                     city: document.getElementById('p1_city').value,
                     tz: document.getElementById('p1_tz').value
                 },
-                p2: {
+                p2: isSingle ? {} : {
                     name: p2_name,
                     date: document.getElementById('p2_date').value,
                     time: document.getElementById('p2_time').value,
                     city: document.getElementById('p2_city').value,
                     tz: document.getElementById('p2_tz').value
                 },
-                notes: ""
+                notes: isSingle ? `Transit Snapshot for ${tDate} ${tTime}` : ""
             };
 
             try {

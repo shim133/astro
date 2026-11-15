@@ -14,8 +14,8 @@ DEFAULT_CONV_ID = '6ca4c9ae-3b8c-4305-90d1-698625680a3e'
 
 SESSION_METADATA = {
     '6ca4c9ae': {
-        'filename': 'chat_astromatch_v250_expert_astrologist_6ca4c9ae.html',
-        'title': 'AstroMatch Pro v2.5.0: Expert Astrologist Engine, Blind Portrait, Transits & Elon Musk Verification',
+        'filename': 'chat_astromatch_v251_expert_astrologist_6ca4c9ae.html',
+        'title': 'AstroMatch Pro v2.5.1: Single & Transit Mode, Balanced Synastry, Help Guide & Snapshot DB',
     },
     '6b1072ff': {
         'filename': 'chat_astromatch_v220_v241_foundation_6b1072ff.html',

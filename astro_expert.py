@@ -1046,6 +1046,118 @@ def compute_transits_report(natal_sys, transit_sys, transit_date_str, get_house_
     }
 
 
+def compute_single_entity_transit_resonance(natal_sys, transits_report):
+    """
+    Computes professional transit resonance metrics for a single individual or company,
+    measuring active planetary triggers, momentum, mental clarity, grounding,
+    resilience, executive ambition, and opportunity flow for the transit date.
+    """
+    aspects = transits_report.get("transit_aspects", [])
+
+    # Base scores start at balanced neutrality
+    raw_momentum = 50.0
+    raw_clarity = 55.0
+    raw_grounding = 55.0
+    raw_resilience = 55.0
+    raw_executive = 50.0
+    raw_opportunity = 50.0
+
+    harm_count = 0
+    dynam_count = 0
+    total_impact = 0.0
+
+    for asp in aspects:
+        t_p = asp["t_planet"]
+        n_p = asp["n_planet"]
+        orb = asp["orb"]
+        tightness = max(0.1, 1.0 - (orb / 4.5))
+        nature = asp["nature"]
+        imp = asp.get("importance", 5.0)
+
+        pair = {t_p, n_p}
+        delta = imp * tightness * (1.15 if nature == "harmonious" else 0.85)
+        raw_momentum += delta
+        total_impact += delta
+
+        if nature == "harmonious":
+            harm_count += 1
+        else:
+            dynam_count += 1
+
+        # Domain breakdowns
+        if pair & {"Mercury", "Uranus"}:
+            raw_clarity += (7.5 * tightness) if nature == "harmonious" else (-3.0 * tightness)
+        elif pair & {"Sun", "Jupiter"}:
+            raw_clarity += (4.5 * tightness) if nature == "harmonious" else (1.0 * tightness)
+
+        if pair & {"Moon", "Neptune"}:
+            raw_grounding += (8.0 * tightness) if nature == "harmonious" else (-4.5 * tightness)
+        elif pair & {"Venus"}:
+            raw_grounding += (5.0 * tightness) if nature == "harmonious" else (-2.0 * tightness)
+
+        if pair & {"Saturn", "Pluto"}:
+            raw_resilience += (8.5 * tightness) if nature == "harmonious" else (4.0 * tightness)
+        elif pair & {"Mars"}:
+            raw_resilience += (4.0 * tightness)
+
+        if pair & {"Mars", "Midheaven", "Sun"}:
+            raw_executive += (9.0 * tightness) if nature == "harmonious" else (5.5 * tightness)
+        elif pair & {"Pluto"}:
+            raw_executive += (5.5 * tightness)
+
+        if pair & {"Jupiter", "Venus", "North Node"}:
+            raw_opportunity += (9.5 * tightness) if nature == "harmonious" else (2.0 * tightness)
+
+    def clamp(v):
+        return int(max(30, min(97, round(v))))
+
+    momentum_pct = clamp(raw_momentum)
+    clarity_pct = clamp(raw_clarity)
+    grounding_pct = clamp(raw_grounding)
+    resilience_pct = clamp(raw_resilience)
+    executive_pct = clamp(raw_executive)
+    opportunity_pct = clamp(raw_opportunity)
+
+    if total_impact == 0:
+        overall_pct = 50
+    else:
+        harmony_factor = harm_count / (harm_count + dynam_count) if (harm_count + dynam_count) > 0 else 0.5
+        overall_pct = clamp(42 + (harmony_factor * 33) + min(22, total_impact * 0.38))
+
+    if overall_pct >= 85:
+        verdict_key = "transit_high_alignment"
+        verdict_en = "Peak Cosmic Momentum: Highly supportive transit angles trigger your core natal configuration, creating rare windows for decisive strategic advancement, luck, and recognition."
+        verdict_he = "מומנטום קוסמי בשיאו: מעברי כוכבים הרמוניים מפעילים את צירי המפה המרכזיים, ופותחים חלון הזדמנויות נדיר ליוזמה, פריצת דרך, שפע והתרחבות."
+    elif overall_pct >= 70:
+        verdict_key = "transit_positive_flow"
+        verdict_en = "Dynamic Astrological Alignment: Solid planetary tailwinds support proactive endeavors. Favorable transit aspects outshine temporary pressures."
+        verdict_he = "תהודה אסטרולוגית חיובית ויוצרת: רוח גבית פלנטרית תומכת בקידום תוכניות ויוזמות. היבטי הזדמנות גוברים על עומסים זמניים."
+    elif overall_pct >= 55:
+        verdict_key = "transit_growth_catalyst"
+        verdict_en = "Constructive Tension & Transformation: Active transit challenges push you beyond comfort zones, testing endurance and demanding strategic adaptability."
+        verdict_he = "מתח בונה וטרנספורמציה: מעברי השמיים מאתגרים אזורי נוחות ומאיצים התפתחות אישית, תוך דרישה לסבלנות, התמדה וגמישות אסטרטגית."
+    else:
+        verdict_key = "transit_recalibration"
+        verdict_en = "Karmic Consolidation & Focus: Planetary friction calls for inner discipline, reflection, and careful conservation of vital resources before launching major new ventures."
+        verdict_he = "כיול מחדש וחיזוק יסודות: אתגרי מעבר קוראים למשמעת פנימית, התבוננות מעמיקה ושמירה על אנרגיה לקראת השלב הבא."
+
+    return {
+        "overall_resonance_pct": overall_pct,
+        "momentum_score": momentum_pct,
+        "clarity_score": clarity_pct,
+        "grounding_score": grounding_pct,
+        "resilience_score": resilience_pct,
+        "executive_score": executive_pct,
+        "opportunity_score": opportunity_pct,
+        "active_aspects_count": len(aspects),
+        "harmonious_count": harm_count,
+        "challenging_count": dynam_count,
+        "verdict_key": verdict_key,
+        "verdict_en": verdict_en,
+        "verdict_he": verdict_he
+    }
+
+
 def build_interaction_dossier(c1_sys, c2_sys, synastry_sys, name1, name2, get_house_fn):
     """
     Build expert 2-Entity Interaction analysis (for 2 People, Person + Company, or 2 Companies),

@@ -12,13 +12,14 @@ from astro_expert import (
     get_dignity,
     build_expert_natal_dossier,
     compute_transits_report,
+    compute_single_entity_transit_resonance,
     build_interaction_dossier,
     ELON_MUSK_CASE_STUDY,
 )
 
 app = Flask(__name__)
 
-APP_VERSION = "2.5.0"
+APP_VERSION = "2.5.1"
 
 # --- FILE PATHS & DATA LOADING ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,33 +48,61 @@ def find_city_in_db(city_str):
             return c
     return None
 
+def get_storage_path(filename):
+    """
+    Returns path for reading/writing JSON state.
+    On Vercel (or read-only environments), copies to /tmp so writes succeed.
+    """
+    local_path = os.path.join(BASE_DIR, filename)
+    if os.environ.get("VERCEL") or not os.access(BASE_DIR, os.W_OK):
+        tmp_dir = os.environ.get("TMPDIR", "/tmp")
+        tmp_path = os.path.join(tmp_dir, filename)
+        if not os.path.exists(tmp_path) and os.path.exists(local_path):
+            try:
+                import shutil
+                shutil.copyfile(local_path, tmp_path)
+            except Exception:
+                pass
+        return tmp_path if os.path.exists(tmp_path) else local_path
+    return local_path
+
 def load_saved_analyses():
-    if not os.path.exists(SAVED_ANALYSES_FILE):
+    target = get_storage_path('saved_analyses.json')
+    if not os.path.exists(target):
         return []
     try:
-        with open(SAVED_ANALYSES_FILE, 'r', encoding='utf-8') as f:
+        with open(target, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as err:
-        print(f"Error reading {SAVED_ANALYSES_FILE}: {err}")
+        print(f"Error reading {target}: {err}")
         return []
 
 def save_analyses_to_file(data):
-    with open(SAVED_ANALYSES_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    target = get_storage_path('saved_analyses.json')
+    try:
+        with open(target, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as err:
+        print(f"Notice: Could not write to {target} (environment may be read-only): {err}")
 
 def load_saved_people():
-    if not os.path.exists(SAVED_PEOPLE_FILE):
+    target = get_storage_path('saved_people.json')
+    if not os.path.exists(target):
         return []
     try:
-        with open(SAVED_PEOPLE_FILE, 'r', encoding='utf-8') as f:
+        with open(target, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as err:
-        print(f"Error reading {SAVED_PEOPLE_FILE}: {err}")
+        print(f"Error reading {target}: {err}")
         return []
 
 def save_people_to_file(data):
-    with open(SAVED_PEOPLE_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    target = get_storage_path('saved_people.json')
+    try:
+        with open(target, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as err:
+        print(f"Notice: Could not write to {target} (environment may be read-only): {err}")
 
 def upsert_person_record(person_data):
     """Helper to save or update an individual person profile in saved_people.json."""
@@ -127,8 +156,9 @@ ctx.verify_mode = ssl.CERT_NONE
 geolocator = Nominatim(user_agent="astro_match_pro_v3", ssl_context=ctx)
 
 # Load NASA Ephemeris
-print("Loading NASA Ephemeris data (de421.bsp)...")
-eph = load('de421.bsp')
+DE421_PATH = os.path.join(BASE_DIR, 'de421.bsp')
+print(f"Loading NASA Ephemeris data ({DE421_PATH})...")
+eph = load(DE421_PATH)
 earth = eph['earth']
 
 # --- ASTROLOGICAL METADATA ---
@@ -573,11 +603,13 @@ def _calculate_synastry_single(c1_sys, c2_sys, name1="Entity A", name2="Entity B
         pts2.append(c2_sys["north_node"])
     
     raw_score = 0.0
-    category_scores = {
-        "chemistry": 50.0,
-        "emotional": 50.0,
-        "intellectual": 50.0,
-        "stability": 50.0
+    pos_weighted_score = 0.0
+    neg_weighted_score = 0.0
+    cat_tracker = {
+        "chemistry": {"pos": 6.0, "neg": 6.0},
+        "emotional": {"pos": 6.0, "neg": 6.0},
+        "intellectual": {"pos": 6.0, "neg": 6.0},
+        "stability": {"pos": 6.0, "neg": 6.0}
     }
     
     for p1 in pts1:
@@ -604,22 +636,35 @@ def _calculate_synastry_single(c1_sys, c2_sys, name1="Entity A", name2="Entity B
                         aspect_key = f"generic-{asp_name}"
                         meaning = f"Dynamic planetary link: {p1['name']} {asp_name} {p2['name']} creates active energy exchange between {p1['name']}'s drive and {p2['name']}'s essence."
                     
-                    # Point calculation
-                    weight = PLANETS_CONFIG.get(p1['name'], {}).get('weight', 0.9) * \
-                             PLANETS_CONFIG.get(p2['name'], {}).get('weight', 0.9)
+                    # Point calculation with personal planet weighting
+                    w1 = 1.4 if p1['name'] in ['Sun', 'Moon', 'Venus', 'Mars', 'Ascendant'] else (1.0 if p1['name'] in ['Mercury', 'Jupiter', 'Saturn', 'Midheaven'] else 0.5)
+                    w2 = 1.4 if p2['name'] in ['Sun', 'Moon', 'Venus', 'Mars', 'Ascendant'] else (1.0 if p2['name'] in ['Mercury', 'Jupiter', 'Saturn', 'Midheaven'] else 0.5)
+                    weight = w1 * w2
                     pt = asp_cfg["base_points"] * tightness * weight
+                    abs_pt = abs(asp_cfg["base_points"]) * tightness * weight
                     raw_score += pt
-                    
-                    # Categorized impact
+
                     pair_names = {p1['name'], p2['name']}
-                    if pair_names & {'Venus', 'Mars'}:
-                        category_scores["chemistry"] += pt * 1.5
-                    if pair_names & {'Moon', 'Neptune', 'Sun'}:
-                        category_scores["emotional"] += pt * 1.3
-                    if pair_names & {'Mercury', 'Uranus'}:
-                        category_scores["intellectual"] += pt * 1.4
-                    if pair_names & {'Saturn', 'Jupiter', 'Ascendant', 'Midheaven', 'North Node'}:
-                        category_scores["stability"] += pt * 1.3
+                    if asp_cfg["nature"] == "harmonious":
+                        pos_weighted_score += abs_pt
+                        if pair_names & {'Venus', 'Mars'}:
+                            cat_tracker["chemistry"]["pos"] += abs_pt * 1.5
+                        if pair_names & {'Moon', 'Neptune', 'Sun'}:
+                            cat_tracker["emotional"]["pos"] += abs_pt * 1.3
+                        if pair_names & {'Mercury', 'Uranus'}:
+                            cat_tracker["intellectual"]["pos"] += abs_pt * 1.4
+                        if pair_names & {'Saturn', 'Jupiter', 'Ascendant', 'Midheaven', 'North Node'}:
+                            cat_tracker["stability"]["pos"] += abs_pt * 1.3
+                    else:
+                        neg_weighted_score += abs_pt * 1.15
+                        if pair_names & {'Venus', 'Mars'}:
+                            cat_tracker["chemistry"]["neg"] += abs_pt * 1.5
+                        if pair_names & {'Moon', 'Neptune', 'Sun'}:
+                            cat_tracker["emotional"]["neg"] += abs_pt * 1.3
+                        if pair_names & {'Mercury', 'Uranus'}:
+                            cat_tracker["intellectual"]["neg"] += abs_pt * 1.4
+                        if pair_names & {'Saturn', 'Jupiter', 'Ascendant', 'Midheaven', 'North Node'}:
+                            cat_tracker["stability"]["neg"] += abs_pt * 1.3
                     
                     aspects.append({
                         "p1_planet": p1["name"],
@@ -645,15 +690,18 @@ def _calculate_synastry_single(c1_sys, c2_sys, name1="Entity A", name2="Entity B
     # Sort aspects by tightness
     aspects.sort(key=lambda x: x["orb"])
     
-    # Normalize scores between 20 and 99%
+    # Normalize scores between 25 and 98% based on true harmonic-to-tension ratio
     def clamp_score(val):
         return int(max(25, min(98, round(val))))
         
-    overall_pct = clamp_score(50 + (raw_score * 0.9))
-    chemistry_pct = clamp_score(category_scores["chemistry"])
-    emotional_pct = clamp_score(category_scores["emotional"])
-    intellectual_pct = clamp_score(category_scores["intellectual"])
-    stability_pct = clamp_score(category_scores["stability"])
+    tot_weight = pos_weighted_score + neg_weighted_score
+    harmony_ratio = (pos_weighted_score / tot_weight) if tot_weight > 0 else 0.5
+    overall_pct = clamp_score(25 + (harmony_ratio * 72))
+
+    chemistry_pct = clamp_score(25 + ((cat_tracker["chemistry"]["pos"] / (cat_tracker["chemistry"]["pos"] + cat_tracker["chemistry"]["neg"])) * 72))
+    emotional_pct = clamp_score(25 + ((cat_tracker["emotional"]["pos"] / (cat_tracker["emotional"]["pos"] + cat_tracker["emotional"]["neg"])) * 72))
+    intellectual_pct = clamp_score(25 + ((cat_tracker["intellectual"]["pos"] / (cat_tracker["intellectual"]["pos"] + cat_tracker["intellectual"]["neg"])) * 72))
+    stability_pct = clamp_score(25 + ((cat_tracker["stability"]["pos"] / (cat_tracker["stability"]["pos"] + cat_tracker["stability"]["neg"])) * 72))
     
     # Overall summary verdict
     if overall_pct >= 85:
@@ -765,7 +813,8 @@ def analyze():
         # Allow single-entity analysis by falling back to Current Sky if Partner B is left blank
         p2_name_raw = request.form.get('p2_name', '').strip()
         p2_date_raw = request.form.get('p2_date', '').strip()
-        if p2_name_raw and p2_date_raw:
+        is_single_entity = not (p2_name_raw and p2_date_raw)
+        if not is_single_entity:
             p2_inputs = {
                 'name': p2_name_raw,
                 'date_str': p2_date_raw,
@@ -785,6 +834,7 @@ def analyze():
         # Calculate individual charts
         chart1 = compute_chart(**p1_inputs)
         chart2 = compute_chart(**p2_inputs)
+        chart2["is_current_sky"] = is_single_entity
         
         # Calculate Synastry / Entity Interaction
         synastry = calculate_synastry(chart1, chart2)
@@ -792,12 +842,22 @@ def analyze():
         # Calculate Current Date Transits
         transits = calculate_transits(chart1, chart2, transit_date, transit_time)
         
+        # Calculate Single Entity Transit Resonance & Forecast if in single-entity mode
+        single_resonance = None
+        if is_single_entity:
+            single_resonance = compute_single_entity_transit_resonance(
+                chart1["systems"]["tropical"],
+                transits["systems"]["tropical"]["p1"]
+            )
+        
         # Bundle everything for frontend visualization
         payload = {
             "chart1": chart1,
             "chart2": chart2,
             "synastry": synastry,
             "transits": transits,
+            "is_single_entity": is_single_entity,
+            "single_resonance": single_resonance,
             "elon_case_study": ELON_MUSK_CASE_STUDY,
             "zodiac_data": ZODIAC_DATA
         }
@@ -808,6 +868,8 @@ def analyze():
             p2=chart2,
             synastry=synastry,
             transits=transits,
+            is_single_entity=is_single_entity,
+            single_resonance=single_resonance,
             elon_case_study=ELON_MUSK_CASE_STUDY,
             payload_json=json.dumps(payload),
             app_version=APP_VERSION
@@ -913,23 +975,47 @@ def api_save_analysis():
         
         saved = load_saved_analyses()
         analysis_id = str(uuid.uuid4())[:8]
+        p2_data = data.get("p2", {})
+        p2_name = str(p2_data.get("name", "")).strip()
+
+        # Deduce analysis type: 'single_transit' vs 'synastry'
+        if data.get("type"):
+            analysis_type = data.get("type")
+        elif not p2_name or "Current Sky" in p2_name:
+            analysis_type = "single_transit"
+        else:
+            analysis_type = "synastry"
+
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        transit_date = data.get("transit_date") or datetime.now().strftime("%Y-%m-%d")
+        transit_time = data.get("transit_time") or datetime.now().strftime("%H:%M")
+
+        p1_name = str(data.get("p1", {}).get("name", "Individual")).strip()
+        if analysis_type == "single_transit":
+            default_title = f"{p1_name} — Transit Snapshot ({transit_date})"
+        else:
+            default_title = f"{p1_name} & {p2_name or 'Partner B'}"
+
         new_item = {
             "id": f"match-{analysis_id}",
-            "title": data.get("title") or f"{data.get('p1', {}).get('name', 'Partner A')} & {data.get('p2', {}).get('name', 'Partner B')}",
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "type": analysis_type,
+            "title": data.get("title") or default_title,
+            "created_at": now_str,
+            "transit_date": transit_date,
+            "transit_time": transit_time,
             "version": data.get("version") or APP_VERSION,
             "p1": data.get("p1", {}),
-            "p2": data.get("p2", {}),
+            "p2": p2_data if analysis_type != "single_transit" else {},
             "notes": data.get("notes", "")
         }
         saved.insert(0, new_item)
         save_analyses_to_file(saved)
         
-        # Also ensure Partner A and Partner B are registered/synced in saved_people.json
+        # Also ensure Partner A is synced in saved_people.json; sync Partner B only if real person
         if data.get("p1") and data["p1"].get("name"):
             upsert_person_record(data["p1"])
-        if data.get("p2") and data["p2"].get("name"):
-            upsert_person_record(data["p2"])
+        if analysis_type != "single_transit" and p2_name and "Current Sky" not in p2_name:
+            upsert_person_record(p2_data)
 
         return jsonify({"success": True, "analysis": new_item}), 201
     except Exception as err:

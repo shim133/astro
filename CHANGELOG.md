@@ -5,6 +5,35 @@ All notable changes to the **AstroMatch Pro** project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2026-11-05
+
+### Added
+- **Dedicated Single Entity & Daily Transit Alignment Mode (`is_single_entity`)**:
+  - Automatically activates when Partner B is left blank or when analyzing a single entity alone (e.g., Elon Musk, SA, or YS).
+  - Replaces romantic couple synastry with the **Cosmic Transit Resonance Index (מדד תהודת מעברים קוסמית לתאריך)**.
+  - Computes 6 personalized daily transit influence metrics:
+    - ⚡ **Active Transit Momentum** (`מומנטום מעברים פעיל`)
+    - 💡 **Mental Focus & Clarity** (`מיקוד ובהירות מחשבתית`)
+    - 🌊 **Emotional Grounding & Balance** (`איזון רגשי ורווחה אישית`)
+    - 🏛️ **Resilience & Structural Discipline** (`יציבות ועמידות מול אתגרים`)
+    - 🚀 **Executive Drive & Ambition** (`עוצמה ביצועית ושאפתנות`)
+    - 💎 **Resource & Opportunity Flow** (`זרימת הזדמנויות ומשאבים`)
+  - Partner B card dynamically transforms into the **Current Sky Planetary Positions Card (`🌍 מיקום כוכבי השמיים כיום`)** showing active transit degrees and a 1-click `➕ Compare Partner` action.
+- **Interactive Help & Professional Astrological Guide (`❓ מדריך שימוש ואסטרולוגיה מקצועית`)**:
+  - Added a dedicated, bilingual Help Modal accessible from the navbar and hero header in both `index.html` and `result.html`.
+  - Comprehensive guide sections explaining Single Entity vs. Dual Synastry, why 98% compatibility appeared in previous versions, key chart axes (`Ascendant`, `Chart Ruler`, `Midheaven / MC`, `North Node`), Blind Portrait mode, and database snapshots.
+- **Saved Analyses Filtering & Transit Snapshot Database**:
+  - Added filter tabs in the Saved Analyses Manager: `🔘 All (הכל)`, `👤 Single & Transits (אישי ומעברים לתאריך)`, and `👥 Couples & Synastry (זוגות ושותפויות)`.
+  - Distinguishes snapshots cleanly with dedicated visual badges (`👤 Single & Transits` vs `👥 Couple Synastry`).
+  - Allows 1-click snapshot saving directly from both the calculator form and results page with smart auto-titling (`{Name} — Transit Snapshot ({Date})`).
+
+### Fixed
+- **Synastry Score Inflation Bug**:
+  - Fixed the mathematical calculation in `_calculate_synastry_single` where unnormalized positive aspect points were unconditionally added to a base of 50, causing almost every pair (including individuals compared to the current sky) to score 88%-98%.
+  - Replaced with a balanced **Harmonic-to-Tension Ratio** weighted by personal luminaries (`Sun`, `Moon`, `Venus`, `Mars`, `Ascendant`) vs generational outer planets (`Uranus`, `Neptune`, `Pluto`), producing realistic, nuanced scores (e.g., 65-75% for mixed pairs, 85-98% for rare harmonic alignment).
+- **Single Entity Current Sky Fallback Bug**:
+  - Fixed the issue where single entity submissions erroneously generated couple synastry and romantic compatibility ("Soulmate potential", "Romantic chemistry") with the sky of the current date.
+
 ## [2.5.0] - 2026-11-04
 
 ### Added

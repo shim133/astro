@@ -362,15 +362,25 @@
         <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 flex-wrap gap-2">
             <div>
                 <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill mb-1" data-i18n="newCalc">← New Calculation</a>
+                {% if is_single_entity %}
+                <h1 class="cinzel h3 text-white mb-0">
+                    <span class="entity-name-label" data-entity="p1" data-real-name="{{ p1.name }}" style="color: var(--p1-color)">{{ p1.name }}</span> 
+                    <span class="text-secondary">—</span> 
+                    <span class="text-warning">🌍 <span data-i18n="transitWeatherTitle">Transits</span> ({{ transits.date }})</span>
+                </h1>
+                <small class="text-muted"><span data-i18n="singleReportSubtitle">High-Precision Geocentric Natal Chart & Current Date Transit Analysis</span> · <span class="text-warning">🌍 {{ transits.date }} {{ transits.time }}</span></small>
+                {% else %}
                 <h1 class="cinzel h3 text-white mb-0">
                     <span class="entity-name-label" data-entity="p1" data-real-name="{{ p1.name }}" style="color: var(--p1-color)">{{ p1.name }}</span> 
                     <span class="text-secondary">&amp;</span> 
                     <span class="entity-name-label" data-entity="p2" data-real-name="{{ p2.name }}" style="color: var(--p2-color)">{{ p2.name }}</span>
                 </h1>
                 <small class="text-muted"><span data-i18n="reportSubtitle">High-Precision Geocentric Synastry Analysis</span> · <span class="text-warning">🌍 Transits: {{ transits.date }} {{ transits.time }}</span></small>
+                {% endif %}
             </div>
 
             <div class="d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" class="btn btn-export border-info text-info" onclick="openHelpModal()" data-i18n="helpBtn">❓ Help &amp; Astrological Guide</button>
                 <button type="button" id="blindModeBtn" class="btn btn-export border-warning text-warning" onclick="toggleBlindMode()" data-i18n="blindModeToggle">🕵️ Blind Mode (Hide Names &amp; Deduce Purely from Chart)</button>
                 <button type="button" class="btn btn-export" onclick="openEditCompareModal()" data-i18n="editDetailsCompareBtn">✏️ Edit Details / Compare Partner</button>
                 <button type="button" id="langToggleBtn" class="btn btn-export" onclick="toggleLanguage()">🌐 עברית (HE)</button>
@@ -385,6 +395,106 @@
             
             <!-- Overall Score & Verdict -->
             <div class="col-xl-4 col-lg-5">
+                {% if is_single_entity and single_resonance %}
+                <!-- Single Entity Transit Resonance & Alignment -->
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between" style="border-top: 3px solid #f59e0b;">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="cinzel text-uppercase tracking-wider text-warning" style="font-size: 0.85rem;" data-i18n="transitResonanceIndex">Cosmic Transit Resonance Index</span>
+                            <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1" style="font-size: 0.78rem;">{{ single_resonance.active_aspects_count }} <span data-i18n="aspectsCount">Transit Hits</span></span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-4 mb-4">
+                            <div class="score-circle" style="--score-pct: {{ single_resonance.overall_resonance_pct }};">
+                                <div class="score-circle-inner">
+                                    <span class="cinzel h2 mb-0 text-white font-weight-bold">{{ single_resonance.overall_resonance_pct }}</span>
+                                    <span class="text-muted" style="font-size: 0.7rem;">/ 100</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="h5 mb-1 text-white" data-i18n="transitAlignmentTitle">Transit Alignment</h4>
+                                <div class="text-secondary" style="font-size: 0.85rem;">
+                                    {% if single_resonance.overall_resonance_pct >= 80 %}
+                                        <span class="text-warning">✨ Peak Cosmic Momentum</span>
+                                    {% elif single_resonance.overall_resonance_pct >= 65 %}
+                                        <span class="text-info">💫 Dynamic Alignment &amp; Flow</span>
+                                    {% else %}
+                                        <span class="text-secondary">⚡ Constructive Growth Catalyst</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p id="synastryVerdictText" class="text-secondary mb-3" data-verdict-key="{{ single_resonance.verdict_key }}" data-default-verdict="{{ single_resonance.verdict_en }}" style="font-size: 0.88rem; line-height: 1.55;">
+                            {{ single_resonance.verdict_en }}
+                        </p>
+                    </div>
+
+                    <!-- Category Bars for Single Entity Transits -->
+                    <div class="pt-2 border-top border-secondary border-opacity-25">
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="activeMomentum">⚡ Active Transit Momentum</span>
+                                <span class="text-white">{{ single_resonance.momentum_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.momentum_score }}%; background: #f59e0b;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="mentalClarity">💡 Mental Focus &amp; Clarity</span>
+                                <span class="text-white">{{ single_resonance.clarity_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.clarity_score }}%; background: #38bdf8;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="emotionalBalance">🌊 Emotional Grounding &amp; Balance</span>
+                                <span class="text-white">{{ single_resonance.grounding_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.grounding_score }}%; background: #818cf8;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="resilienceSaturn">🏛️ Resilience &amp; Structural Discipline</span>
+                                <span class="text-white">{{ single_resonance.resilience_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.resilience_score }}%; background: #10b981;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="executiveAmbition">🚀 Executive Drive &amp; Ambition</span>
+                                <span class="text-white">{{ single_resonance.executive_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.executive_score }}%; background: #ef4444;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.78rem;">
+                                <span data-i18n="opportunityFlow">💎 Resource &amp; Opportunity Flow</span>
+                                <span class="text-white">{{ single_resonance.opportunity_score }}%</span>
+                            </div>
+                            <div class="metric-bar-wrap">
+                                <div class="metric-bar-fill" style="width: {{ single_resonance.opportunity_score }}%; background: #a855f7;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Dual Entity Synastry Score -->
                 <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -481,6 +591,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             <!-- Big Three Comparison -->
@@ -546,6 +657,25 @@
 
                     <!-- Partner B Profile -->
                     <div class="col-md-6">
+                        {% if is_single_entity %}
+                        <!-- Current Sky Transits Card -->
+                        <div class="glass-card p-4 h-100" style="border-top: 3px solid #f59e0b;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h3 class="h5 cinzel mb-0 text-warning" data-i18n="currentSkyPositions">🌍 Current Sky ({{ transits.date }})</h3>
+                                    </div>
+                                    <small class="text-muted">Real-Time Planetary Positions ({{ transits.date }} {{ transits.time }})</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-xs btn-outline-info py-0 px-2 rounded-pill" onclick="openEditCompareModal('p2')" style="font-size: 0.72rem;" title="Add or compare with a partner">
+                                        ➕ Compare Partner
+                                    </button>
+                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);" data-i18n="transitWeatherTitle">Transits</span>
+                                </div>
+                            </div>
+                        {% else %}
+                        <!-- Partner B Profile -->
                         <div class="glass-card p-4 h-100" style="border-top: 3px solid var(--p2-color);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
@@ -562,6 +692,7 @@
                                     <span class="badge" style="background: rgba(244, 114, 182, 0.15); color: var(--p2-color); border: 1px solid rgba(244, 114, 182, 0.3);" data-i18n="outerWheel">Outer Wheel</span>
                                 </div>
                             </div>
+                        {% endif %}
 
                             <div class="d-flex flex-column gap-2 mt-2">
                                 <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
@@ -616,33 +747,37 @@
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs mb-4 justify-content-center flex-wrap gap-1" id="mapTabs">
                 <li class="nav-item">
-                    <button class="nav-link active" id="tab-btn-synastry" onclick="switchMapMode('synastry')" data-i18n="tabBiWheel">
-                        🔮 Synastry Bi-Wheel
+                    <button class="nav-link {% if not is_single_entity %}active{% endif %}" id="tab-btn-synastry" onclick="switchMapMode('synastry')" data-i18n="tabBiWheel">
+                        🔮 {% if is_single_entity %}Transit Bi-Wheel (Natal ✕ Current Sky){% else %}Synastry Bi-Wheel{% endif %}
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link tab-natal-btn" id="tab-btn-natal1" data-partner="p1" data-name="{{ p1.name }}" onclick="switchMapMode('natal1')">
+                    <button class="nav-link tab-natal-btn {% if is_single_entity %}active{% endif %}" id="tab-btn-natal1" data-partner="p1" data-name="{{ p1.name }}" onclick="switchMapMode('natal1')">
                         🪐 {{ p1.name }}'s Natal Map
                     </button>
                 </li>
+                {% if not is_single_entity %}
                 <li class="nav-item">
                     <button class="nav-link tab-natal-btn" id="tab-btn-natal2" data-partner="p2" data-name="{{ p2.name }}" onclick="switchMapMode('natal2')">
                         🌙 {{ p2.name }}'s Natal Map
                     </button>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <button class="nav-link" id="tab-btn-transits1" onclick="switchMapMode('transits1')" data-i18n="tabTransitsP1">
                         🌍 Current Transits - Entity A
                     </button>
                 </li>
+                {% if not is_single_entity %}
                 <li class="nav-item">
                     <button class="nav-link" id="tab-btn-transits2" onclick="switchMapMode('transits2')" data-i18n="tabTransitsP2">
                         🌍 Current Transits - Entity B
                     </button>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <button class="nav-link" onclick="scrollToAspects()">
-                        📜 <span data-i18n="tabAspects">Aspect Catalog</span> ({{ synastry.aspects|length }})
+                        📜 <span data-i18n="tabAspects">Aspect Catalog</span> ({% if is_single_entity and single_resonance %}{{ single_resonance.active_aspects_count }}{% else %}{{ synastry.aspects|length }}{% endif %})
                     </button>
                 </li>
             </ul>
@@ -923,7 +1058,7 @@
             };
         }
 
-        let currentMode = 'synastry'; // 'synastry' | 'natal1' | 'natal2' | 'transits1' | 'transits2'
+        let currentMode = (astroData.is_single_entity) ? 'natal1' : 'synastry'; // 'synastry' | 'natal1' | 'natal2' | 'transits1' | 'transits2'
         let activeAspectFilter = 'all';
 
         const CX = 450;
@@ -2508,13 +2643,30 @@
         // Save Current Analysis
         async function saveCurrentAnalysis() {
             const btn = document.getElementById('btnSaveAnalysis');
-            const defaultTitle = `${chart1.name} & ${chart2.name}`;
-            const promptMsg = window.t ? window.t('promptTitle') : "Enter a title to save this analysis:";
+            const isSingle = astroData.is_single_entity || false;
+            const tDate = (transits && transits.date) ? transits.date : '';
+            const tTime = (transits && transits.time) ? transits.time : '';
+            
+            let defaultTitle = `${chart1.name} & ${chart2.name}`;
+            if (isSingle) {
+                defaultTitle = `${chart1.name} — Transit Snapshot (${tDate})`;
+            }
+
+            const promptMsg = isSingle
+                ? (window.t ? window.t('saveTransitSnapshot') : "Enter title for this transit snapshot:")
+                : (window.t ? window.t('promptTitle') : "Enter a title to save this analysis:");
             const title = prompt(promptMsg, defaultTitle);
             if (title === null) return;
 
+            const resonanceScore = (astroData.single_resonance && astroData.single_resonance.overall_resonance_pct)
+                ? astroData.single_resonance.overall_resonance_pct
+                : 80;
+
             const payload = {
                 title: title.trim() || defaultTitle,
+                type: isSingle ? "single_transit" : "synastry",
+                transit_date: tDate,
+                transit_time: tTime,
                 version: window.APP_VERSION || "{{ app_version }}",
                 p1: {
                     name: chart1.name,
@@ -2523,14 +2675,16 @@
                     city: chart1.city,
                     tz: chart1.tz
                 },
-                p2: {
+                p2: isSingle ? {} : {
                     name: chart2.name,
                     date: chart2.date,
                     time: chart2.time,
                     city: chart2.city,
                     tz: chart2.tz
                 },
-                notes: `Compatibility Score: ${getActiveSynastry().overall_score}% (${getActiveSynastry().aspects.length} aspects) [${currentCoordSystem}]`
+                notes: isSingle
+                    ? `Transit Snapshot at ${tDate} ${tTime} · Cosmic Resonance: ${resonanceScore}% [${currentCoordSystem}]`
+                    : `Compatibility Score: ${getActiveSynastry().overall_score}% (${getActiveSynastry().aspects.length} aspects) [${currentCoordSystem}]`
             };
 
             try {
@@ -2720,6 +2874,132 @@
         </div>
     </div>
 
+    <!-- Help & Professional Astrological Guide Modal -->
+    <div class="modal fade" id="helpGuideModal" tabindex="-1" aria-labelledby="helpGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content glass-card border border-warning border-opacity-25 text-light" style="background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(18px);">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <h5 class="modal-title cinzel text-warning d-flex align-items-center gap-2" id="helpGuideModalLabel">
+                        📖 <span data-i18n="helpModalTitle">Professional User &amp; Astrological Guide (v2.5.1)</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" style="line-height: 1.75; font-size: 0.92rem;">
+                    <!-- Guide Navigation Tabs -->
+                    <ul class="nav nav-pills mb-3 border-bottom border-secondary border-opacity-25 pb-2 gap-1" id="guideTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active btn-sm rounded-pill" id="guide-tab-single-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-single" type="button">
+                                👤 Single &amp; Transits
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-synastry-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-synastry" type="button">
+                                👥 Synastry &amp; Pairs
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-concepts-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-concepts" type="button">
+                                🧭 Key Concepts (ASC, MC, Nodes)
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-blind-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-blind" type="button">
+                                🕵️ Blind Mode
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn-sm rounded-pill" id="guide-tab-snapshots-btn" data-bs-toggle="pill" data-bs-target="#guide-tab-snapshots" type="button">
+                                💾 Snapshots &amp; Filters
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="guideTabContent">
+                        <!-- Tab 1: Single & Transits -->
+                        <div class="tab-pane fade show active" id="guide-tab-single">
+                            <h6 class="text-warning fw-bold mb-2">👤 מצב ניתוח אישי ומעברי שמיים / Single Entity &amp; Transits</h6>
+                            <p class="text-secondary mb-2">
+                                <strong>האם חייבים להזין בן/בת זוג ב׳?</strong><br>
+                                לא! אם משאירים את בן/בת זוג ב׳ ריק (או מזינים רק אדם יחיד), האפליקציה עוברת באופן אוטומטי ל<strong>מצב ניתוח אישי ומעברי שמיים (Single Entity &amp; Transit Alignment Mode)</strong>.
+                            </p>
+                            <div class="p-3 rounded mb-3" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b;">
+                                <strong class="text-warning">🔍 מדוע ראיתם קודם 98% מול תאריך המעברים (Current Sky)?</strong><br>
+                                <span class="text-secondary small">
+                                    בגרסה 2.5.0, כאשר הוזן אדם יחיד, המערכת בדקה את מפת השמיים כיום בתור "בן זוג" והריצה עליו חישוב התאמה זוגי רומנטי (ולכן נכתב "דירוג התאמה 98% / פוטנציאל לנפשות תאומות / כימיה רומנטית").<br>
+                                    <strong>בגרסה 2.5.1 זה תוקן לחלוטין:</strong> אדם יחיד מוצג עם <strong>מדד תהודת מעברים קוסמית (Cosmic Transit Resonance)</strong> עם מדדי מומנטום פעיל, מיקוד מנטלי, איזון רגשי, עמידות ביצועית ושפע — ללא מושגים זוגיים שאינם רלוונטיים!
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Synastry & Pairs -->
+                        <div class="tab-pane fade" id="guide-tab-synastry">
+                            <h6 class="text-warning fw-bold mb-2">👥 סינסטריה והתאמה זוגית ועסקית / Synastry &amp; Entity Interactions</h6>
+                            <p class="text-secondary mb-2">
+                                כאשר מזינים שני אנשים, או אדם וחברה (כמו במקרה הבוחן של אילון מאסק ו-SpaceX), המערכת מחשבת סינסטריה מלאה:
+                            </p>
+                            <ul class="text-secondary small mb-3">
+                                <li><strong>אלגוריתם ניקוד מאוזן (גרסה 2.5.1):</strong> משקלל את היחס האמיתי בין היבטים הרמוניים (טריין, סקסטיל, צמידות מטיבה) להיבטים מאתגרים (ריבוע, מולות).</li>
+                                <li><strong>עדיפות לכוכבים אישיים:</strong> שמש, ירח, ונוס, מארס ואופק מקבלים משקל כפול מול כוכבים דוריים חיצוניים (אורנוס, נפטון, פלוטו) כדי למנוע אינפלציית ציונים פיקטיבית.</li>
+                                <li><strong>מדדי שותפות עסקית (Power &amp; Wealth):</strong> נמדדים לפי היבטים לרום השמיים (MC), בתים 10, 2 ו-8 וחיבורי מאדים-פלוטו-יופיטר.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Tab 3: Key Concepts -->
+                        <div class="tab-pane fade" id="guide-tab-concepts">
+                            <h6 class="text-warning fw-bold mb-2">🧭 מושגי יסוד באסטרולוגיה מקצועית / Core Astrological Concepts</h6>
+                            <div class="row g-2 text-secondary small">
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-white">🧭 אופק עולה (Ascendant / ASC):</strong><br>
+                                    נקודת המפגש המזרחית ברגע הלידה המדויק. מייצג את "מערכת ההפעלה" הראשונית, חזות האדם והאופן שבו הוא יוזם ופוגש את המציאות.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-warning">👑 שליט המפה (Chart Ruler):</strong><br>
+                                    הכוכב השולט במזל האופק. זהו "הקברניט" המנווט את כל מפת הלידה, ומיקומו בבית ובמזל מגדיר את הזירה המרכזית של הגורל וההתפתחות.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong class="text-info">🏛️ רום שמיים (Midheaven / MC):</strong><br>
+                                    הנקודה הגבוהה ביותר בשמיים (פסגת בית 10). מציינת את שיא ההישגים, השאיפות המקצועיות, המוניטין והייעוד החברתי.
+                                </div>
+                                <div class="col-md-6 p-2 rounded" style="background: rgba(255, 255, 255, 0.03);">
+                                    <strong style="color: #c084fc;">☊ ראש הדרקון (North Node):</strong><br>
+                                    המצפן האבולוציוני של הנשמה. מורה על כיוון הצמיחה העתידי והאתגרים שנועדו להוביל להתעלות אישית.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 4: Blind Mode -->
+                        <div class="tab-pane fade" id="guide-tab-blind">
+                            <h6 class="text-warning fw-bold mb-2">🕵️ מצב מבחן עיוור / Blind Mode Deduction</h6>
+                            <p class="text-secondary small mb-2">
+                                כפתור <strong>"מצב עיוור"</strong> מסתיר את השמות האמיתיים ומאפשר לראות את כוחה הטהור של האסטרולוגיה:
+                            </p>
+                            <p class="text-secondary small mb-0">
+                                כיצד אסטרולוג מומחה, ללא ידיעת שם האדם או הרקע שלו, מסוגל להסיק בדיוק מוחלט תכונות מנהיגות קיצוניות, דחף הנדסי וטכנולוגי, מוטת שליטה וחזון עולמי (כפי שמוצג במקרה הבוחן של אילון מאסק).
+                            </p>
+                        </div>
+
+                        <!-- Tab 5: Snapshots & Filters -->
+                        <div class="tab-pane fade" id="guide-tab-snapshots">
+                            <h6 class="text-warning fw-bold mb-2">💾 שמירת תמונות מצב ומניעת בלגן / Snapshots &amp; Filtered Database</h6>
+                            <p class="text-secondary small mb-2">
+                                כדי למנוע ערבוב ובלגן בין ניתוחי יחיד לניתוחי זוגות:
+                            </p>
+                            <ul class="text-secondary small mb-0">
+                                <li><strong>שמירת תמונת מצב לתאריך:</strong> בעת ניתוח אדם יחיד, לחיצה על "שמור לניתוחים שלי" שומרת תמונת מצב מדויקת עם תאריך ושעת המעברים.</li>
+                                <li><strong>סינון חכם במאגר:</strong> בעמוד הראשי נוספו כפתורי סינון — <code>הכל</code>, <code>👤 אישי ומעברים לתאריך</code> ו-<code>👥 זוגות ושותפויות</code> המאפשרים למצוא כל ניתוח ברגע.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" data-bs-dismiss="modal">
+                        סגור / Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS for modal support -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -2838,6 +3118,14 @@
                     if (sel) sel.focus();
                 }, 350);
             }
+        }
+
+        let helpModalInstance = null;
+        function openHelpModal() {
+            if (!helpModalInstance) {
+                helpModalInstance = new bootstrap.Modal(document.getElementById('helpGuideModal'));
+            }
+            helpModalInstance.show();
         }
 
         function escapeHtml(text) {

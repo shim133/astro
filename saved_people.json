@@ -5,10 +5,10 @@
     "date": "1974-02-20",
     "time": "19:00",
     "city": "Ramat Gan, Israel",
-    "tz": "+03:00",
+    "tz": "+02:00",
     "created_at": "2026-09-06 08:50",
-    "version": "2.3.0",
-    "updated_at": "2026-09-06 09:09"
+    "version": "2.5.1",
+    "updated_at": "2026-11-05 14:01"
   },
   {
     "id": "person-ys-860912",
@@ -38,7 +38,8 @@
     "city": "Pretoria, South Africa",
     "tz": "+02:00",
     "created_at": "2026-11-04 18:35",
-    "version": "2.5.0"
+    "version": "2.5.1",
+    "updated_at": "2026-11-05 14:00"
   },
   {
     "id": "entity-spacex-020314",

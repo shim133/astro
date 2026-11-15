@@ -9,11 +9,13 @@ export const TRANSLATIONS = {
     langName: 'עברית',
     flag: '🇮🇱',
     appTitle: 'אסטרו-מאץ׳ פרו',
-    engineBadge: 'מנוע נתוני נאס״א מדויק (v2.2.0)',
+    engineBadge: 'מנוע נתוני נאס״א מדויק (v2.5.1)',
     heroSubtitle: 'התאמה אסטרולוגית מקצועית ומפות סינסטריה אינטראקטיביות. חישוב אורך אקליפטי מדויק באמצעות Skyfield ומודל NASA DE421.',
     quickSample: '💫 דוגמה מהירה להתאמה',
     viewSaved: '📁 צפה בניתוחים שמורים',
     savedCountSuffix: 'שמורים',
+    helpBtn: '❓ מדריך שימוש ואסטרולוגיה',
+    helpModalTitle: '📖 מדריך מקצועי למשתמש — אסטרו-מאץ׳ פרו (v2.5.1)',
 
     // Partner A & B
     partnerA: 'בן/בת זוג א׳',
@@ -226,13 +228,37 @@ export const TRANSLATIONS = {
       water: 'מים'
     },
 
-    // Score Verdicts
+    // Score Verdicts (Synastry & Transits)
     scoreVerdicts: {
       verdict_85: 'זיקה קוסמית יוצאת דופן: הרמוניה מגנטית נדירה עם הבנה הדדית עמוקה וחיבור נשמתי מתמשך.',
       verdict_70: 'תהודה אסטרולוגית גבוהה: כימיה טבעית והיבטים תומכים המאפילים על הבדלים מינוריים.',
       verdict_55: 'קשר דינמי ומשלים: תשוקה משמעותית לצד הזדמנויות צמיחה הדורשות אמפתיה מודעת.',
-      verdict_0: 'זרז לצמיחה קארמתית: חיכוך אינטנסיבי ומזגים שונים; טרנספורמציה אישית משמעותית אם מטפחים תקשורת.'
+      verdict_0: 'זרז לצמיחה קארמתית: חיכוך אינטנסיבי ומזגים שונים; טרנספורמציה אישית משמעותית אם מטפחים תקשורת.',
+      transit_high_alignment: 'מומנטום קוסמי בשיאו: מעברי כוכבים הרמוניים מפעילים את צירי המפה המרכזיים, ופותחים חלון הזדמנויות נדיר ליוזמה, פריצת דרך, שפע והתרחבות.',
+      transit_positive_flow: 'תהודה אסטרולוגית חיובית ויוצרת: רוח גבית פלנטרית תומכת בקידום תוכניות ויוזמות. היבטי הזדמנות גוברים על עומסים זמניים.',
+      transit_growth_catalyst: 'מתח בונה וטרנספורמציה: מעברי השמיים מאתגרים אזורי נוחות ומאיצים התפתחות אישית, תוך דרישה לסבלנות, התמדה וגמישות אסטרטגית.',
+      transit_recalibration: 'כיול מחדש וחיזוק יסודות: אתגרי מעבר קוראים למשמעת פנימית, התבוננות מעמיקה ושמירה על אנרגיה לקראת השלב הבא.'
     },
+
+    // Single-Entity Transit Resonance & Filtering Keys
+    transitResonanceIndex: 'מדד תהודת מעברים קוסמית לתאריך',
+    transitAlignmentTitle: 'השפעת מעברי השמיים כיום',
+    activeTransitMomentum: 'מומנטום קוסמי פעיל',
+    singleReportSubtitle: 'ניתוח מפת לידה אישית ומעברי כוכבים מדויקים לתאריך הנבחר',
+    transitWeatherTitle: 'מעברים אסטרולוגיים',
+    currentSkyPositions: '🌍 מיקום כוכבי השמיים כיום',
+    filterAllAnalyses: 'הכל',
+    filterSingleTransits: '👤 אישי ומעברים לתאריך',
+    filterCoupleSynastry: '👥 זוגות ושותפויות',
+    snapshotBadgeSingle: 'אישי ומעברים',
+    snapshotBadgePair: 'סינסטריה זוגית',
+    saveTransitSnapshot: '📸 שמור תמונת מצב מעברים',
+    activeMomentum: '⚡ מומנטום והיבטי מעבר פעילים',
+    mentalClarity: '💡 מיקוד ובהירות מחשבתית',
+    emotionalBalance: '🌊 איזון רגשי ורווחה אישית',
+    resilienceSaturn: '🏛️ יציבות ועמידות מול אתגרים',
+    executiveAmbition: '🚀 עוצמה ביצועית ושאפתנות',
+    opportunityFlow: '💎 זרימת הזדמנויות ומשאבים',
 
     // Detailed Aspect Interpretations
     aspectMeanings: {
@@ -335,11 +361,13 @@ export const TRANSLATIONS = {
     langName: 'English',
     flag: '🇺🇸',
     appTitle: 'AstroMatch Pro',
-    engineBadge: 'Pure NASA Ephemeris Engine (v2.2.0)',
+    engineBadge: 'Pure NASA Ephemeris Engine (v2.5.1)',
     heroSubtitle: 'Professional Astrological Compatibility & Interactive Synastry Wheel Maps. Accurate geocentric ecliptic longitudes via Skyfield & NASA DE421.',
     quickSample: '💫 Quick Sample Match',
     viewSaved: '📁 View Saved Analyses',
     savedCountSuffix: 'Saved',
+    helpBtn: '❓ Help & Astrological Guide',
+    helpModalTitle: '📖 Professional User & Astrological Guide (v2.5.1)',
 
     // Partner A & B
     partnerA: 'Partner A',
@@ -552,13 +580,37 @@ export const TRANSLATIONS = {
       water: 'Water'
     },
 
-    // Score Verdicts
+    // Score Verdicts (Synastry & Transits)
     scoreVerdicts: {
       verdict_85: 'Exceptional Cosmic Affinity: Rare magnetic harmony with deep mutual understanding and lasting soul connection.',
       verdict_70: 'High Astrological Resonance: Natural chemistry and supportive aspects outshine minor differences.',
       verdict_55: 'Dynamic & Complementary Bond: Meaningful passion paired with growth opportunities that require conscious empathy.',
-      verdict_0: 'Karmic Growth Catalyst: Intense friction and distinct temperaments; great personal transformation if communication is nurtured.'
+      verdict_0: 'Karmic Growth Catalyst: Intense friction and distinct temperaments; great personal transformation if communication is nurtured.',
+      transit_high_alignment: 'Peak Cosmic Momentum: Highly supportive transit angles trigger your core natal configuration, creating rare windows for decisive strategic advancement, luck, and recognition.',
+      transit_positive_flow: 'Dynamic Astrological Alignment: Solid planetary tailwinds support proactive endeavors. Favorable transit aspects outshine temporary pressures.',
+      transit_growth_catalyst: 'Constructive Tension & Transformation: Active transit challenges push you beyond comfort zones, testing endurance and demanding strategic adaptability.',
+      transit_recalibration: 'Karmic Consolidation & Focus: Planetary friction calls for inner discipline, reflection, and careful conservation of vital resources before launching major new ventures.'
     },
+
+    // Single-Entity Transit Resonance & Filtering Keys
+    transitResonanceIndex: 'Cosmic Transit Resonance Index',
+    transitAlignmentTitle: 'Current Sky Transit Alignment',
+    activeTransitMomentum: 'Active Transit Momentum',
+    singleReportSubtitle: 'High-Precision Geocentric Natal Chart & Current Date Transit Analysis',
+    transitWeatherTitle: 'Astrological Transits',
+    currentSkyPositions: '🌍 Current Sky Planetary Positions',
+    filterAllAnalyses: 'All',
+    filterSingleTransits: '👤 Single & Transits',
+    filterCoupleSynastry: '👥 Couples & Synastry',
+    snapshotBadgeSingle: 'Single & Transits',
+    snapshotBadgePair: 'Couple Synastry',
+    saveTransitSnapshot: '📸 Save Transit Snapshot',
+    activeMomentum: '⚡ Active Transit Momentum',
+    mentalClarity: '💡 Mental Focus & Clarity',
+    emotionalBalance: '🌊 Emotional Grounding & Balance',
+    resilienceSaturn: '🏛️ Resilience & Structural Discipline',
+    executiveAmbition: '🚀 Executive Drive & Ambition',
+    opportunityFlow: '💎 Resource & Opportunity Flow',
 
     // Detailed Aspect Interpretations
     aspectMeanings: {

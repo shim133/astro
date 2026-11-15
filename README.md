@@ -1,14 +1,31 @@
-# AstroMatch Pro (v2.5.0)
+# AstroMatch Pro (v2.5.1)
 
-Professional-grade Astrological Compatibility (Synastry), Expert Natal & Transit Dossier, and Interactive Celestial Maps web application.
+Professional-grade Astrological Compatibility (Synastry), Single-Entity Transit Alignment & Cosmic Resonance, Expert Natal Dossier, and Interactive Celestial Maps web application.
 
-AstroMatch Pro calculates the precise astronomical positions of planets, lunar nodes, and cardinal angles for any two entities (people, companies, organizations, or historical events) as well as real-time **Current Date Transits**. It computes unequal Porphyry house cusps, Essential Dignities, Retrograde motion (`Rx`), Mutual Receptions, House Overlays, and Blind Astrological Portraits, visualizing them on interactive SVG Astrological Maps (Synastry Bi-Wheel, Natal Charts, and Current Transits Bi-Wheels).
+AstroMatch Pro calculates the precise astronomical positions of planets, lunar nodes, and cardinal angles for single individuals, couples, or entities (people, companies, organizations, or historical events) as well as real-time **Current Date Transits**. It computes unequal Porphyry house cusps, Essential Dignities, Retrograde motion (`Rx`), Mutual Receptions, House Overlays, and Blind Astrological Portraits, visualizing them on interactive SVG Astrological Maps (Synastry Bi-Wheel, Natal Charts, and Current Transits Bi-Wheels).
 
 ---
 
 ## Key Features
 
-- **Expert Astrologist Engine & Blind Portrait Synthesis (New in v2.5.0)**:
+- **Single Entity & Daily Transit Alignment Mode (New in v2.5.1)**:
+  - **No Need to Always Enter a Second Entity**: Analyze a single person or company alone against current (or custom date) planetary transits.
+  - **Cosmic Transit Resonance Index (`מדד תהודת מעברים קוסמית`)**: Replaces romantic couple compatibility with 6 individual transit influence areas: Active Transit Momentum, Mental Focus & Clarity, Emotional Grounding, Resilience & Structural Discipline, Executive Drive & Ambition, and Resource & Opportunity Flow.
+  - **Real-Time Sky Card**: Automatically displays the current planetary sky positions with a 1-click option to add or compare a partner.
+
+- **Balanced Synastry Scoring Engine (New in v2.5.1)**:
+  - **Non-Inflated, Realistic Compatibility Rating**: Eliminates score inflation by evaluating the weighted ratio of harmonious aspects (trines, sextiles, favorable conjunctions) versus challenging friction (squares, oppositions).
+  - **Personal Luminary Prioritization**: Personal points (`Sun`, `Moon`, `Venus`, `Mars`, `Ascendant`) carry high weight (1.4x-1.5x), while generational outer planets (`Uranus`, `Neptune`, `Pluto`) carry lower weight (0.5x).
+
+- **Interactive Help & Astrological Guide Modal (`❓ מדריך שימוש ואסטרולוגיה מקצועית`) (New in v2.5.1)**:
+  - Bilingual popup modal accessible from both the homepage and results view.
+  - In-depth, accessible explanations of Single Entity vs. Dual Synastry, why 98% compatibility appeared in previous versions, key chart axes (`Ascendant`, `Chart Ruler`, `Midheaven / MC`, `North Node`), Blind Portrait mode, and database snapshots.
+
+- **Saved Analyses Filtering & Transit Snapshot Database (New in v2.5.1)**:
+  - Avoids clutter with category filter pills in the Saved Analyses Manager: `🔘 All`, `👤 Single & Transits`, and `👥 Pairs & Synastry`.
+  - 1-click snapshot saving directly from both calculator forms and results pages, auto-tagged with transit date/time.
+
+- **Expert Astrologist Engine & Blind Portrait Synthesis (v2.5.0)**:
   - **אופק (Ascendant / Rising Sign) & Chart Ruler (שליט המפה)**: Deep analysis of the Rising Sign degree, its planetary ruler, and the house/sign where the Chart Ruler steers the life trajectory.
   - **Midheaven (רום שמיים - MC) & MC Ruler + Lunar North Node (ראש הדרקון ☊)**: Complete vocational and karmic destiny analysis.
   - **Retrograde (`Rx`), Daily Speed & Essential Dignities**: Full evaluation of apparent retrograde motion and planetary dignity (`Domicile`, `Exaltation`, `Detriment`, `Fall`, `Peregrine`).

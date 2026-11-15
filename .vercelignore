@@ -1,0 +1,8 @@
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.log
+build_chat_html.py
+chat_*.html
+
