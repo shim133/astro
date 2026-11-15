@@ -788,6 +788,7 @@ def calculate_transits(chart1, chart2, transit_date_str=None, transit_time_str=N
 
 # --- ROUTES ---
 @app.route('/', methods=['GET'])
+@app.route('/api/index', methods=['GET'])
 def index():
     now_date = datetime.now().strftime("%Y-%m-%d")
     now_time = datetime.now().strftime("%H:%M")
